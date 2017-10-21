@@ -45,7 +45,23 @@ int idt_test(){
 	return result;
 }
 
-// add more tests here
+/* Divide by 0 test
+ *
+ * Attempts to divide by zero
+ * Inputs: none
+ * Outputs: none
+ * Side Effects: none
+ * Coverage: IDT exception handler
+ * Files: idt.c
+ */
+void divide_zero_test()  {
+	TEST_HEADER;
+
+	int i = 1;
+	int j = 0;
+
+	int k = i/j;
+}
 
 /* Checkpoint 2 tests */
 /* Checkpoint 3 tests */
@@ -56,5 +72,7 @@ int idt_test(){
 /* Test suite entry point */
 void launch_tests(){
 	TEST_OUTPUT("idt_test", idt_test());
+	
 	// launch your tests here
+	divide_zero_test();
 }
