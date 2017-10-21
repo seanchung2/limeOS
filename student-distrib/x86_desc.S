@@ -10,6 +10,9 @@
 .globl gdt_desc, ldt_desc, tss_desc
 .globl tss, tss_desc_ptr, ldt, ldt_desc_ptr
 .globl gdt_ptr
+#Modify by Mark 10/21/2017
+.globl gdt_desc_ptr
+##########################
 .globl idt_desc_ptr, idt
 
 .align 4
@@ -90,6 +93,15 @@ ldt:
     .quad 0
     .endr
 ldt_bottom:
+
+#Mdoify by Mark 10/21/2017	
+.align 4
+    .word 0 # Padding
+gdt_desc_ptr:
+    .word gdt_bottom - gdt - 1
+    .long gdt	
+
+###########################	
 
 .align 4
     .word 0 # Padding

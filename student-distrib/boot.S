@@ -25,7 +25,19 @@ _start:
 
 continue:
     # Load the GDT
-
+	#Modify by Mark 10/21/2017
+	LGDT	gdt_desc_ptr
+	
+	#initial IDT
+	PUSHL	%eax
+	PUSHL	%ecx
+	PUSHL	%edx
+	call	init_idt
+	POPL	%edx
+	POPL	%ecx
+	POPL	%eax
+	##########################
+	
     # Load CS with the new descriptor value
     ljmp    $KERNEL_CS, $keep_going
 
