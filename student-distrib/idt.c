@@ -13,6 +13,9 @@
  */
 void init_idt()
 {
+	// load IDT
+	lidt(idt_desc_ptr);
+
 	int i;
 	
 	for (i=0;i<NUM_VEC;i++)
@@ -40,6 +43,7 @@ void init_idt()
 		}
 	}
 	
+	/* Sets runtime parameters for an IDT entry */
 	SET_IDT_ENTRY(idt[0], DE);
 	SET_IDT_ENTRY(idt[1], DB);
 	SET_IDT_ENTRY(idt[2], NMI);
@@ -59,8 +63,5 @@ void init_idt()
 	SET_IDT_ENTRY(idt[17], AC);
 	SET_IDT_ENTRY(idt[18], MC);
 	SET_IDT_ENTRY(idt[19], XF);
-
-
-	lidt(idt_desc_ptr);
 	
 }

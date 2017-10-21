@@ -77,8 +77,8 @@ int overflow_test()  {
 	TEST_HEADER;
 
 	int result = PASS;
-	int i = 100+ 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
-	i = 1;
+	//int i = 100+ 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
+	//i = 1;
 	return result;
 }
 
