@@ -2,28 +2,125 @@
 #include "x86_desc.h"
 #include "lib.h"
 #include "i8259.h"
+#include "idt.h"
 
-EXCEPTION_HANDLER(DE,"Divide Error!!!");
-EXCEPTION_HANDLER(DB,"RESERVED!!!");
-EXCEPTION_HANDLER(NMI,"Nonmaskable Interrupt Exception!!!");
-EXCEPTION_HANDLER(BP,"Breakpoint Exception!!!");
-EXCEPTION_HANDLER(OF,"Overflow Exception!!!");
-EXCEPTION_HANDLER(BR,"BOUND Range Exceeded Exception!!!");
-EXCEPTION_HANDLER(UD,"Invalid Opcode Exception!!!");
-EXCEPTION_HANDLER(NM,"Device Not Available Exception!!!");
-EXCEPTION_HANDLER(DF,"Double Fault Exception!!!");
-EXCEPTION_HANDLER(CSO,"Coprocessor Segment Overrun Exception!!!");
-EXCEPTION_HANDLER(TS,"Invalid TSS Exception!!!");
-EXCEPTION_HANDLER(NP,"Segment Not Present!!!");
-EXCEPTION_HANDLER(SS,"Stack-Segment Fault Exception!!!");
-EXCEPTION_HANDLER(GP,"General Protection Exception!!!");
-EXCEPTION_HANDLER(PF,"Page Fault Exception!!!");
-EXCEPTION_HANDLER(MF,"Floating Point Error Exception!!!");
-EXCEPTION_HANDLER(AC,"Alignment Check Exception!!!");
-EXCEPTION_HANDLER(MC,"Machine Check Exception!!!");
-EXCEPTION_HANDLER(XF,"SIMD Floating-Point Exception!!!");
+// Division Error Handler
+void DE()  {
+	printf("Divide Error!!!");
+	while(1) {}
+}
+
+// Reserved Exception Handler
+void DB()  {
+	printf("RESERVED!!!");
+	while(1) {}
+}
+
+// Non Maskable Interupt Handler
+void NMI()  {
+	printf("Nonmaskable Interrupt Exception!!!");
+	while(1) {}
+}
+
+// Breakpoint Exception Handler
+void BP()  {
+	printf("Breakpoint Exception!!!");
+	while(1) {}
+}
+
+// Overflow Exception Handler
+void OF()  {
+	printf("Overflow Exception!!!");
+	while(1) {}
+}
+
+// Bound Range Exceeded Exception Handler
+void BR()  {
+	printf("BOUND Range Exceeded Exception!!!");
+	while(1) {}
+}
+
+// Invalid Opcode Exception Handler
+void UD()  {
+	printf("Invalid Opcode Exception!!!");
+	while(1) {}
+}
+
+// Device Not Available Exception Handler
+void NM()  {
+	printf("Device Not Available Exception!!!");
+	while(1) {}
+}
+
+// Double Faut Exception Handler
+void DF()  {
+	printf("Double Fault Exception!!!");
+	while(1) {}
+}
+
+// Coprocessor Segment Overrun Exception Handler
+void CSO()  {
+	printf("Coprocessor Segment Overrun Exception!!!");
+	while(1) {}
+}
+
+// Invalid TSS Exception Handler
+void TS()  {
+	printf("Invalid TSS Exception!!!");
+	while(1) {}
+}
+
+// Segment Not Preset Exception Handler
+void NP()  {
+	printf("Segment Not Present!!!");
+	while(1) {}
+}
+
+// Stack-Segment Fault Exception Handler
+void SS()  {
+	printf("Stack-Segment Fault Exception!!!");
+	while(1) {}
+}
+
+// General Protetion Exception Handler
+void GP()  {
+	printf("General Protection Exception!!!");
+	while(1) {}
+}
 
 
+// Page Fault Exception Handler
+void PF()  {
+	printf("Page Fault Exception!!!");
+	while(1) {}
+}
+
+// Floating Point Error Exception Handler
+void MF()  {
+	printf("Floating Point Error Exception!!!");
+	while(1) {}
+}
+
+// Alignment Check Exception Handler
+void AC()  {
+	printf("Alignment Check Exception!!!");
+	while(1) {}
+}
+
+// Machine Check Exception handler
+void MC()  {
+	printf("Machine Check Exception!!!");
+	while(1) {}
+}
+
+// SIMD Floatin-Point Exception Handler
+void XF()  {
+	printf("SIMD Floating Point Exception!!!");
+	while(1) {}
+}
+
+
+/* Load IDT with correct vectors */
 void init_idt()
 {
 	int i;

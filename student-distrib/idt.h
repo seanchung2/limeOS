@@ -13,25 +13,27 @@ void exeception_name()									\
 }
 
 /* Define the handler */												
-EXCEPTION_HANDLER(DE,"Divide Error!!!");
-EXCEPTION_HANDLER(DB,"RESERVED!!!");
-EXCEPTION_HANDLER(NMI,"Nonmaskable Interrupt Exception!!!");
-EXCEPTION_HANDLER(BP,"Breakpoint Exception!!!");
-EXCEPTION_HANDLER(OF,"Overflow Exception!!!");
-EXCEPTION_HANDLER(BR,"BOUND Range Exceeded Exception!!!");
-EXCEPTION_HANDLER(UD,"Invalid Opcode Exception!!!");
-EXCEPTION_HANDLER(NM,"Device Not Available Exception!!!");
-EXCEPTION_HANDLER(DF,"Double Fault Exception!!!");
-EXCEPTION_HANDLER(CSO,"Coprocessor Segment Overrun Exception!!!");
-EXCEPTION_HANDLER(TS,"Invalid TSS Exception!!!");
-EXCEPTION_HANDLER(NP,"Segment Not Present!!!");
-EXCEPTION_HANDLER(SS,"Stack-Segment Fault Exception!!!");
-EXCEPTION_HANDLER(GP,"General Protection Exception!!!");
-EXCEPTION_HANDLER(PF,"Page Fault Exception!!!");
-EXCEPTION_HANDLER(MF,"Floating Point Error Exception!!!");
-EXCEPTION_HANDLER(AC,"Alignment Check Exception!!!");
-EXCEPTION_HANDLER(MC,"Machine Check Exception!!!");
-EXCEPTION_HANDLER(XF,"SIMD Floating-Point Exception!!!");
+void DE();
+void DB();
+void NMI();
+void BP();
+void OF();
+void BR();
+void OF();
+void BR();
+void UD();
+void NM();
+void DF();
+void CSO();
+void TS();
+void NP();
+void SS();
+void GP();
+void PF();
+void MF();
+void AC();
+void MC();
+void XF();
 
 /* initialize the IDT */
 extern void init_idt();
