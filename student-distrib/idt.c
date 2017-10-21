@@ -6,130 +6,134 @@
 
 // Division Error Handler
 void DE()  {
-	printf("Divide Error!!!");
+	printf("\nDivide Error!!!\n");
 	while(1) {}
 }
 
 // Reserved Exception Handler
 void DB()  {
-	printf("RESERVED!!!");
+	printf("RESERVED!!!\n");
 	while(1) {}
 }
 
 // Non Maskable Interupt Handler
 void NMI()  {
-	printf("Nonmaskable Interrupt Exception!!!");
+	printf("Nonmaskable Interrupt Exception!!!\n");
 	while(1) {}
 }
 
 // Breakpoint Exception Handler
 void BP()  {
-	printf("Breakpoint Exception!!!");
+	printf("Breakpoint Exception!!!\n");
 	while(1) {}
 }
 
 // Overflow Exception Handler
 void OF()  {
-	printf("Overflow Exception!!!");
+	printf("Overflow Exception!!!\n");
 	while(1) {}
 }
 
 // Bound Range Exceeded Exception Handler
 void BR()  {
-	printf("BOUND Range Exceeded Exception!!!");
+	printf("BOUND Range Exceeded Exception!!!\n");
 	while(1) {}
 }
 
 // Invalid Opcode Exception Handler
 void UD()  {
-	printf("Invalid Opcode Exception!!!");
+	printf("Invalid Opcode Exception!!!\n");
 	while(1) {}
 }
 
 // Device Not Available Exception Handler
 void NM()  {
-	printf("Device Not Available Exception!!!");
+	printf("Device Not Available Exception!!!\n");
 	while(1) {}
 }
 
 // Double Faut Exception Handler
 void DF()  {
-	printf("Double Fault Exception!!!");
+	printf("Double Fault Exception!!!\n");
 	while(1) {}
 }
 
 // Coprocessor Segment Overrun Exception Handler
 void CSO()  {
-	printf("Coprocessor Segment Overrun Exception!!!");
+	printf("Coprocessor Segment Overrun Exception!!!\n");
 	while(1) {}
 }
 
 // Invalid TSS Exception Handler
 void TS()  {
-	printf("Invalid TSS Exception!!!");
+	printf("Invalid TSS Exception!!!\n");
 	while(1) {}
 }
 
 // Segment Not Preset Exception Handler
 void NP()  {
-	printf("Segment Not Present!!!");
+	printf("Segment Not Present!!!\n");
 	while(1) {}
 }
 
 // Stack-Segment Fault Exception Handler
 void SS()  {
-	printf("Stack-Segment Fault Exception!!!");
+	printf("Stack-Segment Fault Exception!!!\n");
 	while(1) {}
 }
 
 // General Protetion Exception Handler
 void GP()  {
-	printf("General Protection Exception!!!");
+	printf("General Protection Exception!!!\n");
 	while(1) {}
 }
 
-
 // Page Fault Exception Handler
 void PF()  {
-	printf("Page Fault Exception!!!");
+	printf("Page Fault Exception!!!\n");
 	while(1) {}
 }
 
 // Floating Point Error Exception Handler
 void MF()  {
-	printf("Floating Point Error Exception!!!");
+	printf("Floating Point Error Exception!!!\n");
 	while(1) {}
 }
 
 // Alignment Check Exception Handler
 void AC()  {
-	printf("Alignment Check Exception!!!");
+	printf("Alignment Check Exception!!!\n");
 	while(1) {}
 }
 
 // Machine Check Exception handler
 void MC()  {
-	printf("Machine Check Exception!!!");
+	printf("Machine Check Exception!!!\n");
 	while(1) {}
 }
 
 // SIMD Floatin-Point Exception Handler
 void XF()  {
-	printf("SIMD Floating Point Exception!!!");
+	printf("SIMD Floating Point Exception!!!\n");
 	while(1) {}
 }
 
 
-/* Load IDT with correct vectors */
+/* init_idt
+ *
+ * Set the gates and load IDT with correct vectors
+ * Inputs: none
+ * Outputs: none
+ * Side Effects: none
+ */
 void init_idt()
 {
 	int i;
-	lidt(idt_desc_ptr);
 	
 	for (i=0;i<NUM_VEC;i++)
 	{
 		idt[i].present = 0x1;				//set to present
-		idt[i].dpl =0x0;					//at level 0
+		idt[i].dpl = 0x0;					//at level 0
 		idt[i].reserved0 = 0x0;				//reserved0
 		idt[i].size = 0x1;					//not sure 1 for 32bits or 0 for 16bits
 		idt[i].reserved1 = 0x1;				//reserved1
@@ -138,10 +142,14 @@ void init_idt()
 		idt[i].reserved4 = 0x0;				//reserved4
 		idt[i].seg_selector = KERNEL_CS;
 	
-	
+		
+		if(i<32)
+			idt[i].reserved3 = 0x1;
+
 		/* if it is system call, set to user space */
 		if (i == SYSTEM_CALL_VEC_NUM)
 		{	
+
 			/* Change the privilege level */
 			idt[i].dpl = 0x3;				
 		}
@@ -166,5 +174,8 @@ void init_idt()
 	SET_IDT_ENTRY(idt[17], AC);
 	SET_IDT_ENTRY(idt[18], MC);
 	SET_IDT_ENTRY(idt[19], XF);
+
+
+	lidt(idt_desc_ptr);
 	
 }

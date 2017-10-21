@@ -5,12 +5,12 @@
 #define SYSTEM_CALL_VEC_NUM 0x80 
 
 /* Setup a macro handler */
-#define EXECPTION_HANDLER (exeception_name,msg_print)	\
+/*#define EXECPTION_HANDLER (exeception_name,msg_print)	\
 void exeception_name()									\
 {														\
 	printf("%s\n",#msg_print); 							\
 	while(1);											\
-}
+}*/
 
 /* Define the handler */												
 void DE();
