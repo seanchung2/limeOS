@@ -3,15 +3,6 @@
 #include "lib.h"
 #include "i8259.h"
 
-
-#define EXECPTION_HANDLER (exeception_name,msg_print)	\
-void exeception_name()									\
-{														\
-	printf("%s\n",#msg_print); 							\
-	while(1);											\
-}														\
-
-
 EXCEPTION_HANDLER(DE,"Divide Error!!!");
 EXCEPTION_HANDLER(DB,"RESERVED!!!");
 EXCEPTION_HANDLER(NMI,"Nonmaskable Interrupt Exception!!!");
@@ -51,9 +42,10 @@ void init_idt()
 		idt[i].seg_selector = KERNEL_CS;
 	
 	
-		/* if it is system call, set to user space*/
-		if (i==0x80)
+		/* if it is system call, set to user space */
+		if (i == SYSTEM_CALL_VEC_NUM)
 		{	
+			/* Change the privilege level */
 			idt[i].dpl = 0x3;				
 		}
 	}
