@@ -64,6 +64,24 @@ void divide_zero_test()  {
 	k = 1;
 }
 
+/* Overflow test
+ *
+ * Attempts to make an integer overflow
+ * Inputs: none
+ * Outputs: PASS/FAIL
+ * Side Effects: none
+ * Coverage: IDT exception handler
+ * Files: idt.c
+ */
+int overflow_test()  {
+	TEST_HEADER;
+
+	int result = PASS;
+	int i = 100+ 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
+	i = 1;
+	return result;
+}
+
 /* Checkpoint 2 tests */
 /* Checkpoint 3 tests */
 /* Checkpoint 4 tests */
@@ -75,5 +93,6 @@ void launch_tests(){
 	TEST_OUTPUT("idt_test", idt_test());
 
 	// launch your tests here
+	//TEST_OUTPUT("overflow_test", overflow_test());
 	divide_zero_test();
 }
