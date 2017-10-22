@@ -14,11 +14,14 @@
  */
 void init_idt()
 {
-	// load IDT
-	lidt(idt_desc_ptr);
 
 	int i;
+
+	// load IDT
+	lidt(idt_desc_ptr);
 	
+	/* Defined the inturrpt vectors correspond to exception */
+	/* default to "interrput gate" */
 	for (i=0;i<NUM_VEC;i++)
 	{
 		idt[i].present = 0x1;				//set to present
@@ -33,18 +36,21 @@ void init_idt()
 	
 		/* Exception defined by Intel should be interrupt */
 		if(i < EXCEPTION_DEFINED_BY_INTEL)
-			idt[i].reserved3 = 0x1;
+			idt[i].reserved3 = 0x0;
 
-		/* if it is system call, set to user space */
+		/* if it is system call, set to user space, should be trap */
 		if (i == SYSTEM_CALL_VEC_NUM)
 		{	
 			idt[i].reserved3 = 0x1;
 			/* Change the privilege level */
 			idt[i].dpl = 0x3;				
 		}
+
+		/* Sets runtime parameters for IDT entries */
+		SET_IDT_ENTRY(idt[i], undefined_interrupt);
 	}
 	
-	/* Sets runtime parameters for an IDT entry */
+	/* Sets runtime parameters for IDT entries */
 	SET_IDT_ENTRY(idt[0], DE);
 	SET_IDT_ENTRY(idt[1], DB);
 	SET_IDT_ENTRY(idt[2], NMI);
@@ -66,5 +72,13 @@ void init_idt()
 	SET_IDT_ENTRY(idt[18], MC);
 	SET_IDT_ENTRY(idt[19], XF);
 	
+	/* set system call handler to the entry */
 	SET_IDT_ENTRY(idt[SYSTEM_CALL_VEC_NUM], sys_handler);
+
+	/* set keyboard handler to the entry */
+	SET_IDT_ENTRY(idt[KEYBOARD_VEC_NUM], keyboard_handler);
+
+	/* set rtc handler to the entry */
+	SET_IDT_ENTRY(idt[RTC_VEC_NUM], test_interrupts);
+	
 }

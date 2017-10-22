@@ -475,7 +475,12 @@ void test_interrupts(void) {
     }
 }
 
-
+/* void reset_screen(void)
+ * move the screen pointer back to 0,0
+ * Inputs: void
+ * Return Value: void
+ * Function: as description
+ */
 void reset_screen(void)  {
     screen_x = 0;
     screen_y = 0;
