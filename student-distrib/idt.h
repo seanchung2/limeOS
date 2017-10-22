@@ -5,6 +5,7 @@
 #define SYSTEM_CALL_VEC_NUM 0x80
 #define EXCEPTION_DEFINED_BY_INTEL 0x20 
 #define KEYBOARD_VEC_NUM 0x21
+#define RTC_VEC_NUM 0x28
 
 /* Setup a macro handler */
 #define EXECPTION_HANDLER (exeception_name,msg_print)	\

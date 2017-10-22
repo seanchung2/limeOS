@@ -77,4 +77,8 @@ void init_idt()
 
 	/* set keyboard handler to the entry */
 	SET_IDT_ENTRY(idt[KEYBOARD_VEC_NUM], keyboard_handler);
+
+	/* set rtc handler to the entry */
+	SET_IDT_ENTRY(idt[RTC_VEC_NUM], test_interrupts);
+	
 }
