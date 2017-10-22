@@ -64,6 +64,7 @@ void divide_zero_test()  {
 	k = 1;
 }
 
+<<<<<<< HEAD
 /* Dereference NULL test
  *
  * Attempts to dereference NULL
@@ -80,6 +81,24 @@ void deref_null_test()  {
 	int i;
 
 	i = *(ref);
+=======
+/* Overflow test
+ *
+ * Attempts to make an integer overflow
+ * Inputs: none
+ * Outputs: PASS/FAIL
+ * Side Effects: none
+ * Coverage: IDT exception handler
+ * Files: idt.c
+ */
+int overflow_test()  {
+	TEST_HEADER;
+
+	int result = PASS;
+	//int i = 100+ 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
+	//i = 1;
+	return result;
+>>>>>>> e6c5134e589495deb4afcfa05023cf95279966e1
 }
 
 /* Checkpoint 2 tests */
@@ -93,6 +112,7 @@ void launch_tests(){
 	TEST_OUTPUT("idt_test", idt_test());
 
 	// launch your tests here
+	//TEST_OUTPUT("overflow_test", overflow_test());
 	divide_zero_test();
 	deref_null_test();
 }

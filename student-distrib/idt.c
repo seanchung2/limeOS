@@ -4,6 +4,7 @@
 #include "i8259.h"
 #include "idt.h"
 
+<<<<<<< HEAD
 // Division Error Handler
 void DE()  {
 	printf(" Divide Error!!!\n");
@@ -119,15 +120,20 @@ void XF()  {
 }
 
 
+=======
+>>>>>>> e6c5134e589495deb4afcfa05023cf95279966e1
 /* init_idt
  *
  * Set the gates and load IDT with correct vectors
  * Inputs: none
  * Outputs: none
- * Side Effects: none
+ * Side Effects: load IDT
  */
 void init_idt()
 {
+	// load IDT
+	lidt(idt_desc_ptr);
+
 	int i;
 	
 	for (i=0;i<NUM_VEC;i++)
@@ -142,19 +148,20 @@ void init_idt()
 		idt[i].reserved4 = 0x0;				//reserved4
 		idt[i].seg_selector = KERNEL_CS;
 	
-		
-		if(i<32)
+		/* Exception defined by Intel should be interrupt */
+		if(i < EXCEPTION_DEFINED_BY_INTEL)
 			idt[i].reserved3 = 0x1;
 
 		/* if it is system call, set to user space */
 		if (i == SYSTEM_CALL_VEC_NUM)
 		{	
-
+			idt[i].reserved3 = 0x1;
 			/* Change the privilege level */
 			idt[i].dpl = 0x3;				
 		}
 	}
 	
+	/* Sets runtime parameters for an IDT entry */
 	SET_IDT_ENTRY(idt[0], DE);
 	SET_IDT_ENTRY(idt[1], DB);
 	SET_IDT_ENTRY(idt[2], NMI);
@@ -174,8 +181,5 @@ void init_idt()
 	SET_IDT_ENTRY(idt[17], AC);
 	SET_IDT_ENTRY(idt[18], MC);
 	SET_IDT_ENTRY(idt[19], XF);
-
-
-	lidt(idt_desc_ptr);
 	
 }
