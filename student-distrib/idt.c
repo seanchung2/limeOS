@@ -4,7 +4,7 @@
 #include "i8259.h"
 #include "idt.h"
 
-<<<<<<< HEAD
+
 // Division Error Handler
 void DE()  {
 	printf(" Divide Error!!!\n");
@@ -119,9 +119,6 @@ void XF()  {
 	while(1) {}
 }
 
-
-=======
->>>>>>> e6c5134e589495deb4afcfa05023cf95279966e1
 /* init_idt
  *
  * Set the gates and load IDT with correct vectors
