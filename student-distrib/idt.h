@@ -1,6 +1,12 @@
 #ifndef _IDT_H
 #define _IDT_H
 
+#include "x86_desc.h"
+#include "lib.h"
+#include "i8259.h"
+#include "idt.h"
+#include "int_handler.h"
+
 /* Define variables */
 #define SYSTEM_CALL_VEC_NUM 0x80
 #define EXCEPTION_DEFINED_BY_INTEL 0x20 

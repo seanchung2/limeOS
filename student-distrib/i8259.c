@@ -94,8 +94,8 @@ void initialize_keyboard(){
 }
 
 void initialize_RTC(){
-	uint8_t regB = 0x00;
 	cli();
+	uint8_t regB = 0x00;
 	outb(0x8B, 0x70);
 	regB = inb(0x71);
 	regB = regB | 0x40;
@@ -103,5 +103,6 @@ void initialize_RTC(){
 	outb(regB, 0x71);
 	sti();
 
+	enable_irq(2);
 	enable_irq(8);
 }
