@@ -474,3 +474,14 @@ void test_interrupts(void) {
         video_mem[i << 1]++;
     }
 }
+
+/* void reset_screen(void)
+ * move the screen pointer back to 0,0
+ * Inputs: void
+ * Return Value: void
+ * Function: as description
+ */
+void reset_screen(void)  {
+    screen_x = 0;
+    screen_y = 0;
+}

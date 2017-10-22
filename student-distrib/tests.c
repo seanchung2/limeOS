@@ -45,7 +45,129 @@ int idt_test(){
 	return result;
 }
 
-// add more tests here
+/* Divide by 0 test
+ *
+ * Attempts to divide by zero
+ * Inputs: none
+ * Outputs: none
+ * Side Effects: freezes kernel
+ * Coverage: IDT exception handler
+ * Files: idt.c
+ */
+void divide_zero_test()  {
+	TEST_HEADER;
+
+	int i = 1;
+	int j = 0;
+
+	int k = i/j;
+	k = 1;
+}
+
+/* Dereference NULL test
+ *
+ * Attempts to dereference NULL
+ * Inputs: none
+ * Outputs: none
+ * Side Effects: freezes kernel
+ * Coverage: IDT exception handler
+ * Files: idt.c
+ */
+void deref_null_test()  {
+	TEST_HEADER;
+
+	int* ref = NULL;
+	int i;
+
+	i = *(ref);
+}
+
+/* Overflow test
+ *
+ * Attempts to make an integer overflow
+ * Inputs: none
+ * Outputs: PASS/FAIL
+ * Side Effects: none
+ * Coverage: IDT exception handler
+ * Files: idt.c
+ */
+/*int overflow_test()  {
+	TEST_HEADER;
+
+	int result = PASS;
+	//int i = 100+ 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
+	//i = 1;
+	return result;
+}*/
+
+/* System Call test
+ *
+ * Attempts to call system call
+ * Inputs: none
+ * Outputs: PASS/FAIL
+ * Side Effects: none
+ * Coverage: IDT system call handler
+ * Files: idt.c
+ */
+int syscall_test()
+{
+	TEST_HEADER;
+	int result = PASS;
+	asm volatile("int $0x80");
+	return result;
+}
+
+/* Paging test kernel
+ *
+ * Writes into valid kernek memory and reads from same
+ * address to check if paging is working corecctly
+ * Input: none
+ * Output: PASS/FAIL
+ * Side Effects: none
+ * Coverage: Pages that are defined in memory
+ * Files: paging.c
+ */
+int paging_test_kernel()  {
+	TEST_HEADER;
+
+	int test = 0;
+	int* test_ptr = (int*)0x401000;
+	int init_value = *test_ptr;
+	*test_ptr = 25;
+	test = *test_ptr;
+	if(test != 25)  {
+		*test_ptr = init_value;
+		return FAIL;
+	}
+	*test_ptr = init_value;
+	return PASS;
+}
+
+/* Paging test video
+ *
+ * Writes into valid video memory and reads from same
+ * address to check if paging is working corecctly
+ * Input: none
+ * Output: PASS/FAIL
+ * Side Effects: none
+ * Coverage: Pages that are defined in memory
+ * Files: paging.c
+ */
+int paging_test_vidmem()  {
+	TEST_HEADER;
+
+	int test = 0;
+	int* test_ptr = (int*)0xB8010;
+	int init_value = *test_ptr;
+	*test_ptr = 25;
+	test = *test_ptr;
+	if(test != 25)  {
+		*test_ptr = init_value;
+		return FAIL;
+	}
+	*test_ptr = init_value;
+	return PASS;
+}
 
 /* Checkpoint 2 tests */
 /* Checkpoint 3 tests */
@@ -56,5 +178,12 @@ int idt_test(){
 /* Test suite entry point */
 void launch_tests(){
 	TEST_OUTPUT("idt_test", idt_test());
+
 	// launch your tests here
+	TEST_OUTPUT("syscall_test",syscall_test());
+	TEST_OUTPUT("paging_test_kernel", paging_test_kernel());
+	TEST_OUTPUT("paging_test_vidmem", paging_test_vidmem());
+	deref_null_test();
+	//divide_zero_test();
+
 }
