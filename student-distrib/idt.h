@@ -20,119 +20,126 @@ void exeception_name()									\
  * Outputs: none
  * Side Effects: print out the error message
  */												
-// Division Error Handler
+// 0 Division Error Handler
 void DE()  {
 	printf(" Divide Error!!!\n");
 	while(1) {}
 }
 
-// Reserved Exception Handler
+// 1 Reserved Exception Handler
 void DB()  {
 	printf("RESERVED!!!\n");
 	while(1) {}
 }
 
-// Non Maskable Interupt Handler
+// 2 Non Maskable Interupt Handler
 void NMI()  {
 	printf("Nonmaskable Interrupt Exception!!!\n");
 	while(1) {}
 }
 
-// Breakpoint Exception Handler
+// 3 Breakpoint Exception Handler
 void BP()  {
 	printf("Breakpoint Exception!!!\n");
 	while(1) {}
 }
 
-// Overflow Exception Handler
+// 4 Overflow Exception Handler
 void OF()  {
 	printf("Overflow Exception!!!\n");
 	while(1) {}
 }
 
-// Bound Range Exceeded Exception Handler
+// 5 Bound Range Exceeded Exception Handler
 void BR()  {
 	printf("BOUND Range Exceeded Exception!!!\n");
 	while(1) {}
 }
 
-// Invalid Opcode Exception Handler
+// 6 Invalid Opcode Exception Handler
 void UD()  {
 	printf("Invalid Opcode Exception!!!\n");
 	while(1) {}
 }
 
-// Device Not Available Exception Handler
+// 7 Device Not Available Exception Handler
 void NM()  {
 	printf("Device Not Available Exception!!!\n");
 	while(1) {}
 }
 
-// Double Faut Exception Handler
+// 8 Double Faut Exception Handler
 void DF()  {
 	printf("Double Fault Exception!!!\n");
 	while(1) {}
 }
 
-// Coprocessor Segment Overrun Exception Handler
+// 9 Coprocessor Segment Overrun Exception Handler
 void CSO()  {
 	printf("Coprocessor Segment Overrun Exception!!!\n");
 	while(1) {}
 }
 
-// Invalid TSS Exception Handler
+// 10 Invalid TSS Exception Handler
 void TS()  {
 	printf("Invalid TSS Exception!!!\n");
 	while(1) {}
 }
 
-// Segment Not Preset Exception Handler
+// 11 Segment Not Preset Exception Handler
 void NP()  {
 	printf("Segment Not Present!!!\n");
 	while(1) {}
 }
 
-// Stack-Segment Fault Exception Handler
+// 12 Stack-Segment Fault Exception Handler
 void SS()  {
 	printf("Stack-Segment Fault Exception!!!\n");
 	while(1) {}
 }
 
-// General Protetion Exception Handler
+// 13 General Protetion Exception Handler
 void GP()  {
 	printf("General Protection Exception!!!\n");
 	while(1) {}
 }
 
-// Page Fault Exception Handler
+// 14 Page Fault Exception Handler
 void PF()  {
 	printf("Page Fault Exception!!!\n");
 	while(1) {}
 }
 
-// Floating Point Error Exception Handler
+// 15 Reserved
+void Resr()  {
+	printf("Reserved!!!\n");
+	while(1) {}
+}
+
+// 16 Floating Point Error Exception Handler
 void MF()  {
 	printf("Floating Point Error Exception!!!\n");
 	while(1) {}
 }
 
-// Alignment Check Exception Handler
+// 17 Alignment Check Exception Handler
 void AC()  {
 	printf("Alignment Check Exception!!!\n");
 	while(1) {}
 }
 
-// Machine Check Exception handler
+// 18 Machine Check Exception handler
 void MC()  {
 	printf("Machine Check Exception!!!\n");
 	while(1) {}
 }
 
-// SIMD Floatin-Point Exception Handler
+// 19 SIMD Floatin-Point Exception Handler
 void XF()  {
 	printf("SIMD Floating Point Exception!!!\n");
 	while(1) {}
 }
+
 
 /* initialize the IDT */
 extern void init_idt();

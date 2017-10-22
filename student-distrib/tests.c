@@ -64,7 +64,6 @@ void divide_zero_test()  {
 	k = 1;
 }
 
-<<<<<<< HEAD
 /* Dereference NULL test
  *
  * Attempts to dereference NULL
@@ -81,7 +80,7 @@ void deref_null_test()  {
 	int i;
 
 	i = *(ref);
-=======
+}
 /* Overflow test
  *
  * Attempts to make an integer overflow
@@ -98,7 +97,6 @@ int overflow_test()  {
 	//int i = 100+ 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
 	//i = 1;
 	return result;
->>>>>>> e6c5134e589495deb4afcfa05023cf95279966e1
 }
 
 /* Checkpoint 2 tests */
@@ -113,6 +111,6 @@ void launch_tests(){
 
 	// launch your tests here
 	//TEST_OUTPUT("overflow_test", overflow_test());
-	divide_zero_test();
-	deref_null_test();
+	//divide_zero_test();
+	//deref_null_test();
 }
