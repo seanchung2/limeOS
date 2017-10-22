@@ -100,6 +100,13 @@ int overflow_test()  {
 	//i = 1;
 	return result;
 }
+int syscall_test()
+{
+	TEST_HEADER;
+	int result = PASS;
+	asm volatile("int $0x80");
+	return result;
+}
 
 /* Checkpoint 2 tests */
 /* Checkpoint 3 tests */
@@ -113,6 +120,7 @@ void launch_tests(){
 
 	// launch your tests here
 	//TEST_OUTPUT("overflow_test", overflow_test());
-	divide_zero_test();
-	deref_null_test();
+//	divide_zero_test();
+//	deref_null_test();
+	TEST_OUTPUT("syscall_test",syscall_test());
 }

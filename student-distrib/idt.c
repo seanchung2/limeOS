@@ -3,6 +3,7 @@
 #include "lib.h"
 #include "i8259.h"
 #include "idt.h"
+#include "int_handler.h"
 
 /* init_idt
  *
@@ -64,4 +65,5 @@ void init_idt()
 	SET_IDT_ENTRY(idt[18], MC);
 	SET_IDT_ENTRY(idt[19], XF);
 	
+	SET_IDT_ENTRY(idt[SYSTEM_CALL_VEC_NUM], sys_handler);
 }

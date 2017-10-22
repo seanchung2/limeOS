@@ -7,5 +7,6 @@ void launch_tests();
 // test exceptions
 void divide_zero_test();
 void deref_null_test();
+int syscall_test();
 
 #endif /* TESTS_H */
