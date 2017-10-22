@@ -4,6 +4,7 @@
 /* Define variables */
 #define SYSTEM_CALL_VEC_NUM 0x80
 #define EXCEPTION_DEFINED_BY_INTEL 0x20 
+#define KEYBOARD_VEC_NUM 0x21
 
 /* Setup a macro handler */
 #define EXECPTION_HANDLER (exeception_name,msg_print)	\
@@ -11,6 +12,16 @@ void exeception_name()									\
 {														\
 	printf("%s\n",#msg_print); 							\
 	while(1);											\
+}
+
+/* Define the handler for undefined interrupt
+ * Inputs: none
+ * Outputs: none
+ * Side Effects: print out the "Undefined Interrupt!!!"
+ */	
+void undefined_interrupt()  {
+	printf(" Undefined Interrupt!!!\n");
+	while(1) {}
 }
 
 /* Define the handler respectively
