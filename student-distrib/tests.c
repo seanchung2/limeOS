@@ -64,7 +64,10 @@ void divide_zero_test()  {
 	k = 1;
 }
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> 3021f7a486356d595f10413c0a64c1e7afc378ae
 /* Dereference NULL test
  *
  * Attempts to dereference NULL
@@ -82,7 +85,10 @@ void deref_null_test()  {
 
 	i = *(ref);
 }
+<<<<<<< HEAD
+=======
 
+>>>>>>> 3021f7a486356d595f10413c0a64c1e7afc378ae
 /* Overflow test
  *
  * Attempts to make an integer overflow
@@ -113,6 +119,6 @@ void launch_tests(){
 
 	// launch your tests here
 	//TEST_OUTPUT("overflow_test", overflow_test());
-	divide_zero_test();
-	deref_null_test();
+	//divide_zero_test();
+	//deref_null_test();
 }
