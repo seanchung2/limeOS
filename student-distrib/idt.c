@@ -14,11 +14,13 @@
  */
 void init_idt()
 {
-	// load IDT
-	lidt(idt_desc_ptr);
 
 	int i;
 	
+	// load IDT
+	lidt(idt_desc_ptr);
+	
+	/* Defined the inturrpt vectors correspond to exception */
 	for (i=0;i<NUM_VEC;i++)
 	{
 		idt[i].present = 0x1;				//set to present
@@ -44,7 +46,7 @@ void init_idt()
 		}
 	}
 	
-	/* Sets runtime parameters for an IDT entry */
+	/* Sets runtime parameters for IDT entries */
 	SET_IDT_ENTRY(idt[0], DE);
 	SET_IDT_ENTRY(idt[1], DB);
 	SET_IDT_ENTRY(idt[2], NMI);

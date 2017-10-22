@@ -91,14 +91,24 @@ void deref_null_test()  {
  * Coverage: IDT exception handler
  * Files: idt.c
  */
-int overflow_test()  {
+/*int overflow_test()  {
 	TEST_HEADER;
 
 	int result = PASS;
 	//int i = 100+ 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
 	//i = 1;
 	return result;
-}
+}*/
+
+/* System Call test
+ *
+ * Attempts to call system call
+ * Inputs: none
+ * Outputs: PASS/FAIL
+ * Side Effects: none
+ * Coverage: IDT system call handler
+ * Files: idt.c
+ */
 int syscall_test()
 {
 	TEST_HEADER;
@@ -107,9 +117,9 @@ int syscall_test()
 	return result;
 }
 
-/* Paging test
+/* Paging test kernel
  *
- * Writes into valid memory and reads from same
+ * Writes into valid kernek memory and reads from same
  * address to check if paging is working corecctly
  * Input: none
  * Output: PASS/FAIL
@@ -133,6 +143,16 @@ int paging_test_kernel()  {
 	return PASS;
 }
 
+/* Paging test video
+ *
+ * Writes into valid video memory and reads from same
+ * address to check if paging is working corecctly
+ * Input: none
+ * Output: PASS/FAIL
+ * Side Effects: none
+ * Coverage: Pages that are defined in memory
+ * Files: paging.c
+ */
 int paging_test_vidmem()  {
 	TEST_HEADER;
 
@@ -160,14 +180,10 @@ void launch_tests(){
 	TEST_OUTPUT("idt_test", idt_test());
 
 	// launch your tests here
-	//TEST_OUTPUT("overflow_test", overflow_test());
-//	divide_zero_test();
-//	deref_null_test();
 	TEST_OUTPUT("syscall_test",syscall_test());
 	TEST_OUTPUT("paging_test_kernel", paging_test_kernel());
 	TEST_OUTPUT("paging_test_vidmem", paging_test_vidmem());
 	deref_null_test();
 	//divide_zero_test();
-	//deref_null_test();
 
 }

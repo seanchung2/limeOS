@@ -137,6 +137,7 @@ void entry(unsigned long magic, unsigned long addr) {
         ltr(KERNEL_TSS);
     }
 
+    /* clear the screen and move the screen pointer back to the 0,0 */
     clear();
     reset_screen();
 
