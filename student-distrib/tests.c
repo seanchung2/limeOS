@@ -183,7 +183,7 @@ void launch_tests(){
 	TEST_OUTPUT("syscall_test",syscall_test());
 	TEST_OUTPUT("paging_test_kernel", paging_test_kernel());
 	TEST_OUTPUT("paging_test_vidmem", paging_test_vidmem());
-	deref_null_test();
+	//deref_null_test();
 	//divide_zero_test();
 
 }

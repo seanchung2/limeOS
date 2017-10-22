@@ -18,6 +18,6 @@ extern void sys_handler();
 extern void keyboard_handler ();
 
 /* deal with output of keyboard */
-extern void keyboard_output_dealer (char c);
+extern void keyboard_output_dealer (uint8_t c);
 
 #endif /* _INT_HANDLER_H */

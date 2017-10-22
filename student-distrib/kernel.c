@@ -142,6 +142,7 @@ void entry(unsigned long magic, unsigned long addr) {
     reset_screen();
 
     /* Init the PIC */
+    printf("initializing devices");
     i8259_init();
 
     /* Initialize devices, memory, filesystem, enable device interrupts on the
