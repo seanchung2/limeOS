@@ -3,6 +3,7 @@
 #define PAGING_H
 
 #include "types.h"
+#include "lib.h"
 
 #define PAGE_SIZE		1024		//number of entries in a 4KB page
 #define FOUR_KB			4096		//number if bytes in 4MB

@@ -10,5 +10,5 @@
 */
 void sys_handler ()
 {
-	printf("System Call !!!!!!");
+	printf("System Call !!!!!! \n");
 }

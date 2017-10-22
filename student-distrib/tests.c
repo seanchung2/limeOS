@@ -107,6 +107,48 @@ int syscall_test()
 	return result;
 }
 
+/* Paging test
+ *
+ * Writes into valid memory and reads from same
+ * address to check if paging is working corecctly
+ * Input: none
+ * Output: PASS/FAIL
+ * Side Effects: none
+ * Coverage: Pages that are defined in memory
+ * Files: paging.c
+ */
+int paging_test_kernel()  {
+	TEST_HEADER;
+
+	int test = 0;
+	int* test_ptr = (int*)0x401000;
+	int init_value = *test_ptr;
+	*test_ptr = 25;
+	test = *test_ptr;
+	if(test != 25)  {
+		*test_ptr = init_value;
+		return FAIL;
+	}
+	*test_ptr = init_value;
+	return PASS;
+}
+
+int paging_test_vidmem()  {
+	TEST_HEADER;
+
+	int test = 0;
+	int* test_ptr = (int*)0xB8010;
+	int init_value = *test_ptr;
+	*test_ptr = 25;
+	test = *test_ptr;
+	if(test != 25)  {
+		*test_ptr = init_value;
+		return FAIL;
+	}
+	*test_ptr = init_value;
+	return PASS;
+}
+
 /* Checkpoint 2 tests */
 /* Checkpoint 3 tests */
 /* Checkpoint 4 tests */
@@ -122,6 +164,9 @@ void launch_tests(){
 //	divide_zero_test();
 //	deref_null_test();
 	TEST_OUTPUT("syscall_test",syscall_test());
+	TEST_OUTPUT("paging_test_kernel", paging_test_kernel());
+	TEST_OUTPUT("paging_test_vidmem", paging_test_vidmem());
+	deref_null_test();
 	//divide_zero_test();
 	//deref_null_test();
 

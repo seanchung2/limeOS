@@ -60,7 +60,7 @@ void init_idt()
 	SET_IDT_ENTRY(idt[12], SS);
 	SET_IDT_ENTRY(idt[13], GP);
 	SET_IDT_ENTRY(idt[14], PF);
-	SET_IDT_ENTRY(idt[14], Resr);
+	SET_IDT_ENTRY(idt[15], Resr);
 	SET_IDT_ENTRY(idt[16], MF);
 	SET_IDT_ENTRY(idt[17], AC);
 	SET_IDT_ENTRY(idt[18], MC);
