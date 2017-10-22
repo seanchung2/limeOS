@@ -64,7 +64,6 @@ void divide_zero_test()  {
 	k = 1;
 }
 
-
 /* Dereference NULL test
  *
  * Attempts to dereference NULL
@@ -123,4 +122,7 @@ void launch_tests(){
 //	divide_zero_test();
 //	deref_null_test();
 	TEST_OUTPUT("syscall_test",syscall_test());
+	//divide_zero_test();
+	//deref_null_test();
+
 }
