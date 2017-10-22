@@ -6,7 +6,7 @@
 
 // Division Error Handler
 void DE()  {
-	printf("\nDivide Error!!!\n");
+	printf(" Divide Error!!!\n");
 	while(1) {}
 }
 

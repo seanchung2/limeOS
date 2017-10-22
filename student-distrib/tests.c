@@ -50,7 +50,7 @@ int idt_test(){
  * Attempts to divide by zero
  * Inputs: none
  * Outputs: none
- * Side Effects: none
+ * Side Effects: freezes kernel
  * Coverage: IDT exception handler
  * Files: idt.c
  */
@@ -62,6 +62,24 @@ void divide_zero_test()  {
 
 	int k = i/j;
 	k = 1;
+}
+
+/* Dereference NULL test
+ *
+ * Attempts to dereference NULL
+ * Inputs: none
+ * Outputs: none
+ * Side Effects: freezes kernel
+ * Coverage: IDT exception handler
+ * Files: idt.c
+ */
+void deref_null_test()  {
+	TEST_HEADER;
+
+	int* ref = NULL;
+	int i;
+
+	i = *(ref);
 }
 
 /* Checkpoint 2 tests */
@@ -76,4 +94,5 @@ void launch_tests(){
 
 	// launch your tests here
 	divide_zero_test();
+	deref_null_test();
 }
