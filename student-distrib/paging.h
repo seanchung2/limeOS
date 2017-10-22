@@ -17,12 +17,6 @@ typedef struct page_table_t  {
 	int entries[PAGE_SIZE];
 } page_table_t;
 
-// Page Descriptor Table struct
-static page_table_t PDT __attribute__( (aligned(FOUR_KB)) );
-
-// Video Memory Page Table struct
-static page_table_t PT0 __attribute__( (aligned(FOUR_KB)) );
-
 // function to initialize paging
 void init_paging();
 

@@ -1,5 +1,11 @@
 #include "paging.h"
 
+// Page Descriptor Table struct
+static page_table_t PDT __attribute__( (aligned(FOUR_KB)) );
+
+// Video Memory Page Table struct
+static page_table_t PT0 __attribute__( (aligned(FOUR_KB)) );
+
 /*
  * init_paging()
  * Inputs: none
