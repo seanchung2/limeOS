@@ -6,8 +6,8 @@
 #include "lib.h"
 
 /* Interrupt masks to determine which interrupts are enabled and disabled */
-uint8_t master_mask = 0xff; /* IRQs 0-7  */
-uint8_t slave_mask = 0xff;  /* IRQs 8-15 */
+static uint8_t master_mask = 0xff; /* IRQs 0-7  */
+static uint8_t slave_mask = 0xff;  /* IRQs 8-15 */
 
 /* Initialize the 8259 PIC */
 void i8259_init(void) {
@@ -33,12 +33,15 @@ void i8259_init(void) {
 	outb(ICW4, MASTER_8259_PORT + 1);
 	outb(ICW4, SLAVE_8259_PORT + 1);
 
-	initialize_keyboard();
+	//initialize_keyboard();
+
+	enable_irq(2);
+
 	initialize_RTC();
 
 	//SAVING THE MASKS
-	master_mask = inb(MASTER_8259_PORT + 1);
-	slave_mask = inb(SLAVE_8259_PORT + 1);
+	//master_mask = inb(MASTER_8259_PORT + 1);
+	//slave_mask = inb(SLAVE_8259_PORT + 1);
 }
 
 /* Enable (unmask) the specified IRQ */
@@ -52,7 +55,7 @@ void enable_irq(uint32_t irq_num) {
 	}
 	else{
 		port = SLAVE_8259_PORT + 1;
-		slave_mask = slave_mask & ~(1 << irq_num);
+		slave_mask = slave_mask & ~(1 << (irq_num - 8));
 		outb(slave_mask, port);
 	}
 }
@@ -68,7 +71,7 @@ void disable_irq(uint32_t irq_num) {
 	}
 	else{
 		port = SLAVE_8259_PORT + 1;
-		slave_mask = slave_mask | (1 << irq_num);//~ using this operator as we have mask the IRQ
+		slave_mask = slave_mask | (1 << (irq_num - 8));//~ using this operator as we have mask the IRQ
 		outb(slave_mask, port);
 	}
 }
@@ -76,9 +79,12 @@ void disable_irq(uint32_t irq_num) {
 /* Send end-of-interrupt signal for the specified IRQ */
 void send_eoi(uint32_t irq_num) {
 	if (irq_num >= 8){ //It means that the command is from slave. Therefore, we have to issue
-		outb(EOI | irq_num, SLAVE_8259_PORT);				//command to both PIC Chips
+		outb(EOI | (irq_num - 8), SLAVE_8259_PORT);				//command to both PIC Chips
+		outb(EOI | 2, MASTER_8259_PORT);
 	}
-	outb(EOI | irq_num, MASTER_8259_PORT);
+	else  {
+		outb(EOI | irq_num, MASTER_8259_PORT);
+	}
 }
 
 void initialize_keyboard(){
@@ -103,6 +109,7 @@ void initialize_RTC(){
 	outb(regB, 0x71);
 	sti();
 
-	enable_irq(2);
 	enable_irq(8);
+	outb(0x0C, 0x70);
+	inb(0x71);
 }

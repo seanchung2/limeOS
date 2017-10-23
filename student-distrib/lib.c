@@ -469,14 +469,16 @@ int8_t* strncpy(int8_t* dest, const int8_t* src, uint32_t n) {
  * Return Value: void
  * Function: increments video memory. To be used to test rtc */
 void test_interrupts(void) {
-    printf("test_interrupts reached \n");
+    cli();
     int32_t i;
+    int8_t garbage;
     for (i = 0; i < NUM_ROWS * NUM_COLS; i++) {
         video_mem[i << 1]++;
     }
     outb(0x0C, 0x70);
-    inb(0x71);
+    garbage = inb(0x71);
     send_eoi(8);
+    sti();
 }
 
 /* void reset_screen(void)
