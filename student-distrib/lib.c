@@ -2,7 +2,6 @@
  * vim:ts=4 noexpandtab */
 
 #include "lib.h"
-
 #define VIDEO       0xB8000
 #define NUM_COLS    80
 #define NUM_ROWS    25
@@ -11,7 +10,7 @@
 static int screen_x;
 static int screen_y;
 static char* video_mem = (char *)VIDEO;
-
+int RTC_STATUS=0;
 /* void clear(void);
  * Inputs: void
  * Return Value: none
@@ -473,7 +472,12 @@ void test_interrupts(void) {
     int32_t i;
     int8_t garbage;
     for (i = 0; i < NUM_ROWS * NUM_COLS; i++) {
-        video_mem[(i << 1) + 1]++;
+        if(RTC_STATUS == 1) {
+            video_mem[(i << 1) + 1]++;
+        }
+        else {
+            video_mem[(i << 1) + 1] = COLOR_SCREEN;
+        }
     }
     outb(0x0C, 0x70);
     garbage = inb(0x71);

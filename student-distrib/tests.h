@@ -13,4 +13,6 @@ int syscall_test();
 int paging_test_kernel();
 int paging_test_vidmem();
 
+void type_tester(char c);
+
 #endif /* TESTS_H */
