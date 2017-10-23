@@ -142,7 +142,7 @@ void entry(unsigned long magic, unsigned long addr) {
     reset_screen();
 
     /* Init the PIC */
-    printf("initializing devices\n");
+    printf("Initializing devices...\n");
     i8259_init();
 
     /* Initialize devices, memory, filesystem, enable device interrupts on the
@@ -160,6 +160,7 @@ void entry(unsigned long magic, unsigned long addr) {
     /* Run tests */
     launch_tests();
 #endif
+    sti();
     /* Execute the first program ("shell") ... */
 
     /* Spin (nicely, so we don't chew up cycles) */

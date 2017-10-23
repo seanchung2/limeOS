@@ -1,9 +1,4 @@
-
-#include "x86_desc.h"
-#include "lib.h"
-#include "i8259.h"
 #include "idt.h"
-#include "int_handler.h"
 
 /* init_idt
  *
