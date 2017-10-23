@@ -6,16 +6,17 @@
 #include "lib.h"
 
 /* Interrupt masks to determine which interrupts are enabled and disabled */
-static uint8_t master_mask = 0xff; /* IRQs 0-7  */
-static uint8_t slave_mask = 0xff;  /* IRQs 8-15 */
+//0xff - Active Low  Implementation
+static uint8_t master_mask = ACT_LOW; /* IRQs 0-7  */
+static uint8_t slave_mask = ACT_LOW;  /* IRQs 8-15 */
 
 /* Initialize the 8259 PIC */
 void i8259_init(void) {
 	
 
 	//Masking all interrupts
-	outb(0xff, MASTER_8259_PORT + 1);
-	outb(0xff, SLAVE_8259_PORT + 1);
+	outb(ACT_LOW, MASTER_8259_PORT + 1);
+	outb(ACT_LOW, SLAVE_8259_PORT + 1);
 
 	//Initialization Sequence  -- Uses ICW1
 	outb(ICW1, MASTER_8259_PORT);//Master initialization
@@ -86,30 +87,45 @@ void send_eoi(uint32_t irq_num) {
 	}
 }
 
+/* initialize_keyboard
+ *
+ * Description: Initializes the Keyboard
+ * Inputs: none
+ * Outputs: none
+ * Side Effects:
+ */
 void initialize_keyboard(){
-	outb(0xF6, 0x60);
+	outb(DEFAULT_PARA, KEYBOARD_PORT);
 	uint8_t check = 0x00;
-	while(check != 0xFA){
-		check = inb(0x60);
-		if(check == 0xFE){
-			outb(0xF6, 0x60);
+	while(check != KEYBOARD_ACK){
+		check = inb(KEYBOARD_PORT);
+		if(check == KEYBOARD_RESEND){
+			outb(DEFAULT_PARA, KEYBOARD_PORT);
 		}
 	}
 	enable_irq(1);
 }
 
+/* initialize_RTC
+ *
+ * Description: Initializes the RTC
+ * Inputs: none
+ * Outputs: none
+ * Side Effects:
+ */
 void initialize_RTC(){
 	//cli();
-	uint8_t regB = 0x00;
-	outb(0x8B, 0x70);
-	regB = inb(0x71);
-	regB = regB | 0x40;
-	outb(0x8B, 0x70);
-	outb(regB, 0x71);
+
+	uint8_t regB = 0x00;//Register B of RTC
+	outb(RTC_REG_B, RTC_PORT);
+	regB = inb(COMS_PORT);
+	regB = regB | 0x40;//This turns on bit 6
+	outb(RTC_REG_B, RTC_PORT);
+	outb(regB, COMS_PORT);
 	//sti();
 
 	enable_irq(2);
 	enable_irq(8);
-	outb(0x0C, 0x70);
-	inb(0x71);
+	outb(RTC_REG_C, RTC_PORT);
+	inb(COMS_PORT);
 }

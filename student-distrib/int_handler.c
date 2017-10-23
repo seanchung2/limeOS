@@ -1,6 +1,7 @@
 #include "int_handler.h"
 #include "lib.h"
 #include "i8259.h"
+#include "tests.h"
 
 /*
 * sys_handler()
@@ -42,7 +43,6 @@ void keyboard_handler ()
     /* Send end-of-interrupt signal for the specified IRQ */
     send_eoi(KEYBOARD_IRQ);
     sti();
-    while(1)  {}
 }
 
 /*
@@ -66,6 +66,7 @@ void keyboard_output_dealer (uint8_t c)
 			if(c == letter_code[i])
 			{
 				putc((LETTER_OFFSET+i));
+				type_tester((char)(LETTER_OFFSET+i));
 				found = i;
 				break;
 			}
@@ -79,9 +80,11 @@ void keyboard_output_dealer (uint8_t c)
 			if(c == number_code[i])
 			{
 				putc(NUMBER_OFFSET+i);
+				type_tester((char)(NUMBER_OFFSET+i));
 				found = i;
 				break;
 			}
 		}
 	}
 }
+

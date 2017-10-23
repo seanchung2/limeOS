@@ -6,6 +6,9 @@ static page_table_t PDT __attribute__( (aligned(FOUR_KB)) );
 // Video Memory Page Table struct
 static page_table_t PT0 __attribute__( (aligned(FOUR_KB)) );
 
+int PDT_addr = (int)&PDT;
+int PT0_addr = (int)&PT0;
+
 /*
  * init_paging()
  * Inputs: none
@@ -15,9 +18,7 @@ static page_table_t PT0 __attribute__( (aligned(FOUR_KB)) );
  */
 void init_paging()  {
 	int i;
-	int PDT_addr = (int)&PDT;
-	int PT0_addr = (int)&PT0;
-
+	
 	printf("Initializing Paging... \n");
 	// Initialize all entries to zero
 	for(i = 0; i < PAGE_SIZE; i++)  {

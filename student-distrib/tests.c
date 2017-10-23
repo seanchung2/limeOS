@@ -2,6 +2,8 @@
 #include "x86_desc.h"
 #include "lib.h"
 #include "int_handler.h"
+#include "i8259.h"
+#include "paging.h"
 
 #define PASS 1
 #define FAIL 0
@@ -44,6 +46,25 @@ int idt_test(){
 	}
 
 	return result;
+}
+
+void type_tester(char c)  {
+	if(c == '0')  {
+		printf("\n");
+		divide_zero_test();
+	}
+	if(c == 'n')  {
+		printf("\n");
+		deref_null_test();
+	}
+	if(c == 'r')  {
+		if(RTC_STATUS == 0) {
+			RTC_STATUS = 1;
+		}
+		else  {
+			RTC_STATUS = 0;
+		}
+	}
 }
 
 /* Divide by 0 test
@@ -171,66 +192,30 @@ int paging_test_vidmem()  {
 }
 
 
-/* keyboard_handler_letter_test
+/* paging_value_test
  *
- * Check if the interpret from scancodes is correct
+ * Test whether the paging table has been initialized
  * Input: none
  * Output: PASS/FAIL
  * Side Effects: none
- * Coverage: keyboard handler
- * Files: int_handler.c
+ * Coverage: PDT[0], PDT[1], PT0[184]
+ * Files: paging.c
  */
-int keyboard_handler_letter_test()  {
+int paging_value_test()  {
 	TEST_HEADER;
+	int *ptr = (int*)PDT_addr;
+	if( ptr[0] == 0)  {
+		return FAIL;
+	}
+	if( ptr[1] == 0)  {
+		return FAIL;
+	}
 
-	int result = FAIL;
-	uint8_t c = 0;
-
-	cli();
-	printf("Type \"a\":");
-    do {
-        if(inb(KEYBOARD_DATA_PORT) != c) {
-            c = inb(KEYBOARD_DATA_PORT);
-            if(c > 0)
-                break;
-        }
-    } while(1);
-	if (c == letter_code[0])
-		result = PASS;
-	sti();
-
-	return result;
-}
-
-/* keyboard_handler_num_test
- *
- * Check if the interpret from scancodes is correct
- * Input: none
- * Output: PASS/FAIL
- * Side Effects: none
- * Coverage: keyboard handler
- * Files: int_handler.c
- */
-int keyboard_handler_num_test()  {
-	TEST_HEADER;
-
-	int result = FAIL;
-	uint8_t c = 0;
-
-	cli();
-	printf("Type \"0\":");
-    do {
-        if(inb(KEYBOARD_DATA_PORT) != c) {
-            c = inb(KEYBOARD_DATA_PORT);
-            if(c > 0)
-                break;
-        }
-    } while(1);
-	if (c == number_code[0])
-		result = PASS;
-	sti();
-
-	return result;
+	ptr = (int*)PT0_addr;
+	if( ptr[VID_MEM_INDEX] == 0)  {
+		return FAIL;
+	}
+	return PASS;
 }
 
 /* Checkpoint 2 tests */
@@ -247,9 +232,6 @@ void launch_tests(){
 	TEST_OUTPUT("syscall_test",syscall_test());
 	TEST_OUTPUT("paging_test_kernel", paging_test_kernel());
 	TEST_OUTPUT("paging_test_vidmem", paging_test_vidmem());
-	TEST_OUTPUT("keyboard_handler_letter_test", keyboard_handler_letter_test());
-	TEST_OUTPUT("keyboard_handler_num_test", keyboard_handler_num_test());
-	deref_null_test();
-	//divide_zero_test();
+	TEST_OUTPUT("paging_value_test", paging_value_test());
 
 }
