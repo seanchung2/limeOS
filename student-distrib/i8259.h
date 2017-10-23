@@ -27,6 +27,21 @@
  * to declare the interrupt finished */
 #define EOI                 0x60
 
+/*Definitions for Keyboard*/
+#define DEFAULT_PARA 		0xF6
+#define KEYBOARD_ACK 		0xFA
+#define KEYBOARD_RESEND 	0xFE
+#define KEYBOARD_PORT 		0x60
+
+/*Definitions for RTC*/
+#define	RTC_REG_B 			0x8B
+#define RTC_REG_C 			0x0C
+#define RTC_PORT 			0x70
+#define COMS_PORT 			0x71
+
+/*Activve Low Implementation Constant*/
+#define ACT_LOW				0xFF
+
 /* Externally-visible functions */
 
 /* Initialize both PICs */
@@ -38,8 +53,22 @@ void disable_irq(uint32_t irq_num);
 /* Send end-of-interrupt signal for the specified IRQ */
 void send_eoi(uint32_t irq_num);
 
+/* initialize_keyboard
+ *
+ * Description: Initializes the Keyboard
+ * Inputs: none
+ * Outputs: none
+ * Side Effects:
+ */
 void initialize_keyboard();
 
+/* initialize_RTC
+ *
+ * Description: Initializes the RTC
+ * Inputs: none
+ * Outputs: none
+ * Side Effects:
+ */
 void initialize_RTC();
 
 #endif /* _I8259_H */
