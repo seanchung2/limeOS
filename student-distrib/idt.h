@@ -158,6 +158,10 @@ void XF()  {
 	while(1) {}
 }
 
+/* a wrapper to map idt table to keyboard_handler */
+void k_handler();
+/* a wrapper to map idt table to RTC_handler */
+void R_handler();
 
 /* initialize the IDT */
 extern void init_idt();

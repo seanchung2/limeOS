@@ -38,6 +38,7 @@ _tss:
 tss_bottom:
 
     .align  16
+#By lg6: Initally an empty GDT created by 391 staff.
 gdt:
 _gdt:
 
