@@ -9,7 +9,6 @@
  */
 void init_idt()
 {
-
 	int i;
 
 	// load IDT
@@ -91,19 +90,19 @@ void k_handler()
 					"pushl	%ebx;"	
 					"pushl	%esi;"
 					"pushl	%edi;"
-					"pushl	%eax;"
-					"pushl	%ecx;"
-					"pushl	%edx;"
-					"call 	keyboard_handler;"
-					"popl	%edx;"
-					"popl	%ecx;"
-					"popl	%eax;"
+						"pushl	%eax;"
+						"pushl	%ecx;"
+						"pushl	%edx;"
+							"call 	keyboard_handler;"
+						"popl	%edx;"
+						"popl	%ecx;"
+						"popl	%eax;"
 					"popl	%edi;"
 					"popl	%esi;"
 					"popl	%ebx;"
 					"leave;"
 					"iret;"
-									);
+				);
 }
 
 /* 
@@ -119,13 +118,13 @@ void R_handler()
 					"pushl	%ebx;"	
 					"pushl	%esi;"
 					"pushl	%edi;"
-					"pushl	%eax;"
-					"pushl	%ecx;"
-					"pushl	%edx;"
-					"call 	test_interrupts;"
-					"popl	%edx;"
-					"popl	%ecx;"
-					"popl	%eax;"
+						"pushl	%eax;"
+						"pushl	%ecx;"
+						"pushl	%edx;"
+							"call 	test_interrupts;"
+						"popl	%edx;"
+						"popl	%ecx;"
+						"popl	%eax;"
 					"popl	%edi;"
 					"popl	%esi;"
 					"popl	%ebx;"

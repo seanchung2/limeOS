@@ -10,10 +10,15 @@
 static uint8_t master_mask = ACT_LOW; /* IRQs 0-7  */
 static uint8_t slave_mask = ACT_LOW;  /* IRQs 8-15 */
 
-/* Initialize the 8259 PIC */
+/* i8259_init
+ *
+ * Description: Initialize the 8259 PIC
+ * Inputs: none
+ * Outputs: none
+ * Side Effects: as description
+ */
 void i8259_init(void) {
 	
-
 	//Masking all interrupts
 	outb(ACT_LOW, MASTER_8259_PORT + 1);
 	outb(ACT_LOW, SLAVE_8259_PORT + 1);
@@ -34,17 +39,18 @@ void i8259_init(void) {
 	outb(ICW4, MASTER_8259_PORT + 1);
 	outb(ICW4, SLAVE_8259_PORT + 1);
 
-	initialize_keyboard();
-
-
-	initialize_RTC();
-
 	//SAVING THE MASKS
 	//master_mask = inb(MASTER_8259_PORT + 1);
 	//slave_mask = inb(SLAVE_8259_PORT + 1);
 }
 
-/* Enable (unmask) the specified IRQ */
+/* enable_irq
+ *
+ * Description: Enable (unmask) the specified IRQ
+ * Inputs: none
+ * Outputs: none
+ * Side Effects: as description
+ */
 void enable_irq(uint32_t irq_num) {
 	uint16_t port;
 
@@ -60,7 +66,13 @@ void enable_irq(uint32_t irq_num) {
 	}
 }
 
-/* Disable (mask) the specified IRQ */
+/* disable_irq
+ *
+ * Description: Disable (mask) the specified IRQ
+ * Inputs: none
+ * Outputs: none
+ * Side Effects: as description
+ */
 void disable_irq(uint32_t irq_num) {
 	uint16_t port;
 
@@ -76,7 +88,13 @@ void disable_irq(uint32_t irq_num) {
 	}
 }
 
-/* Send end-of-interrupt signal for the specified IRQ */
+/* send_eoi
+ *
+ * Description: Send end-of-interrupt signal for the specified IRQ
+ * Inputs: none
+ * Outputs: none
+ * Side Effects: as description
+ */
 void send_eoi(uint32_t irq_num) {
 	if (irq_num >= 8){ //It means that the command is from slave. Therefore, we have to issue
 		outb(EOI | (irq_num - 8), SLAVE_8259_PORT);				//command to both PIC Chips
@@ -92,7 +110,7 @@ void send_eoi(uint32_t irq_num) {
  * Description: Initializes the Keyboard
  * Inputs: none
  * Outputs: none
- * Side Effects:
+ * Side Effects: as description
  */
 void initialize_keyboard(){
 	outb(DEFAULT_PARA, KEYBOARD_PORT);
@@ -111,7 +129,7 @@ void initialize_keyboard(){
  * Description: Initializes the RTC
  * Inputs: none
  * Outputs: none
- * Side Effects:
+ * Side Effects: as description
  */
 void initialize_RTC(){
 	//cli();

@@ -48,15 +48,30 @@ int idt_test(){
 	return result;
 }
 
+/* 
+ * type_tester(char c)
+ * test the exceptions, rtc, and keyboard decided
+ *				by input "c" 
+ * Inputs: c: character sent by int_handler.c
+ * Outputs: PASS/FAIL
+ * Side Effects: None
+ * Coverage: Load IDT, IDT definition
+ * Files: idt.c, int_handler.c
+ */
 void type_tester(char c)  {
+	/* if receive '0', trigger devide by zero exception */
 	if(c == '0')  {
 		printf("\n");
 		divide_zero_test();
 	}
+
+	/* if receive 'n', trigger dereference null exception */
 	if(c == 'n')  {
 		printf("\n");
 		deref_null_test();
 	}
+
+	/* if receive 'r', toggle the RTC */
 	if(c == 'r')  {
 		if(RTC_STATUS == 0) {
 			RTC_STATUS = 1;
@@ -104,24 +119,6 @@ void deref_null_test()  {
 	i = *(ref);
 }
 
-/* Overflow test
- *
- * Attempts to make an integer overflow
- * Inputs: none
- * Outputs: PASS/FAIL
- * Side Effects: none
- * Coverage: IDT exception handler
- * Files: idt.c
- */
-/*int overflow_test()  {
-	TEST_HEADER;
-
-	int result = PASS;
-	//int i = 100+ 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
-	//i = 1;
-	return result;
-}*/
-
 /* System Call test
  *
  * Attempts to call system call
@@ -129,7 +126,7 @@ void deref_null_test()  {
  * Outputs: PASS/FAIL
  * Side Effects: none
  * Coverage: IDT system call handler
- * Files: idt.c
+ * Files: int_handler.c
  */
 int syscall_test()
 {

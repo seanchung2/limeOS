@@ -13,14 +13,6 @@
 #define KEYBOARD_VEC_NUM 0x21
 #define RTC_VEC_NUM 0x28
 
-/* Setup a macro handler */
-#define EXECPTION_HANDLER (exeception_name,msg_print)	\
-void exeception_name()									\
-{														\
-	printf("%s\n",#msg_print); 							\
-	while(1);											\
-}
-
 /* Define the handler for undefined interrupt
  * Inputs: none
  * Outputs: none

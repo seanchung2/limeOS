@@ -10,7 +10,10 @@
 static int screen_x;
 static int screen_y;
 static char* video_mem = (char *)VIDEO;
-int RTC_STATUS=0;
+
+/* self-defined variables */
+int RTC_STATUS=0;       /* for test use */
+
 /* void clear(void);
  * Inputs: void
  * Return Value: none

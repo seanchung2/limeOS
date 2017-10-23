@@ -8,8 +8,10 @@
 #include "types.h"
 #include "i8259.h"
 
-extern int RTC_STATUS;
-#define COLOR_SCREEN 7
+/* self-defined variables */
+extern int RTC_STATUS;              // for test
+#define COLOR_SCREEN 7              // for text color when rtc disabled
+
 int32_t printf(int8_t *format, ...);
 void putc(uint8_t c);
 int32_t puts(int8_t *s);

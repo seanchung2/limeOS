@@ -16,8 +16,18 @@
 /* Check if the bit BIT in FLAGS is set. */
 #define CHECK_FLAG(flags, bit)   ((flags) & (1 << (bit)))
 
-/* Check if MAGIC is valid and print the Multiboot information structure
-   pointed by ADDR. */
+
+/*
+* entry(unsigned long magic, unsigned long addr)
+* Check if MAGIC is valid and print the Multiboot 
+*           information structure pointed by ADDR
+*           Also initialize pic, keyboard, rtc, and paging
+* input: magic: check if I am booted by a 
+                    Multiboot-compliant boot loader?
+*        addr: the address of the Multiboot information structure
+* output: none
+* side effect: as description
+*/
 void entry(unsigned long magic, unsigned long addr) {
 
     multiboot_info_t *mbi;
@@ -147,6 +157,8 @@ void entry(unsigned long magic, unsigned long addr) {
 
     /* Initialize devices, memory, filesystem, enable device interrupts on the
      * PIC, any other initialization stuff... */
+    initialize_keyboard();
+    initialize_RTC();
     init_paging();
 
     /* Enable interrupts */

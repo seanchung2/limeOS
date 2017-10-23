@@ -6,6 +6,7 @@ static page_table_t PDT __attribute__( (aligned(FOUR_KB)) );
 // Video Memory Page Table struct
 static page_table_t PT0 __attribute__( (aligned(FOUR_KB)) );
 
+/* store directory and table addresses */
 int PDT_addr = (int)&PDT;
 int PT0_addr = (int)&PT0;
 
@@ -20,6 +21,7 @@ void init_paging()  {
 	int i;
 	
 	printf("Initializing Paging... \n");
+
 	// Initialize all entries to zero
 	for(i = 0; i < PAGE_SIZE; i++)  {
 		PDT.entries[i] = 0;
@@ -45,7 +47,7 @@ void init_paging()  {
 						: "eax", "cc"
 						);
 
-	// Set Page Size Extension in CR3
+	// Set Page Size Extension in CR4
 	asm volatile (	"movl %%CR4, %%eax;"
 					"orl $0x10, %%eax;"
 					"movl %%eax, %%CR4;"

@@ -56,9 +56,14 @@ void keyboard_output_dealer (uint8_t c)
 {
 	int i;
 	int found = -1;
+
+	/* if the scancode is "enter" */
 	if(c == 0x1C)  {
 		putc('\n');
+		found = 1;
 	}
+
+	/* check if the scancode is part of lower letters */
 	if(found < 0)
 	{
 		for(i=0; i<LETTER_NUM;i++)
@@ -66,6 +71,7 @@ void keyboard_output_dealer (uint8_t c)
 			if(c == letter_code[i])
 			{
 				putc((LETTER_OFFSET+i));
+				/* go to "type_tester" to check if the key is part of saved keys for test */
 				type_tester((char)(LETTER_OFFSET+i));
 				found = i;
 				break;
@@ -73,6 +79,7 @@ void keyboard_output_dealer (uint8_t c)
 		}
 	}
 
+	/* check if the scancode is part of numbers */
 	if(found < 0)
 	{
 		for(i=0; i<NUMBER_NUM;i++)
@@ -80,6 +87,7 @@ void keyboard_output_dealer (uint8_t c)
 			if(c == number_code[i])
 			{
 				putc(NUMBER_OFFSET+i);
+				/* go to "type_tester" to check if the key is part of saved keys for test */
 				type_tester((char)(NUMBER_OFFSET+i));
 				found = i;
 				break;
