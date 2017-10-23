@@ -54,6 +54,7 @@ void keyboard_handler ()
     /* Send end-of-interrupt signal for the specified IRQ */
     send_eoi(KEYBOARD_IRQ);
 	sti();
+	while(1);
 }
 
 /*

@@ -11,11 +11,9 @@ uint8_t slave_mask = 0xff;  /* IRQs 8-15 */
 
 /* Initialize the 8259 PIC */
 void i8259_init(void) {
-	
-
 	//Masking all interrupts
-	outb(0xff, MASTER_8259_PORT + 1);
-	outb(0xff, SLAVE_8259_PORT + 1);
+//	outb(0xff, MASTER_8259_PORT + 1);
+//	outb(0xff, SLAVE_8259_PORT + 1);
 
 	//Initialization Sequence  -- Uses ICW1
 	outb(ICW1, MASTER_8259_PORT);//Master initialization
@@ -33,10 +31,12 @@ void i8259_init(void) {
 	outb(ICW4, MASTER_8259_PORT + 1);
 	outb(ICW4, SLAVE_8259_PORT + 1);
 
-	initialize_keyboard();
 	initialize_RTC();
+	initialize_keyboard();
 
 	//SAVING THE MASKS
+//	outb(master_mask, MASTER_8259_PORT + 1);
+//	outb(slave_mask, SLAVE_8259_PORT + 1);
 	master_mask = inb(MASTER_8259_PORT + 1);
 	slave_mask = inb(SLAVE_8259_PORT + 1);
 }
@@ -47,12 +47,16 @@ void enable_irq(uint32_t irq_num) {
 
 	if(irq_num < 8){
 		port = MASTER_8259_PORT + 1;
-		master_mask = master_mask & ~(1 << irq_num);
+		master_mask = master_mask & ( ~(1 << irq_num) );
 		outb(master_mask, port);
 	}
 	else{
+//		port = MASTER_8259_PORT + 1;
+//		master_mask = master_mask & ( ~(1 << 2) );
+//		outb(master_mask, port);
+
 		port = SLAVE_8259_PORT + 1;
-		slave_mask = slave_mask & ~(1 << irq_num);
+		slave_mask = slave_mask & ( ~(1 << (irq_num-8)) );
 		outb(slave_mask, port);
 	}
 }
@@ -68,7 +72,7 @@ void disable_irq(uint32_t irq_num) {
 	}
 	else{
 		port = SLAVE_8259_PORT + 1;
-		slave_mask = slave_mask | (1 << irq_num);//~ using this operator as we have mask the IRQ
+		slave_mask = slave_mask | ( (1 << (irq_num-8)) );//~ using this operator as we have mask the IRQ
 		outb(slave_mask, port);
 	}
 }
@@ -76,7 +80,8 @@ void disable_irq(uint32_t irq_num) {
 /* Send end-of-interrupt signal for the specified IRQ */
 void send_eoi(uint32_t irq_num) {
 	if (irq_num >= 8){ //It means that the command is from slave. Therefore, we have to issue
-		outb(EOI | irq_num, SLAVE_8259_PORT);				//command to both PIC Chips
+		outb(EOI | (irq_num-8) , SLAVE_8259_PORT);				//command to both PIC Chips
+		outb(EOI | 2, MASTER_8259_PORT);
 	}
 	outb(EOI | irq_num, MASTER_8259_PORT);
 }
@@ -101,8 +106,11 @@ void initialize_RTC(){
 	regB = regB | 0x40;
 	outb(0x8B, 0x70);
 	outb(regB, 0x71);
+
+	outb(0x0C,0x70);	// select register C
+	inb(0x71);		// just throw away contents
 	sti();
 
-	enable_irq(2);
+	//enable_irq(2);
 	enable_irq(8);
 }
