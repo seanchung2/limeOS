@@ -35,8 +35,6 @@ void sys_handler ()
 void keyboard_handler ()
 {
 	/* prevent another keyboard or other interrputs from interrputing this handler */
-	cli();
-
 	uint8_t c = 0;
 
 	/* get the data from keyboard data port */
@@ -53,7 +51,8 @@ void keyboard_handler ()
 
     /* Send end-of-interrupt signal for the specified IRQ */
     send_eoi(KEYBOARD_IRQ);
-	sti();
+    while(1);
+
 }
 
 /*

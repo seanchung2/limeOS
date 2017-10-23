@@ -33,7 +33,7 @@ void i8259_init(void) {
 	outb(ICW4, MASTER_8259_PORT + 1);
 	outb(ICW4, SLAVE_8259_PORT + 1);
 
-	//initialize_keyboard();
+	initialize_keyboard();
 
 	enable_irq(2);
 
