@@ -1,6 +1,7 @@
 #include "tests.h"
 #include "x86_desc.h"
 #include "lib.h"
+#include "int_handler.h"
 
 #define PASS 1
 #define FAIL 0
@@ -169,6 +170,69 @@ int paging_test_vidmem()  {
 	return PASS;
 }
 
+
+/* keyboard_handler_letter_test
+ *
+ * Check if the interpret from scancodes is correct
+ * Input: none
+ * Output: PASS/FAIL
+ * Side Effects: none
+ * Coverage: keyboard handler
+ * Files: int_handler.c
+ */
+int keyboard_handler_letter_test()  {
+	TEST_HEADER;
+
+	int result = FAIL;
+	uint8_t c = 0;
+
+	cli();
+	printf("Type \"a\":");
+    do {
+        if(inb(KEYBOARD_DATA_PORT) != c) {
+            c = inb(KEYBOARD_DATA_PORT);
+            if(c > 0)
+                break;
+        }
+    } while(1);
+	if (c == letter_code[0])
+		result = PASS;
+	sti();
+
+	return result;
+}
+
+/* keyboard_handler_num_test
+ *
+ * Check if the interpret from scancodes is correct
+ * Input: none
+ * Output: PASS/FAIL
+ * Side Effects: none
+ * Coverage: keyboard handler
+ * Files: int_handler.c
+ */
+int keyboard_handler_num_test()  {
+	TEST_HEADER;
+
+	int result = FAIL;
+	uint8_t c = 0;
+
+	cli();
+	printf("Type \"0\":");
+    do {
+        if(inb(KEYBOARD_DATA_PORT) != c) {
+            c = inb(KEYBOARD_DATA_PORT);
+            if(c > 0)
+                break;
+        }
+    } while(1);
+	if (c == number_code[0])
+		result = PASS;
+	sti();
+
+	return result;
+}
+
 /* Checkpoint 2 tests */
 /* Checkpoint 3 tests */
 /* Checkpoint 4 tests */
@@ -183,7 +247,9 @@ void launch_tests(){
 	TEST_OUTPUT("syscall_test",syscall_test());
 	TEST_OUTPUT("paging_test_kernel", paging_test_kernel());
 	TEST_OUTPUT("paging_test_vidmem", paging_test_vidmem());
-	//deref_null_test();
+	TEST_OUTPUT("keyboard_handler_letter_test", keyboard_handler_letter_test());
+	TEST_OUTPUT("keyboard_handler_num_test", keyboard_handler_num_test());
+	deref_null_test();
 	//divide_zero_test();
 
 }
