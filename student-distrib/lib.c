@@ -479,7 +479,6 @@ void test_interrupts(void) {
     garbage = inb(0x71);
     send_eoi(8);
     sti();
-    while(1);
 }
 
 /* void reset_screen(void)
