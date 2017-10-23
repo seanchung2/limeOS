@@ -1,0 +1,21 @@
+*****	LimeOS MP3 Buglog:	*****
+*********************************
+
+CHECKPOINT 1:
+*************
+
+BUG 1:
+Description:	We attempted to use a macro to declare the basic exception handlers
+				we are using.
+Fix:			Instead of using a macro, we wrote all of the fuctions by hand in 
+				the header file.
+
+BUG 2:
+Description:	The RTC was not intializing while the keyboard was initialized.
+				Both of them would work individually, but attempting to intialize
+				both of them at the same time would result in the RTC producing
+				no interupts
+Fix:			We put a while loop at the end of both interupt handlers as a
+				replacment for an assembly wrapper. In the future we will write
+				a wrapper to properly handle this problem, but for now this allows
+				us to run the code and test other aspects of our OS.
