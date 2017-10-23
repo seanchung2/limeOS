@@ -110,6 +110,3 @@ dkms.conf
 # 391 specific
 *.qcow
 source/
-
-student-distrib/mp3.img
-
