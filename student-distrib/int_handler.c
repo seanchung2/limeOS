@@ -38,6 +38,7 @@ void keyboard_handler ()
 	uint8_t c = 0;
 
 	/* get the data from keyboard data port */
+	cli();
     do {
         if(inb(KEYBOARD_DATA_PORT) != c) {
             c = inb(KEYBOARD_DATA_PORT);
@@ -51,8 +52,8 @@ void keyboard_handler ()
 
     /* Send end-of-interrupt signal for the specified IRQ */
     send_eoi(KEYBOARD_IRQ);
-    while(1);
-
+    sti();
+    while(1)  {}
 }
 
 /*

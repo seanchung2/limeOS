@@ -35,7 +35,6 @@ void i8259_init(void) {
 
 	initialize_keyboard();
 
-	enable_irq(2);
 
 	initialize_RTC();
 
@@ -100,15 +99,16 @@ void initialize_keyboard(){
 }
 
 void initialize_RTC(){
-	cli();
+	//cli();
 	uint8_t regB = 0x00;
 	outb(0x8B, 0x70);
 	regB = inb(0x71);
 	regB = regB | 0x40;
 	outb(0x8B, 0x70);
 	outb(regB, 0x71);
-	sti();
+	//sti();
 
+	enable_irq(2);
 	enable_irq(8);
 	outb(0x0C, 0x70);
 	inb(0x71);

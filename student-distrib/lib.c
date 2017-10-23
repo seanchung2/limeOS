@@ -473,12 +473,13 @@ void test_interrupts(void) {
     int32_t i;
     int8_t garbage;
     for (i = 0; i < NUM_ROWS * NUM_COLS; i++) {
-        video_mem[i << 1]++;
+        video_mem[(i << 1) + 1]++;
     }
     outb(0x0C, 0x70);
     garbage = inb(0x71);
     send_eoi(8);
     sti();
+    while(1);
 }
 
 /* void reset_screen(void)
