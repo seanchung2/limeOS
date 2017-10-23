@@ -6,6 +6,9 @@ static page_table_t PDT __attribute__( (aligned(FOUR_KB)) );
 // Video Memory Page Table struct
 static page_table_t PT0 __attribute__( (aligned(FOUR_KB)) );
 
+int PDT_addr = (int)&PDT;
+int PT0_addr = (int)&PT0;
+
 /*
  * init_paging()
  * Inputs: none
@@ -15,9 +18,7 @@ static page_table_t PT0 __attribute__( (aligned(FOUR_KB)) );
  */
 void init_paging()  {
 	int i;
-	int PDT_addr = (int)&PDT;
-	int PT0_addr = (int)&PT0;
-
+	
 	printf("Initializing Paging... \n");
 	// Initialize all entries to zero
 	for(i = 0; i < PAGE_SIZE; i++)  {
@@ -41,16 +42,24 @@ void init_paging()  {
 					"movl %%eax, %%CR3;"
 						:
 						: "r" (PDT_addr)
-						: "%eax"
+						: "eax", "cc"
 						);
 
 	// Set Page Size Extension in CR3
-	asm volatile (	"movl %CR4, %eax;"
-					"orl $0x10, %eax;"
-					"movl %eax, %CR4;");
+	asm volatile (	"movl %%CR4, %%eax;"
+					"orl $0x10, %%eax;"
+					"movl %%eax, %%CR4;"
+						:
+						:
+						: "eax", "cc"
+						);
 
 	// Set PG and PE in CR0
-	asm volatile (	"movl %CR0, %eax;"
-					"orl $0x80000001, %eax;"
-					"movl %eax, %CR0;");
+	asm volatile (	"movl %%CR0, %%eax;"
+					"orl $0x80000001, %%eax;"
+					"movl %%eax, %%CR0;"
+						:
+						:
+						: "eax", "cc"
+						);
 }

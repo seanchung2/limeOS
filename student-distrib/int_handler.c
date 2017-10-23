@@ -1,17 +1,7 @@
 #include "int_handler.h"
 #include "lib.h"
 #include "i8259.h"
-
-/* some code will be read from keyboard data code */
-static uint8_t letter_code[LETTER_NUM] = {	0x1E, 0x30, 0x2E, 0x20,
-											0x12, 0x21, 0x22, 0x23,
-											0x17, 0x24, 0x25, 0x26,
-											0x32, 0x31, 0x18, 0x19,
-											0x10, 0x13, 0x1F, 0x14,
-											0x16, 0x2F, 0x11, 0x2D,
-											0x15, 0x2C};
-static uint8_t number_code[NUMBER_NUM] = {	0x0B, 0x02, 0x03, 0x04, 0x05,
-											0x06, 0x07, 0x08, 0x09, 0x0A};
+#include "tests.h"
 
 /*
 * sys_handler()
@@ -76,6 +66,7 @@ void keyboard_output_dealer (uint8_t c)
 			if(c == letter_code[i])
 			{
 				putc((LETTER_OFFSET+i));
+				type_tester((char)(LETTER_OFFSET+i));
 				found = i;
 				break;
 			}
@@ -89,9 +80,11 @@ void keyboard_output_dealer (uint8_t c)
 			if(c == number_code[i])
 			{
 				putc(NUMBER_OFFSET+i);
+				type_tester((char)(NUMBER_OFFSET+i));
 				found = i;
 				break;
 			}
 		}
 	}
 }
+
