@@ -6,6 +6,7 @@
 #include "i8259.h"
 #include "idt.h"
 #include "int_handler.h"
+#include "keyboard.h"
 
 /* Define variables */
 #define SYSTEM_CALL_VEC_NUM 0x80

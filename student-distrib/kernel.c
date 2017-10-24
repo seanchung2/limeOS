@@ -9,6 +9,7 @@
 #include "debug.h"
 #include "tests.h"
 #include "paging.h"
+#include "keyboard.h"
 
 #define RUN_TESTS
 

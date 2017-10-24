@@ -4,6 +4,7 @@
 #include "int_handler.h"
 #include "i8259.h"
 #include "paging.h"
+#include "keyboard.h"
 
 #define PASS 1
 #define FAIL 0

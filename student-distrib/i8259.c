@@ -105,24 +105,6 @@ void send_eoi(uint32_t irq_num) {
 	}
 }
 
-/* initialize_keyboard
- *
- * Description: Initializes the Keyboard
- * Inputs: none
- * Outputs: none
- * Side Effects: as description
- */
-void initialize_keyboard(){
-	outb(DEFAULT_PARA, KEYBOARD_PORT);
-	uint8_t check = 0x00;
-	while(check != KEYBOARD_ACK){
-		check = inb(KEYBOARD_PORT);
-		if(check == KEYBOARD_RESEND){
-			outb(DEFAULT_PARA, KEYBOARD_PORT);
-		}
-	}
-	enable_irq(1);
-}
 
 /* initialize_RTC
  *
