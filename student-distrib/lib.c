@@ -498,3 +498,18 @@ void reset_screen(void)  {
     screen_x = 0;
     screen_y = 0;
 }
+
+/* void backspace_pressed(void)
+ * draw blank at prevoius video memory and move cursor back 
+ * Inputs: void
+ * Return Value: void
+ * Function: as description
+ */
+void backspace_pressed(void){
+    screen_x --;
+    if (screen_x < 0){
+        screen_x += NUM_COLS; 
+    }
+    *(uint8_t *)(video_mem + ((NUM_COLS * screen_y + screen_x) << 1)) = ' ';
+    *(uint8_t *)(video_mem + ((NUM_COLS * screen_y + screen_x) << 1) + 1) = ATTRIB;
+}

@@ -3,6 +3,15 @@
 #include "i8259.h"
 #include "tests.h"
 
+/* store the status of shift/ctrl */
+int shift_flag = 0;
+int ctrl_flag = 0;
+int capslock_flag = 0;
+int release_caps = 1;
+
+/* store the input characters */
+int buf_index = 0;
+uint8_t char_buf[CHARACTER_BUFFER_SIZE];
 
 /* initialize_keyboard
  *
@@ -66,21 +75,78 @@ void keyboard_output_dealer (uint8_t c)
 	int found = -1;
 
 	/* if the scancode is "enter" */
-	if(c == 0x1C)  {
+	if(c == PRESS_ENTER)  {
 		putc('\n');
 		found = 1;
 	}
 
-	/* check if the scancode is part of lower letters */
+	/* if the scancode is "press_shift" */
+	if (c == PRESS_LEFT_SHIFT || c == PRESS_RIGHT_SHIFT){
+		shift_flag = 1;
+	}
+
+	/* if the scancode is "release_shift" */
+	if (c == RELEASE_LEFT_SHIFT || c == RELEASE_RIGHT_SHIFT){
+		shift_flag = 0;
+	}
+
+	/* if the scancode is "press_ctrl" */
+	if (c == PRESS_LEFT_CTRL){
+		ctrl_flag = 1;
+	}
+
+	/* if the scancode is "release_ctrl" */
+	if (c == RELEASE_LEFT_CTRL){
+		ctrl_flag = 0;
+	}
+
+	/* if the scancode is "backspace" */
+	if (c == PRESS_BACKSPACE)
+	{
+		backspace_pressed();
+		return;
+	}
+
+	/* if the scancode is "press_capslock" */
+	if (c == PRESS_CAPSLOCK)
+	{
+		if (release_caps == 1){
+			capslock_flag ^= 1;
+			release_caps = 0;
+		}
+	}
+
+	/* if the scancode is "release_capslock" */
+	if (c == RELEASE_CAPSLOCK)
+	{
+		release_caps = 1;
+	}
+
+	/* check if the scancode is part of letters */
 	if(found < 0)
 	{
 		for(i=0; i<LETTER_NUM;i++)
 		{
 			if(c == letter_code[i])
 			{
-				putc((LETTER_OFFSET+i));
+				/* if CTRL+L is pressed, clean the screen and reset the cursor position */
+				if (ctrl_flag ==1 && c == 0x26 ){
+					clear();
+					reset_screen();
+					return;
+				}
+
+				/* shift is pressed 	-> upper case */
+				if( (shift_flag ^ capslock_flag) == 1){
+					putc((UPPER_LETTER_OFFSET+i));
+				}
+				/* shift is not pressed -> lower case */
+				else{
+					putc((LOWER_LETTER_OFFSET+i));
+				}
+
 				/* go to "type_tester" to check if the key is part of saved keys for test */
-				type_tester((char)(LETTER_OFFSET+i));
+				//type_tester((char)(LETTER_OFFSET+i));
 				found = i;
 				break;
 			}
@@ -94,9 +160,17 @@ void keyboard_output_dealer (uint8_t c)
 		{
 			if(c == number_code[i])
 			{
-				putc(NUMBER_OFFSET+i);
+				/* shift is pressed 	-> sign */
+				if(shift_flag == 1){
+					putc(sign_asciicode[i]);
+				}
+				/* shift is not pressed -> number */
+				else{
+					putc(NUMBER_OFFSET+i);
+				}
+
 				/* go to "type_tester" to check if the key is part of saved keys for test */
-				type_tester((char)(NUMBER_OFFSET+i));
+				//type_tester((char)(NUMBER_OFFSET+i));
 				found = i;
 				break;
 			}
