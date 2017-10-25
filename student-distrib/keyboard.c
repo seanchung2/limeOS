@@ -121,6 +121,13 @@ void keyboard_output_dealer (uint8_t c)
 	{
 		release_caps = 1;
 	}
+	
+	/* if the scancode is "PRESS_SPACE" */
+	if (c == PRESS_SPACE)
+	{
+		putc(' ');
+		found = ' ';
+	}
 
 	/* check if the scancode is part of letters */
 	if(found < 0)
@@ -130,7 +137,7 @@ void keyboard_output_dealer (uint8_t c)
 			if(c == letter_code[i])
 			{
 				/* if CTRL+L is pressed, clean the screen and reset the cursor position */
-				if (ctrl_flag ==1 && c == 0x26 ){
+				if (ctrl_flag ==1 && c == letter_code[L_ORDER]){
 					clear();
 					reset_screen();
 					return;
