@@ -177,8 +177,9 @@ void putc(uint8_t c) {
         *(uint8_t *)(video_mem + ((NUM_COLS * screen_y + screen_x) << 1)) = c;
         *(uint8_t *)(video_mem + ((NUM_COLS * screen_y + screen_x) << 1) + 1) = ATTRIB;
         screen_x++;
-        screen_x %= NUM_COLS;
+
         screen_y = (screen_y + (screen_x / NUM_COLS)) % NUM_ROWS;
+        screen_x %= NUM_COLS;
     }
 }
 
@@ -506,9 +507,16 @@ void reset_screen(void)  {
  * Function: as description
  */
 void backspace_pressed(void){
-    screen_x --;
-    if (screen_x < 0){
+    
+    screen_x--;
+    if((screen_x < 0) && (screen_y == 0))
+    {
+        screen_x++;
+    }
+    else if ((screen_x < 0) && (screen_y > 0))
+    {
         screen_x += NUM_COLS; 
+        screen_y--;
     }
     *(uint8_t *)(video_mem + ((NUM_COLS * screen_y + screen_x) << 1)) = ' ';
     *(uint8_t *)(video_mem + ((NUM_COLS * screen_y + screen_x) << 1) + 1) = ATTRIB;
