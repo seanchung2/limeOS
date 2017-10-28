@@ -3,29 +3,29 @@
 #ifndef _KEYBOARD_H
 #define _KEYBOARD_H
 
-/* Definitions for Keyboard*/
-#define DEFAULT_PARA 		0xF6
-#define KEYBOARD_ACK 		0xFA
-#define KEYBOARD_RESEND 	0xFE
-#define KEYBOARD_PORT 		0x60
-#define L_ORDER				11
-
-/* define some values */
+/* Definitions for Keyboard */
+#define DEFAULT_PARA 			0xF6
+#define KEYBOARD_ACK 			0xFA
+#define KEYBOARD_RESEND 		0xFE
+#define KEYBOARD_PORT 			0x60
+#define L_ORDER					11
 #define KEYBOARD_DATA_PORT 		0x60
 #define KEYBOARD_IRQ 			0x1
+
+/* some define values */
 #define LETTER_NUM 				26
 #define NUMBER_NUM 				10
 #define LOWER_LETTER_OFFSET 	0x61
 #define UPPER_LETTER_OFFSET 	0x41
 #define NUMBER_OFFSET 			0x30		
-#define CHARACTER_BUFFER_SIZE 	128		
+#define CHARACTER_BUFFER_SIZE 	128
+
+/* keyboard character scancode */
 #define PRESS_ENTER 			0x1C
 #define PRESS_BACKSPACE			0x0E
 #define PRESS_SPACE 			0x39
 #define PRESS_LEFT_CTRL			0x1D
-//#define PRESS_RIGHT_CTRL		0xE0
-#define RELEASE_LEFT_CTRL		0x9D
-//#define RELEASE_RIGHT_CTRL		
+#define RELEASE_LEFT_CTRL		0x9D	
 #define PRESS_LEFT_SHIFT		0x2A
 #define PRESS_RIGHT_SHIFT		0x36
 #define RELEASE_LEFT_SHIFT		0xAA
@@ -33,8 +33,10 @@
 #define PRESS_CAPSLOCK			0x3A
 #define RELEASE_CAPSLOCK		0xBA
 #define PRESS_SPACE 			0x39
+#define PRESS_TAB 				0x0F
 
-/* some code will be read from keyboard data code */
+/* ascii code variables and tables */
+#define TAB   					9
 static const uint8_t letter_code[LETTER_NUM] = {	0x1E, 0x30, 0x2E, 0x20,
 													0x12, 0x21, 0x22, 0x23,
 													0x17, 0x24, 0x25, 0x26,

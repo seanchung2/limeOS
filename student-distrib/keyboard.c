@@ -23,12 +23,12 @@ uint8_t char_buf[CHARACTER_BUFFER_SIZE];
  * Side Effects: as description
  */
 void initialize_keyboard(){
-	outb(DEFAULT_PARA, KEYBOARD_PORT);
+	outb(DEFAULT_PARA, KEYBOARD_DATA_PORT);
 	uint8_t check = 0x00;
 	while(check != KEYBOARD_ACK){
-		check = inb(KEYBOARD_PORT);
+		check = inb(KEYBOARD_DATA_PORT);
 		if(check == KEYBOARD_RESEND){
-			outb(DEFAULT_PARA, KEYBOARD_PORT);
+			outb(DEFAULT_PARA, KEYBOARD_DATA_PORT);
 		}
 	}
 	enable_irq(1);
@@ -141,6 +141,15 @@ void keyboard_output_dealer (uint8_t c)
 		found = ' ';
 	}
 
+	/* if the scancode is "PRESS_TAB" */
+	if (c == PRESS_TAB)
+	{
+		//putc(' ');
+		if(buf_index < CHARACTER_BUFFER_SIZE-1)
+			char_buf[++buf_index] = TAB;
+		found = ' ';
+	}
+
 	/* check if the scancode is part of letters */
 	if(found < 0)
 	{
@@ -247,7 +256,7 @@ int terminal_write()
 			terminal_index = buf_index = -1;
 			return -1;
 		}
-		
+
 		backspace_pressed();
 		terminal_index = buf_index;
 	}
