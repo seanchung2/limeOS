@@ -5,7 +5,10 @@
 #ifndef _RTC_H
 #define _RTC_H
 
+#include "types.h"
+
 /*Definitions for RTC*/
+#define RTC_REG_A			0x8A
 #define	RTC_REG_B 			0x8B
 #define RTC_REG_C 			0x0C
 #define RTC_PORT 			0x70

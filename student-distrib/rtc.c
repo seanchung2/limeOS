@@ -61,7 +61,7 @@ int32_t read_RTC(int32_t fd, void* buf, int32_t nbytes){
 }
 
 int32_t write_RTC(int32_t fd, const void* buf, int32_t nbytes){
-	if(buf == null || nbytes != 4)
+	if(buf == NULL || nbytes != 4)
 		return -1;
 	else
 		changeFreq_RTC(*((int32_t*)buf));

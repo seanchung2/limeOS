@@ -10,6 +10,8 @@
 #include "tests.h"
 #include "paging.h"
 #include "keyboard.h"
+#include "filesystem.h"
+#include "rtc.h"
 
 #define RUN_TESTS
 
@@ -158,7 +160,7 @@ void entry(unsigned long magic, unsigned long addr) {
 
     /* Initialize devices, memory, filesystem, enable device interrupts on the
      * PIC, any other initialization stuff... */
-    set_fs_start(mbi->mods_addr);
+    set_fs_start((module_t*)(mbi->mods_addr));
     initialize_keyboard();
     initialize_RTC();
     init_paging();
