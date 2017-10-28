@@ -33,6 +33,7 @@ int8_t* strncpy(int8_t* dest, const int8_t*src, uint32_t n);
 void test_interrupts(void);
 void reset_screen();
 void backspace_pressed(void);
+void update_cursor(int x, int y);
 
 /* Userspace address-check functions */
 int32_t bad_userspace_addr(const void* addr, int32_t len);
