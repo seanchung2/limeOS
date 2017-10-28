@@ -7,13 +7,13 @@
 #define MAX_NAME_LENGTH 32
 #define RESERVED_LENGTH 24
 #define DATA_BLOCK_COUNT 1023
-#define FS_START 
+#define FS_START 0 //temp for test
 #define DENTRY_SIZE 64
 #define FOUR_KB 4096
 #define ONE_KB 1024
 
 /* directory entry structure */
-typedef struct dentry_t  {
+typedef struct dentry  {
 	int8_t file_name[MAX_NAME_LENGTH];
 	int32_t file_type;
 	int32_t inode_number;
@@ -21,18 +21,23 @@ typedef struct dentry_t  {
 } dentry_t;
 
 /* inode structure */
-typedef struct inode_t  {
+typedef struct inode  {
 	int32_t length;
 	int32_t data_block_numbers[DATA_BLOCK_COUNT];
 } inode_t;
 
 /* entry in file array of PCB */
-typedef struct FD_entry_t  {
+typedef struct fd_entry  {
 	int32_t operations_pointer;
 	int32_t inode_index;
 	int32_t file_position;
 	int32_t flags;
-} FD_entry_t;
+} fd_entry_t;
+
+/* structure for PCB */
+typedef struct PCB_table  {
+	fd_entry_t* file_descriptors[8];
+} PCB_table_t;
 
 /* functions to find specific directory entry by name or index */
 int32_t read_dentry_by_name(const uint8_t* fname, dentry_t* dentry);
