@@ -30,12 +30,6 @@ void initialize_RTC(){
 	inb(COMS_PORT);
 }
 
-int32_t open_RTC(const uint8_t* filename){
-	changeFreq_RTC(2);
-
-	return 0;//success
-}
-
 void changeFreq_RTC(uint8_t rate){
 	//Need to make sure that rate is between 2 and 15.
 	if(rate > 2 && rate <=15){
@@ -50,6 +44,12 @@ void changeFreq_RTC(uint8_t rate){
 		sti();
 	}
 	return;
+}
+
+int32_t open_RTC(const uint8_t* filename){
+	changeFreq_RTC(2);
+
+	return 0;//success
 }
 
 int32_t read_RTC(int32_t fd, void* buf, int32_t nbytes){
@@ -69,6 +69,6 @@ int32_t write_RTC(int32_t fd, const void* buf, int32_t nbytes){
 }
 
 int32_t close_RTC(int32_t fd){
-	changeFreq(2);
+	changeFreq_RTC(2);
 	return 0;//success
 }
