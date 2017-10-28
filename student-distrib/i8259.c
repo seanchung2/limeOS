@@ -104,28 +104,3 @@ void send_eoi(uint32_t irq_num) {
 		outb(EOI | irq_num, MASTER_8259_PORT);
 	}
 }
-
-
-/* initialize_RTC
- *
- * Description: Initializes the RTC
- * Inputs: none
- * Outputs: none
- * Side Effects: as description
- */
-void initialize_RTC(){
-	//cli();
-
-	uint8_t regB = 0x00;//Register B of RTC
-	outb(RTC_REG_B, RTC_PORT);
-	regB = inb(COMS_PORT);
-	regB = regB | 0x40;//This turns on bit 6
-	outb(RTC_REG_B, RTC_PORT);
-	outb(regB, COMS_PORT);
-	//sti();
-
-	enable_irq(2);
-	enable_irq(8);
-	outb(RTC_REG_C, RTC_PORT);
-	inb(COMS_PORT);
-}

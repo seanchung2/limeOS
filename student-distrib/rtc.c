@@ -5,9 +5,6 @@
 
 #include "rtc.h"
 #include "lib.h"
-#include "i8259.h" //Have to include RTC defin in rtc.h
-
-#define RTC_FRQ_ACT_LOW 0xF0 //The low 4 bits are important for frequency as it is between 2 and 15
 
 /* initialize_RTC
  *
