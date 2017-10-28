@@ -500,6 +500,8 @@ void test_interrupts(void) {
 //write new RTC handler
 
 
+
+
 /* void reset_screen(void)
  * move the screen pointer back to 0,0
  * Inputs: void
