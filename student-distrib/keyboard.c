@@ -4,13 +4,15 @@
 #include "tests.h"
 
 /* store the status of shift/ctrl */
-int shift_flag = 0;
-int ctrl_flag = 0;
-int capslock_flag = 0;
-int release_caps = 1;
+uint8_t shift_flag = 0;
+uint8_t ctrl_flag = 0;
+uint8_t capslock_flag = 0;
+uint8_t release_caps = 1;
+uint8_t enter_flag = 0;
 
 /* store the input characters */
-int buf_index = 0;
+volatile int buf_index = -1;
+volatile int terminal_index = -1;
 uint8_t char_buf[CHARACTER_BUFFER_SIZE];
 
 /* initialize_keyboard
@@ -57,6 +59,9 @@ void keyboard_handler ()
     /* deal with the received character */
     keyboard_output_dealer(c);
 
+    /* call terminal write to write buffer to screen */
+    terminal_write();
+
     /* Send end-of-interrupt signal for the specified IRQ */
     send_eoi(KEYBOARD_IRQ);
     sti();
@@ -76,7 +81,11 @@ void keyboard_output_dealer (uint8_t c)
 
 	/* if the scancode is "enter" */
 	if(c == PRESS_ENTER)  {
-		putc('\n');
+
+		//memset(char_buf,'\n',CHARACTER_BUFFER_SIZE);
+
+		//(buf_index==CHARACTER_BUFFER_SIZE)? (terminal_index--):(buf_index++);
+		enter_flag = 1;
 		found = 1;
 	}
 
@@ -103,7 +112,8 @@ void keyboard_output_dealer (uint8_t c)
 	/* if the scancode is "backspace" */
 	if (c == PRESS_BACKSPACE)
 	{
-		backspace_pressed();
+		//backspace_pressed();
+		buf_index--;
 		return;
 	}
 
@@ -121,28 +131,42 @@ void keyboard_output_dealer (uint8_t c)
 	{
 		release_caps = 1;
 	}
+	
+	/* if the scancode is "PRESS_SPACE" */
+	if (c == PRESS_SPACE)
+	{
+		//putc(' ');
+		if(buf_index < CHARACTER_BUFFER_SIZE-1)
+			char_buf[++buf_index] = ' ';
+		found = ' ';
+	}
 
 	/* check if the scancode is part of letters */
 	if(found < 0)
 	{
-		for(i=0; i<LETTER_NUM;i++)
+		for(i=0; i<LETTER_NUM; i++)
 		{
 			if(c == letter_code[i])
 			{
 				/* if CTRL+L is pressed, clean the screen and reset the cursor position */
-				if (ctrl_flag ==1 && c == 0x26 ){
+				if (ctrl_flag ==1 && c == letter_code[L_ORDER]){
 					clear();
 					reset_screen();
+					buf_index = terminal_index = -1;
 					return;
 				}
 
 				/* shift is pressed 	-> upper case */
 				if( (shift_flag ^ capslock_flag) == 1){
-					putc((UPPER_LETTER_OFFSET+i));
+					//putc(UPPER_LETTER_OFFSET+i);
+					if(buf_index < CHARACTER_BUFFER_SIZE-1)
+						char_buf[++buf_index] = UPPER_LETTER_OFFSET+i;
 				}
 				/* shift is not pressed -> lower case */
 				else{
-					putc((LOWER_LETTER_OFFSET+i));
+					//putc((LOWER_LETTER_OFFSET+i));
+					if(buf_index < CHARACTER_BUFFER_SIZE-1)
+						char_buf[++buf_index] = LOWER_LETTER_OFFSET+i;
 				}
 
 				/* go to "type_tester" to check if the key is part of saved keys for test */
@@ -162,11 +186,15 @@ void keyboard_output_dealer (uint8_t c)
 			{
 				/* shift is pressed 	-> sign */
 				if(shift_flag == 1){
-					putc(sign_asciicode[i]);
+					//putc(sign_asciicode[i]);
+					if(buf_index < CHARACTER_BUFFER_SIZE-1)
+						char_buf[++buf_index] = sign_asciicode[i];
 				}
 				/* shift is not pressed -> number */
 				else{
-					putc(NUMBER_OFFSET+i);
+					//putc(NUMBER_OFFSET+i);
+					if(buf_index < CHARACTER_BUFFER_SIZE-1)
+						char_buf[++buf_index] = NUMBER_OFFSET+i;
 				}
 
 				/* go to "type_tester" to check if the key is part of saved keys for test */
@@ -176,4 +204,52 @@ void keyboard_output_dealer (uint8_t c)
 			}
 		}
 	}
+}
+
+int terminal_write()
+{
+	int i;
+
+	if (terminal_index == buf_index)
+	{
+		if(enter_flag == 1)
+		{
+			putc('\n');
+
+			enter_flag = 0;
+			buf_index = -1;
+			terminal_index = -1;
+			return 0;
+		}
+			
+		return -1;
+	}
+	else if(terminal_index < buf_index)
+	{
+		for(i=terminal_index+1; i<=buf_index; i++)
+		{
+			putc(char_buf[i]);
+
+			if(char_buf[i] == '\n')
+			{
+				buf_index = -1;
+				terminal_index = -1;
+				break;
+			}
+		}
+		terminal_index = buf_index;
+	}
+	else
+	{
+		if(buf_index<0)
+		{
+			terminal_index = buf_index;
+			return -1;
+		}
+
+		backspace_pressed();
+		terminal_index = buf_index;
+	}
+	return 0;
+	
 }

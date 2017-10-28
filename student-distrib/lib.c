@@ -2,10 +2,14 @@
  * vim:ts=4 noexpandtab */
 
 #include "lib.h"
-#define VIDEO       0xB8000
-#define NUM_COLS    80
-#define NUM_ROWS    25
-#define ATTRIB      0x7
+#define VIDEO           0xB8000
+#define NUM_COLS        80
+#define NUM_ROWS        25
+#define ATTRIB          0x7
+#define CUR_LPORT       0xF
+#define CUR_HPORT       0xE
+#define VGA_INDEX_REG   0x3D4
+#define VGA_DATA_REG    0x3D5
 
 static int screen_x;
 static int screen_y;
@@ -177,9 +181,13 @@ void putc(uint8_t c) {
         *(uint8_t *)(video_mem + ((NUM_COLS * screen_y + screen_x) << 1)) = c;
         *(uint8_t *)(video_mem + ((NUM_COLS * screen_y + screen_x) << 1) + 1) = ATTRIB;
         screen_x++;
-        screen_x %= NUM_COLS;
+
         screen_y = (screen_y + (screen_x / NUM_COLS)) % NUM_ROWS;
+        screen_x %= NUM_COLS;
     }
+
+    /*test*/
+    update_cursor(screen_x, screen_y);
 }
 
 /* int8_t* itoa(uint32_t value, int8_t* buf, int32_t radix);
@@ -497,6 +505,9 @@ void test_interrupts(void) {
 void reset_screen(void)  {
     screen_x = 0;
     screen_y = 0;
+
+    /*test*/
+    update_cursor(screen_x, screen_y);
 }
 
 /* void backspace_pressed(void)
@@ -506,10 +517,44 @@ void reset_screen(void)  {
  * Function: as description
  */
 void backspace_pressed(void){
-    screen_x --;
-    if (screen_x < 0){
+    
+    screen_x--;
+    if((screen_x < 0) && (screen_y == 0))
+    {
+        screen_x++;
+    }
+    else if ((screen_x < 0) && (screen_y > 0))
+    {
         screen_x += NUM_COLS; 
+        screen_y--;
     }
     *(uint8_t *)(video_mem + ((NUM_COLS * screen_y + screen_x) << 1)) = ' ';
     *(uint8_t *)(video_mem + ((NUM_COLS * screen_y + screen_x) << 1) + 1) = ATTRIB;
+
+
+    /*TEST*/
+    update_cursor(screen_x, screen_y);
+}
+
+
+/* void update_cursor(int x, int y)
+ * move the cursor to the correct position
+ * Inputs: x,y: coordinate where the cursor should be
+ * Return Value: void
+ * Function: as description
+ */
+void update_cursor(int x, int y)
+{
+    uint16_t pos = y * NUM_COLS + x;
+ 
+    /* cursor low port to VGA index register */
+    outb(CUR_LPORT, VGA_INDEX_REG);
+    /* cursor low position to VGA data register */
+    outb((uint8_t) (pos & 0xFF), VGA_DATA_REG);
+
+    /* cursor high port to VGA index register */
+    outb(CUR_HPORT, VGA_INDEX_REG);
+
+    /* cursor high position to VGA data register */
+    outb((uint8_t) ((pos >> 8) & 0xFF), VGA_DATA_REG);
 }

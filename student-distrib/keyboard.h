@@ -8,6 +8,7 @@
 #define KEYBOARD_ACK 		0xFA
 #define KEYBOARD_RESEND 	0xFE
 #define KEYBOARD_PORT 		0x60
+#define L_ORDER				11
 
 /* define some values */
 #define KEYBOARD_DATA_PORT 		0x60
@@ -31,6 +32,7 @@
 #define RELEASE_RIGHT_SHIFT		0xB6
 #define PRESS_CAPSLOCK			0x3A
 #define RELEASE_CAPSLOCK		0xBA
+#define PRESS_SPACE 			0x39
 
 /* some code will be read from keyboard data code */
 static const uint8_t letter_code[LETTER_NUM] = {	0x1E, 0x30, 0x2E, 0x20,
@@ -59,5 +61,8 @@ extern void keyboard_handler ();
 
 /* deal with output of keyboard */
 extern void keyboard_output_dealer (uint8_t c);
+
+/* output the buffer */
+extern int terminal_write();
 
 #endif /* _INT_HANDLER_H */
