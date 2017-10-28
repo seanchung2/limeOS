@@ -230,23 +230,24 @@ int terminal_write()
 		{
 			putc(char_buf[i]);
 
-			if(char_buf[i] == '\n')
+/*			if(char_buf[i] == '\n')
 			{
 				buf_index = -1;
 				terminal_index = -1;
 				break;
 			}
+*/
 		}
 		terminal_index = buf_index;
 	}
 	else
 	{
-		if(buf_index<0)
+		if(buf_index < -1)
 		{
-			terminal_index = buf_index;
+			terminal_index = buf_index = -1;
 			return -1;
 		}
-
+		
 		backspace_pressed();
 		terminal_index = buf_index;
 	}
