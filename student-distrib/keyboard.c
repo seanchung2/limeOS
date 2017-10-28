@@ -9,6 +9,7 @@ uint8_t ctrl_flag = 0;
 uint8_t capslock_flag = 0;
 uint8_t release_caps = 1;
 uint8_t enter_flag = 0;
+uint8_t alt_flag = 0;
 
 /* store the input characters */
 volatile int buf_index = -1;
@@ -80,73 +81,173 @@ void keyboard_output_dealer (uint8_t c)
 	int found = -1;
 
 	/* if the scancode is "enter" */
-	if(c == PRESS_ENTER)  {
-
-		//memset(char_buf,'\n',CHARACTER_BUFFER_SIZE);
-
-		//(buf_index==CHARACTER_BUFFER_SIZE)? (terminal_index--):(buf_index++);
-		enter_flag = 1;
-		found = 1;
-	}
+	if(c == PRESS_ENTER) { enter_flag = 1; found = 1; }
 
 	/* if the scancode is "press_shift" */
-	if (c == PRESS_LEFT_SHIFT || c == PRESS_RIGHT_SHIFT){
-		shift_flag = 1;
-	}
+	if (c == PRESS_LEFT_SHIFT || c == PRESS_RIGHT_SHIFT) { shift_flag = 1; found = 1; }
 
 	/* if the scancode is "release_shift" */
-	if (c == RELEASE_LEFT_SHIFT || c == RELEASE_RIGHT_SHIFT){
-		shift_flag = 0;
-	}
+	if (c == RELEASE_LEFT_SHIFT || c == RELEASE_RIGHT_SHIFT) { shift_flag = 0; found = 1; }
 
 	/* if the scancode is "press_ctrl" */
-	if (c == PRESS_LEFT_CTRL){
-		ctrl_flag = 1;
-	}
+	if (c == PRESS_LEFT_CTRL) { ctrl_flag = 1; found = 1; }
 
 	/* if the scancode is "release_ctrl" */
-	if (c == RELEASE_LEFT_CTRL){
-		ctrl_flag = 0;
-	}
+	if (c == RELEASE_LEFT_CTRL){ ctrl_flag = 0; found = 1; }
+
+	/* if the scancode is "press_alt" */
+	if (c == PRESS_ALT) { alt_flag = 1; found = 1; }
+
+	/* if the scancode is "release_alt" */
+	if (c == RELEASE_ALT){ alt_flag = 0; found = 1; }
 
 	/* if the scancode is "backspace" */
-	if (c == PRESS_BACKSPACE)
-	{
-		//backspace_pressed();
-		buf_index--;
-		return;
-	}
+	if (c == PRESS_BACKSPACE) { buf_index--; return; }
 
 	/* if the scancode is "press_capslock" */
-	if (c == PRESS_CAPSLOCK)
-	{
-		if (release_caps == 1){
+	if (c == PRESS_CAPSLOCK) {
+		found = 1;
+		if (release_caps == 1) {
 			capslock_flag ^= 1;
 			release_caps = 0;
 		}
 	}
 
 	/* if the scancode is "release_capslock" */
-	if (c == RELEASE_CAPSLOCK)
-	{
-		release_caps = 1;
-	}
+	if (c == RELEASE_CAPSLOCK) { release_caps = 1; found = 1; }
 	
 	/* if the scancode is "PRESS_SPACE" */
-	if (c == PRESS_SPACE)
-	{
-		//putc(' ');
+	if (c == PRESS_SPACE) {
 		if(buf_index < CHARACTER_BUFFER_SIZE-1)
 			char_buf[++buf_index] = ' ';
 		found = ' ';
 	}
 
 	/* if the scancode is "PRESS_TAB" */
-	if (c == PRESS_TAB)
-	{
-		//putc(' ');
+	if (c == PRESS_TAB) {
 		if(buf_index < CHARACTER_BUFFER_SIZE-1)
 			char_buf[++buf_index] = TAB;
+		found = ' ';
+	}
+
+	/* if the scancode is "PRESS_EQUAL" */
+	if (c == PRESS_EQUAL) {
+		if(buf_index < CHARACTER_BUFFER_SIZE-1) {
+			if(shift_flag)
+				char_buf[++buf_index] = PLUS;
+			else
+				char_buf[++buf_index] = EQUAL;
+		}
+		found = ' ';
+	}
+
+	/* if the scancode is "PRESS_HYPHEN" */
+	if (c == PRESS_HYPHEN) {
+		if(buf_index < CHARACTER_BUFFER_SIZE-1) {
+			if(shift_flag)
+				char_buf[++buf_index] = UNDERSCOPE;
+			else
+				char_buf[++buf_index] = HYPHEN;
+		}
+		found = ' ';
+	}
+
+	/* if the scancode is "PRESS_BACKSLASH" */
+	if (c == PRESS_BACKSLASH) {
+		if(buf_index < CHARACTER_BUFFER_SIZE-1) {
+			if(shift_flag)
+				char_buf[++buf_index] = VERTICAL_SLASH;
+			else
+				char_buf[++buf_index] = BACKSLASH;
+		}
+		found = ' ';
+	}
+
+	/* if the scancode is "PRESS_SINGLE_QUOTE" */
+	if (c == PRESS_SINGLE_QUOTE) {
+		if(buf_index < CHARACTER_BUFFER_SIZE-1) {
+			if(shift_flag)
+				char_buf[++buf_index] = DOUBLE_QUOTE;
+			else
+				char_buf[++buf_index] = SINGLE_QUOTE;
+		}
+		found = ' ';
+	}
+
+	/* if the scancode is "PRESS_BACK_TICK" */
+	if (c == PRESS_BACK_TICK) {
+		if(buf_index < CHARACTER_BUFFER_SIZE-1) {
+			if(shift_flag)
+				char_buf[++buf_index] = TILDE;
+			else
+				char_buf[++buf_index] = BACK_TICK;
+		}
+		found = ' ';
+	}
+
+	/* if the scancode is "PRESS_COMMA" */
+	if (c == PRESS_COMMA) {
+		if(buf_index < CHARACTER_BUFFER_SIZE-1) {
+			if(shift_flag)
+				char_buf[++buf_index] = LESS;
+			else
+				char_buf[++buf_index] = COMMA;
+		}
+		found = ' ';
+	}
+
+	/* if the scancode is "PRESS_DOT" */
+	if (c == PRESS_DOT) {
+		if(buf_index < CHARACTER_BUFFER_SIZE-1) {
+			if(shift_flag)
+				char_buf[++buf_index] = GREATER;
+			else
+				char_buf[++buf_index] = DOT;
+		}
+		found = ' ';
+	}
+
+	/* if the scancode is "PRESS_SLASH" */
+	if (c == PRESS_SLASH) {
+		if(buf_index < CHARACTER_BUFFER_SIZE-1) {
+			if(shift_flag)
+				char_buf[++buf_index] = QUESTION;
+			else
+				char_buf[++buf_index] = SLASH;
+		}
+		found = ' ';
+	}
+
+	/* if the scancode is "PRESS_SEMICOLON" */
+	if (c == PRESS_SEMICOLON) {
+		if(buf_index < CHARACTER_BUFFER_SIZE-1) {
+			if(shift_flag)
+				char_buf[++buf_index] = COLON;
+			else
+				char_buf[++buf_index] = SEMICOLON;
+		}
+		found = ' ';
+	}
+
+	/* if the scancode is "PRESS_LEFT_SQUARE_BRACKET" */
+	if (c == PRESS_LEFT_SQUARE_BRACKET) {
+		if(buf_index < CHARACTER_BUFFER_SIZE-1) {
+			if(shift_flag)
+				char_buf[++buf_index] = LEFT_CURLY_BRACKET;
+			else
+				char_buf[++buf_index] = LEFT_SQUARE_BRACKET;
+		}
+		found = ' ';
+	}
+
+	/* if the scancode is "PRESS_RIGHT_SQUARE_BRACKET" */
+	if (c == PRESS_RIGHT_SQUARE_BRACKET) {
+		if(buf_index < CHARACTER_BUFFER_SIZE-1) {
+			if(shift_flag)
+				char_buf[++buf_index] = RIGHT_CURLY_BRACKET;
+			else
+				char_buf[++buf_index] = RIGHT_SQUARE_BRACKET;
+		}
 		found = ' ';
 	}
 
@@ -167,19 +268,14 @@ void keyboard_output_dealer (uint8_t c)
 
 				/* shift is pressed 	-> upper case */
 				if( (shift_flag ^ capslock_flag) == 1){
-					//putc(UPPER_LETTER_OFFSET+i);
 					if(buf_index < CHARACTER_BUFFER_SIZE-1)
 						char_buf[++buf_index] = UPPER_LETTER_OFFSET+i;
 				}
 				/* shift is not pressed -> lower case */
 				else{
-					//putc((LOWER_LETTER_OFFSET+i));
 					if(buf_index < CHARACTER_BUFFER_SIZE-1)
 						char_buf[++buf_index] = LOWER_LETTER_OFFSET+i;
 				}
-
-				/* go to "type_tester" to check if the key is part of saved keys for test */
-				//type_tester((char)(LETTER_OFFSET+i));
 				found = i;
 				break;
 			}
@@ -195,23 +291,25 @@ void keyboard_output_dealer (uint8_t c)
 			{
 				/* shift is pressed 	-> sign */
 				if(shift_flag == 1){
-					//putc(sign_asciicode[i]);
 					if(buf_index < CHARACTER_BUFFER_SIZE-1)
 						char_buf[++buf_index] = sign_asciicode[i];
 				}
 				/* shift is not pressed -> number */
 				else{
-					//putc(NUMBER_OFFSET+i);
 					if(buf_index < CHARACTER_BUFFER_SIZE-1)
 						char_buf[++buf_index] = NUMBER_OFFSET+i;
 				}
-
-				/* go to "type_tester" to check if the key is part of saved keys for test */
-				//type_tester((char)(NUMBER_OFFSET+i));
 				found = i;
 				break;
 			}
 		}
+	}
+
+	if(found==-1 && (c>=RELEASE_SCANCODE_UPPERBOUND || c<=RELEASE_SCANCODE_LOWERBOUND))
+	{
+		if(check_out_of_bound() == SCROLL_ENTER_PRESSED)
+			scroll_screen();
+		puts("UNKNOWN SCANCODE!\n");
 	}
 }
 
@@ -223,8 +321,11 @@ int terminal_write()
 	{
 		if(enter_flag == 1)
 		{
+			if(check_out_of_bound() == SCROLL_ENTER_PRESSED)
+			{
+				scroll_screen();
+			}
 			putc('\n');
-
 			enter_flag = 0;
 			buf_index = -1;
 			terminal_index = -1;
@@ -237,15 +338,11 @@ int terminal_write()
 	{
 		for(i=terminal_index+1; i<=buf_index; i++)
 		{
-			putc(char_buf[i]);
-
-/*			if(char_buf[i] == '\n')
+			if(check_out_of_bound() == SCROLL_LAST_LETTER)
 			{
-				buf_index = -1;
-				terminal_index = -1;
-				break;
+				scroll_screen();
 			}
-*/
+			putc(char_buf[i]);
 		}
 		terminal_index = buf_index;
 	}

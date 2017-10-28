@@ -175,7 +175,7 @@ int32_t puts(int8_t* s) {
  *  Function: Output a character to the console */
 void putc(uint8_t c) {
     if(c == '\n' || c == '\r') {
-        screen_y = (++screen_y) % NUM_ROWS;
+        screen_y++;
         screen_x = 0;
     } else {
         *(uint8_t *)(video_mem + ((NUM_COLS * screen_y + screen_x) << 1)) = c;
@@ -557,4 +557,51 @@ void update_cursor(int x, int y)
 
     /* cursor high position to VGA data register */
     outb((uint8_t) ((pos >> 8) & 0xFF), VGA_DATA_REG);
+}
+
+/* int check_out_of_bound()
+ * check if we need to scroll down the screen
+ * Inputs: none
+ * Return Value: if enter pressed           -> return 1
+                 if the letter it pressed   -> return 2
+                 else                       -> return 0
+ * Function: as description
+ */
+int check_out_of_bound()
+{
+    int status = 0;
+    if(screen_y == (NUM_ROWS-1))
+    {
+        status = SCROLL_ENTER_PRESSED;
+        if(screen_x == (NUM_COLS-1))
+        {
+            status = SCROLL_LAST_LETTER;
+        }
+    }
+    return status;
+}
+
+/* void scroll_screen()
+ * If the lastest charater meet the lower-right corner or 
+ * if enter is hit when typing in the bottom line,
+ * then the entire screen has to shift up for one line and 
+ * clear the last line
+ * Inputs: none
+ * Return Value: none
+ * Side effect: screen_y will be at NUM_ROW
+ */
+void scroll_screen()
+{
+    int y;
+    int x;
+    for(y = 1; y<NUM_ROWS; y++)
+    {
+        for (x = 0; x<NUM_COLS; x++)
+        {
+            *(uint8_t *)(video_mem + ((NUM_COLS * (y-1) + x) << 1)) = *(uint8_t *)(video_mem + ((NUM_COLS * y + x) << 1));
+            if(y == (NUM_ROWS-1))
+                *(uint8_t *)(video_mem + ((NUM_COLS * y + x) << 1)) = ' ';
+        }
+    }
+    screen_y--;
 }

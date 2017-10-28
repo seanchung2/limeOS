@@ -11,6 +11,8 @@
 /* self-defined variables */
 extern int RTC_STATUS;              // for test
 #define COLOR_SCREEN 7              // for text color when rtc disabled
+#define SCROLL_ENTER_PRESSED    1   // for shifting the screen
+#define SCROLL_LAST_LETTER      2   // for shifting the screen
 
 int32_t printf(int8_t *format, ...);
 void putc(uint8_t c);
@@ -34,6 +36,8 @@ void test_interrupts(void);
 void reset_screen();
 void backspace_pressed(void);
 void update_cursor(int x, int y);
+int check_out_of_bound();
+void scroll_screen();
 
 /* Userspace address-check functions */
 int32_t bad_userspace_addr(const void* addr, int32_t len);
