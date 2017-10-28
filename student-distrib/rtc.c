@@ -54,12 +54,9 @@ int32_t open_RTC(const uint8_t* filename){
 }
 
 int32_t read_RTC(int32_t fd, void* buf, int32_t nbytes){
-
-	cli();
 	while (rtc_interrupt_occured == 1){//like a spin lock
 	}
 	rtc_interrupt_occured = 1;//reset it to 1... active low methodology followed everywhere
-	sti();
 	return 0;
 }
 
