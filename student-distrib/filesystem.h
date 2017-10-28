@@ -3,11 +3,11 @@
 
 #include "types.h"
 #include "lib.h"
+#include "multiboot.h"
 
 #define MAX_NAME_LENGTH 32
 #define RESERVED_LENGTH 24
 #define DATA_BLOCK_COUNT 1023
-#define FS_START 0 //temp for test
 #define DENTRY_SIZE 64
 #define FOUR_KB 4096
 #define ONE_KB 1024
@@ -38,6 +38,9 @@ typedef struct fd_entry  {
 typedef struct PCB_table  {
 	fd_entry_t* file_descriptors[8];
 } PCB_table_t;
+
+/* function to set memory address for the start of the filesystem */
+void set_fs_start(module_t* mod);
 
 /* functions to find specific directory entry by name or index */
 int32_t read_dentry_by_name(const uint8_t* fname, dentry_t* dentry);

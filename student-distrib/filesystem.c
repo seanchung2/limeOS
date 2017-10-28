@@ -1,5 +1,8 @@
 #include "filesystem.h"
 
+/* holds the adress for the start of the filesystem */
+static uint32_t fs_start;
+
 /* General PCB for MP3.2 testing */
 //static PCB_table_t PCB;
 
@@ -26,8 +29,8 @@ int32_t read_dentry_by_name(const uint8_t* fname, dentry_t* dentry)  {
 	if(name_length > MAX_NAME_LENGTH)  {
 		name_length = MAX_NAME_LENGTH;
 	}
-	int dentry_count = *((int*)FS_START);
-	dentry_t* current = (dentry_t*)(FS_START + DENTRY_SIZE);
+	int dentry_count = *((int*)fs_start);
+	dentry_t* current = (dentry_t*)(fs_start + DENTRY_SIZE);
 	int match = 1;
 	int i;
 	int j;
@@ -58,8 +61,8 @@ int32_t read_dentry_by_name(const uint8_t* fname, dentry_t* dentry)  {
  *					to the memory pointed to by dentry
  */
 int32_t read_dentry_by_index(const uint32_t index, dentry_t* dentry)  {
-	int dentry_count = *((int*)FS_START);
-	dentry_t* current = (dentry_t*)(FS_START + DENTRY_SIZE);
+	int dentry_count = *((int*)fs_start);
+	dentry_t* current = (dentry_t*)(fs_start + DENTRY_SIZE);
 	int i;
 
 	for(i = 0; i < dentry_count; i++, current++)  {
@@ -74,17 +77,17 @@ int32_t read_dentry_by_index(const uint32_t index, dentry_t* dentry)  {
 /* read_data
  *
  * INPUTS:	inode - index number for inode to use
- 			offset - character to start copying from in file
- 			buf - pointer to buffer to copy to
-			length - number of bytes to copy
+ *			offset - character to start copying from in file
+ *			buf - pointer to buffer to copy to
+ *			length - number of bytes to copy
  * OUTPUTS:	either the number of bits that were copied, or -1
- 			if an error occured
+ *			if an error occured
  * SIDE EFFECTS:	copys the requested number of bytes starting
- 					from the given offset to the given buffer
+ *					from the given offset to the given buffer
  */
 int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length)  {
-	inode_t* inode_ptr = (inode_t*)(FS_START + ((1 + inode) * FOUR_KB));
-	uint32_t inode_count = *((int*)(FS_START + 4));
+	inode_t* inode_ptr = (inode_t*)(fs_start + ((1 + inode) * FOUR_KB));
+	uint32_t inode_count = *((int*)(fs_start + 4));
 	uint32_t copied_count;
 	uint32_t data_block_index;
 	uint32_t byte_number;
@@ -103,7 +106,7 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
 	}
 
 	/* initialize the data_block_address */
-	data_block_address = (uint8_t*)(FS_START + ((inode_count + 1 + inode_ptr->data_block_numbers[data_block_index]) * FOUR_KB));
+	data_block_address = (uint8_t*)(fs_start + ((inode_count + 1 + inode_ptr->data_block_numbers[data_block_index]) * FOUR_KB));
 
 	/* copy data from data blocks to given buffer */
 	while(copied_count < length)  {
@@ -114,7 +117,7 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
 		if(byte_number >= ONE_KB)  {
 			byte_number = 0;
 			data_block_index++;
-			data_block_address = (uint8_t*)(FS_START + ((inode_count + 1 + inode_ptr->data_block_numbers[data_block_index]) * FOUR_KB));
+			data_block_address = (uint8_t*)(fs_start + ((inode_count + 1 + inode_ptr->data_block_numbers[data_block_index]) * FOUR_KB));
 		}
 		if(offset == inode_ptr->length)  {
 			break;
@@ -124,4 +127,16 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
 	/* add a null character to the end of the string and return the number of copied characters */
 	buf[copied_count] = '\0';
 	return copied_count;
+}
+
+/* set_fs_start
+ *
+ * INPUTS:	mod - pointer to the module that holds the file systen
+ * OUTPUTS:	none
+ * SIDE EFFECTS:	sets fs_start with the address of the start of
+ *					the file system
+ */
+
+void set_fs_start(module_t* mod)  {
+	fs_start = mod->mod_start;
 }

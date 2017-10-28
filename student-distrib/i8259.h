@@ -8,6 +8,8 @@
 
 #include "types.h"
 
+#define ACT_LOW				0xFF
+
 /* Ports that each PIC sits on */
 #define MASTER_8259_PORT    0x20
 #define SLAVE_8259_PORT     0xA0

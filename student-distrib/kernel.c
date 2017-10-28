@@ -158,6 +158,7 @@ void entry(unsigned long magic, unsigned long addr) {
 
     /* Initialize devices, memory, filesystem, enable device interrupts on the
      * PIC, any other initialization stuff... */
+    set_fs_start(mbi->mods_addr);
     initialize_keyboard();
     initialize_RTC();
     init_paging();
