@@ -10,10 +10,11 @@ uint8_t capslock_flag = 0;
 uint8_t release_caps = 1;
 uint8_t enter_flag = 0;
 uint8_t alt_flag = 0;
-
+uint8_t terminal_read_flag = 0;
+uint8_t add_or_not = 0; 
 /* store the input characters */
 volatile int buf_index = -1;
-volatile int terminal_index = -1;
+//volatile int terminal_index = -1;
 uint8_t char_buf[CHARACTER_BUFFER_SIZE];
 
 /* initialize_keyboard
@@ -60,8 +61,14 @@ void keyboard_handler ()
     /* deal with the received character */
     keyboard_output_dealer(c);
 
+    char_buf[buf_index+1] = '\0';
+    if (terminal_read_flag && add_or_not)
+    	terminal_read((int8_t*)(char_buf+buf_index));
+    terminal_read_flag = 0;
+    add_or_not = 0;
     /* call terminal write to write buffer to screen */
-    terminal_write();
+    terminal_write(enter_flag);
+    enter_flag = 0;
 
     /* Send end-of-interrupt signal for the specified IRQ */
     send_eoi(KEYBOARD_IRQ);
@@ -81,7 +88,7 @@ void keyboard_output_dealer (uint8_t c)
 	int found = -1;
 
 	/* if the scancode is "enter" */
-	if(c == PRESS_ENTER) { enter_flag = 1; found = 1; }
+	if(c == PRESS_ENTER) { buf_index = -1; enter_flag = 1; found = 1; }
 
 	/* if the scancode is "press_shift" */
 	if (c == PRESS_LEFT_SHIFT || c == PRESS_RIGHT_SHIFT) { shift_flag = 1; found = 1; }
@@ -90,23 +97,31 @@ void keyboard_output_dealer (uint8_t c)
 	if (c == RELEASE_LEFT_SHIFT || c == RELEASE_RIGHT_SHIFT) { shift_flag = 0; found = 1; }
 
 	/* if the scancode is "press_ctrl" */
-	if (c == PRESS_LEFT_CTRL) { ctrl_flag = 1; found = 1; }
+	if (c == PRESS_LEFT_CTRL) { ctrl_flag = 1; found = 1; return;}
 
 	/* if the scancode is "release_ctrl" */
-	if (c == RELEASE_LEFT_CTRL){ ctrl_flag = 0; found = 1; }
+	if (c == RELEASE_LEFT_CTRL){ ctrl_flag = 0; found = 1; return;}
 
 	/* if the scancode is "press_alt" */
-	if (c == PRESS_ALT) { alt_flag = 1; found = 1; }
+	if (c == PRESS_ALT) {  alt_flag = 1; found = 1; }
 
 	/* if the scancode is "release_alt" */
-	if (c == RELEASE_ALT){ alt_flag = 0; found = 1; }
+	if (c == RELEASE_ALT){  alt_flag = 0; found = 1; }
 
 	/* if the scancode is "backspace" */
-	if (c == PRESS_BACKSPACE) { buf_index--; return; }
+	if (c == PRESS_BACKSPACE) {
+		if(buf_index > -1)
+		{
+			buf_index--;
+			backspace_pressed();
+		}
+		return;
+	}
 
 	/* if the scancode is "press_capslock" */
 	if (c == PRESS_CAPSLOCK) {
 		found = 1;
+		terminal_read_flag = 0;
 		if (release_caps == 1) {
 			capslock_flag ^= 1;
 			release_caps = 0;
@@ -114,139 +129,169 @@ void keyboard_output_dealer (uint8_t c)
 	}
 
 	/* if the scancode is "release_capslock" */
-	if (c == RELEASE_CAPSLOCK) { release_caps = 1; found = 1; }
+	if (c == RELEASE_CAPSLOCK) { terminal_read_flag = 0; release_caps = 1; found = 1; }
 	
 	/* if the scancode is "PRESS_SPACE" */
 	if (c == PRESS_SPACE) {
-		if(buf_index < CHARACTER_BUFFER_SIZE-1)
+		terminal_read_flag = 1;
+		if(buf_index < CHARACTER_BUFFER_SIZE-2)
+		{
+			add_or_not = 1;
 			char_buf[++buf_index] = ' ';
+		}
 		found = ' ';
 	}
 
 	/* if the scancode is "PRESS_TAB" */
 	if (c == PRESS_TAB) {
-		if(buf_index < CHARACTER_BUFFER_SIZE-1)
+		terminal_read_flag = 1;
+		if(buf_index < CHARACTER_BUFFER_SIZE-2)
+		{
+			add_or_not = 1;
 			char_buf[++buf_index] = TAB;
+		}
 		found = ' ';
 	}
 
 	/* if the scancode is "PRESS_EQUAL" */
 	if (c == PRESS_EQUAL) {
-		if(buf_index < CHARACTER_BUFFER_SIZE-1) {
+		terminal_read_flag = 1;
+		if(buf_index < CHARACTER_BUFFER_SIZE-2) {
 			if(shift_flag)
 				char_buf[++buf_index] = PLUS;
 			else
 				char_buf[++buf_index] = EQUAL;
+			add_or_not = 1;
 		}
 		found = ' ';
 	}
 
 	/* if the scancode is "PRESS_HYPHEN" */
 	if (c == PRESS_HYPHEN) {
-		if(buf_index < CHARACTER_BUFFER_SIZE-1) {
+		terminal_read_flag = 1;
+		if(buf_index < CHARACTER_BUFFER_SIZE-2) {
 			if(shift_flag)
 				char_buf[++buf_index] = UNDERSCOPE;
 			else
 				char_buf[++buf_index] = HYPHEN;
+			add_or_not = 1;
 		}
 		found = ' ';
 	}
 
 	/* if the scancode is "PRESS_BACKSLASH" */
 	if (c == PRESS_BACKSLASH) {
-		if(buf_index < CHARACTER_BUFFER_SIZE-1) {
+		terminal_read_flag = 1;
+		if(buf_index < CHARACTER_BUFFER_SIZE-2) {
 			if(shift_flag)
 				char_buf[++buf_index] = VERTICAL_SLASH;
 			else
 				char_buf[++buf_index] = BACKSLASH;
+			add_or_not = 1;
 		}
 		found = ' ';
 	}
 
 	/* if the scancode is "PRESS_SINGLE_QUOTE" */
 	if (c == PRESS_SINGLE_QUOTE) {
-		if(buf_index < CHARACTER_BUFFER_SIZE-1) {
+		terminal_read_flag = 1;
+		if(buf_index < CHARACTER_BUFFER_SIZE-2) {
 			if(shift_flag)
 				char_buf[++buf_index] = DOUBLE_QUOTE;
 			else
 				char_buf[++buf_index] = SINGLE_QUOTE;
+			add_or_not = 1;
 		}
 		found = ' ';
 	}
 
 	/* if the scancode is "PRESS_BACK_TICK" */
 	if (c == PRESS_BACK_TICK) {
-		if(buf_index < CHARACTER_BUFFER_SIZE-1) {
+		terminal_read_flag = 1;
+		if(buf_index < CHARACTER_BUFFER_SIZE-2) {
 			if(shift_flag)
 				char_buf[++buf_index] = TILDE;
 			else
 				char_buf[++buf_index] = BACK_TICK;
+			add_or_not = 1;
 		}
 		found = ' ';
 	}
 
 	/* if the scancode is "PRESS_COMMA" */
 	if (c == PRESS_COMMA) {
-		if(buf_index < CHARACTER_BUFFER_SIZE-1) {
+		terminal_read_flag = 1;
+		if(buf_index < CHARACTER_BUFFER_SIZE-2) {
 			if(shift_flag)
 				char_buf[++buf_index] = LESS;
 			else
 				char_buf[++buf_index] = COMMA;
+			add_or_not = 1;
 		}
 		found = ' ';
 	}
 
 	/* if the scancode is "PRESS_DOT" */
 	if (c == PRESS_DOT) {
-		if(buf_index < CHARACTER_BUFFER_SIZE-1) {
+		terminal_read_flag = 1;
+		if(buf_index < CHARACTER_BUFFER_SIZE-2) {
 			if(shift_flag)
 				char_buf[++buf_index] = GREATER;
 			else
 				char_buf[++buf_index] = DOT;
+			add_or_not = 1;
 		}
 		found = ' ';
 	}
 
 	/* if the scancode is "PRESS_SLASH" */
 	if (c == PRESS_SLASH) {
-		if(buf_index < CHARACTER_BUFFER_SIZE-1) {
+		terminal_read_flag = 1;
+		if(buf_index < CHARACTER_BUFFER_SIZE-2) {
 			if(shift_flag)
 				char_buf[++buf_index] = QUESTION;
 			else
 				char_buf[++buf_index] = SLASH;
+			add_or_not = 1;
 		}
 		found = ' ';
 	}
 
 	/* if the scancode is "PRESS_SEMICOLON" */
 	if (c == PRESS_SEMICOLON) {
-		if(buf_index < CHARACTER_BUFFER_SIZE-1) {
+		terminal_read_flag = 1;
+		if(buf_index < CHARACTER_BUFFER_SIZE-2) {
 			if(shift_flag)
 				char_buf[++buf_index] = COLON;
 			else
 				char_buf[++buf_index] = SEMICOLON;
+			add_or_not = 1;
 		}
 		found = ' ';
 	}
 
 	/* if the scancode is "PRESS_LEFT_SQUARE_BRACKET" */
 	if (c == PRESS_LEFT_SQUARE_BRACKET) {
-		if(buf_index < CHARACTER_BUFFER_SIZE-1) {
+		terminal_read_flag = 1;
+		if(buf_index < CHARACTER_BUFFER_SIZE-2) {
 			if(shift_flag)
 				char_buf[++buf_index] = LEFT_CURLY_BRACKET;
 			else
 				char_buf[++buf_index] = LEFT_SQUARE_BRACKET;
+			add_or_not = 1;
 		}
 		found = ' ';
 	}
 
 	/* if the scancode is "PRESS_RIGHT_SQUARE_BRACKET" */
 	if (c == PRESS_RIGHT_SQUARE_BRACKET) {
-		if(buf_index < CHARACTER_BUFFER_SIZE-1) {
+		terminal_read_flag = 1;
+		if(buf_index < CHARACTER_BUFFER_SIZE-2) {
 			if(shift_flag)
 				char_buf[++buf_index] = RIGHT_CURLY_BRACKET;
 			else
 				char_buf[++buf_index] = RIGHT_SQUARE_BRACKET;
+			add_or_not = 1;
 		}
 		found = ' ';
 	}
@@ -262,21 +307,28 @@ void keyboard_output_dealer (uint8_t c)
 				if (ctrl_flag ==1 && c == letter_code[L_ORDER]){
 					clear();
 					reset_screen();
-					buf_index = terminal_index = -1;
+					buf_index = -1;
 					return;
 				}
 
 				/* shift is pressed 	-> upper case */
 				if( (shift_flag ^ capslock_flag) == 1){
-					if(buf_index < CHARACTER_BUFFER_SIZE-1)
+					if(buf_index < CHARACTER_BUFFER_SIZE-2)
+					{
+						add_or_not = 1;
 						char_buf[++buf_index] = UPPER_LETTER_OFFSET+i;
+					}
 				}
 				/* shift is not pressed -> lower case */
 				else{
-					if(buf_index < CHARACTER_BUFFER_SIZE-1)
+					if(buf_index < CHARACTER_BUFFER_SIZE-2)
+					{
+						add_or_not = 1;
 						char_buf[++buf_index] = LOWER_LETTER_OFFSET+i;
+					}
 				}
 				found = i;
+				terminal_read_flag = 1;
 				break;
 			}
 		}
@@ -291,72 +343,32 @@ void keyboard_output_dealer (uint8_t c)
 			{
 				/* shift is pressed 	-> sign */
 				if(shift_flag == 1){
-					if(buf_index < CHARACTER_BUFFER_SIZE-1)
+					if(buf_index < CHARACTER_BUFFER_SIZE-2)
+					{
+						add_or_not = 1;
 						char_buf[++buf_index] = sign_asciicode[i];
+					}
 				}
 				/* shift is not pressed -> number */
 				else{
-					if(buf_index < CHARACTER_BUFFER_SIZE-1)
+					if(buf_index < CHARACTER_BUFFER_SIZE-2)
+					{
+						add_or_not = 1;
 						char_buf[++buf_index] = NUMBER_OFFSET+i;
+					}
 				}
 				found = i;
+				terminal_read_flag = 1;
 				break;
 			}
 		}
 	}
 
-	if(found==-1 && (c>=RELEASE_SCANCODE_UPPERBOUND || c<=RELEASE_SCANCODE_LOWERBOUND))
+	if(found==-1 && (c>RELEASE_SCANCODE_UPPERBOUND || c<RELEASE_SCANCODE_LOWERBOUND))
 	{
+		terminal_read_flag = 0;
 		if(check_out_of_bound() == SCROLL_ENTER_PRESSED)
 			scroll_screen();
 		puts("UNKNOWN SCANCODE!\n");
 	}
-}
-
-int terminal_write()
-{
-	int i;
-
-	if (terminal_index == buf_index)
-	{
-		if(enter_flag == 1)
-		{
-			if(check_out_of_bound() == SCROLL_ENTER_PRESSED)
-			{
-				scroll_screen();
-			}
-			putc('\n');
-			enter_flag = 0;
-			buf_index = -1;
-			terminal_index = -1;
-			return 0;
-		}
-			
-		return -1;
-	}
-	else if(terminal_index < buf_index)
-	{
-		for(i=terminal_index+1; i<=buf_index; i++)
-		{
-			if(check_out_of_bound() == SCROLL_LAST_LETTER)
-			{
-				scroll_screen();
-			}
-			putc(char_buf[i]);
-		}
-		terminal_index = buf_index;
-	}
-	else
-	{
-		if(buf_index < -1)
-		{
-			terminal_index = buf_index = -1;
-			return -1;
-		}
-
-		backspace_pressed();
-		terminal_index = buf_index;
-	}
-	return 0;
-	
 }

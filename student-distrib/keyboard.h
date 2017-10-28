@@ -1,4 +1,5 @@
 #include "lib.h"
+#include "terminal.h"
 
 #ifndef _KEYBOARD_H
 #define _KEYBOARD_H
@@ -101,7 +102,4 @@ extern void keyboard_handler ();
 /* deal with output of keyboard */
 extern void keyboard_output_dealer (uint8_t c);
 
-/* output the buffer */
-extern int terminal_write();
-
-#endif /* _INT_HANDLER_H */
+#endif /* _KEYBOARD_H */
