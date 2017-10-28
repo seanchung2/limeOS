@@ -34,6 +34,7 @@
 #define RELEASE_CAPSLOCK		0xBA
 #define PRESS_SPACE 			0x39
 
+
 /* some code will be read from keyboard data code */
 static const uint8_t letter_code[LETTER_NUM] = {	0x1E, 0x30, 0x2E, 0x20,
 													0x12, 0x21, 0x22, 0x23,

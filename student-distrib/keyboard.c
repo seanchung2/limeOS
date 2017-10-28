@@ -214,8 +214,11 @@ int terminal_write()
 	{
 		if(enter_flag == 1)
 		{
+			if(check_out_of_bound() == SCROLL_ENTER_PRESSED)
+			{
+				scroll_screen();
+			}
 			putc('\n');
-
 			enter_flag = 0;
 			buf_index = -1;
 			terminal_index = -1;
@@ -228,25 +231,22 @@ int terminal_write()
 	{
 		for(i=terminal_index+1; i<=buf_index; i++)
 		{
-			putc(char_buf[i]);
-
-			if(char_buf[i] == '\n')
+			if(check_out_of_bound() == SCROLL_LAST_LETTER)
 			{
-				buf_index = -1;
-				terminal_index = -1;
-				break;
+				scroll_screen();
 			}
+			putc(char_buf[i]);
 		}
 		terminal_index = buf_index;
 	}
 	else
 	{
-		if(buf_index<0)
+		if(buf_index < -1)
 		{
-			terminal_index = buf_index;
+			terminal_index = buf_index = -1;
 			return -1;
 		}
-
+		
 		backspace_pressed();
 		terminal_index = buf_index;
 	}
