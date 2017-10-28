@@ -6,6 +6,8 @@
 #include "rtc.h"
 #include "lib.h"
 
+volatile int rtc_interrupt_occured = 1;
+
 /* initialize_RTC
  *
  * Description: Initializes the RTC
@@ -32,7 +34,7 @@ void initialize_RTC(){
 
 void changeFreq_RTC(uint8_t rate){
 	//Need to make sure that rate is between 2 and 15.
-	if(rate > 2 && rate <=15){
+	if(rate > 2 && rate <=15){//checking for this as RTC has problems with rate of 1 or 2. It doesn't generate the expected interrupt
 		cli();
 		uint8_t regA = 0x00;
 		outb(RTC_REG_A, RTC_PORT);
@@ -48,27 +50,26 @@ void changeFreq_RTC(uint8_t rate){
 
 int32_t open_RTC(const uint8_t* filename){
 	changeFreq_RTC(2);
-
 	return 0;//success
 }
 
 int32_t read_RTC(int32_t fd, void* buf, int32_t nbytes){
+	while (rtc_interrupt_occured == 1){//like a spin lock
+	}
+	rtc_interrupt_occured = 1;//reset it to 1... active low methodology followed everywhere
 	return 0;
 }
 
 int32_t write_RTC(int32_t fd, const void* buf, int32_t nbytes){
-	int32_t freq;
-	if (4 != nbytes || (int32_t)buf == NULL) 
-		return -1; 
-	else 
-		freq = *((int32_t*)buf);
-
-	changeFreq_RTC(freq);
-	return nbytes;   
-
+	if(buf == null || nbytes != 4)
+		return -1;
+	else
+		changeFreq_RTC(*((int32_t*)buf));
+	
+	return nbytes;
 }
 
 int32_t close_RTC(int32_t fd){
-	changeFreq_RTC(2);
+	changeFreq_RTC(2);//as RTC interrupts should remain open all the times, therefore we set the rate back to 2.
 	return 0;//success
 }
