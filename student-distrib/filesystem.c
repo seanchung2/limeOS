@@ -34,6 +34,7 @@ int32_t read_dentry_by_name(const uint8_t* fname, dentry_t* dentry)  {
 	int match = 1;
 	int i;
 	int j;
+	int k;
 
 	for(i = 0; i < dentry_count; i++, current++)  {
 		match = 1;
@@ -44,7 +45,11 @@ int32_t read_dentry_by_name(const uint8_t* fname, dentry_t* dentry)  {
 			}
 		}
 		if(match == 1)  {
-			*dentry = *current;
+			for(k = 0; k < MAX_NAME_LENGTH; k++)  {
+				dentry->file_name[k] = current->file_name[k];
+			}
+			dentry->file_type = current->file_type;
+			dentry->inode_number = current->inode_number;
 			return 0;
 		}
 	}
@@ -65,13 +70,17 @@ int32_t read_dentry_by_index(const uint32_t index, dentry_t* dentry)  {
 	dentry_t* current = (dentry_t*)(fs_start + DENTRY_SIZE);
 	int i;
 
-	for(i = 0; i < dentry_count; i++, current++)  {
-		if(current->inode_number == index)  {
-			*dentry = *current;
-			return 0;
-		}
+	if(index > dentry_count)  {
+		return -1;
 	}
-	return -1;
+
+	current = (dentry_t*)(fs_start + ((index + 1) * DENTRY_SIZE));
+	for(i = 0; i < MAX_NAME_LENGTH; i++)  {
+		dentry->file_name[i] = current->file_name[i];
+	}
+	dentry->file_type = current->file_type;
+	dentry->inode_number = current->inode_number;
+	return 0;
 }
 
 /* read_data
@@ -88,7 +97,7 @@ int32_t read_dentry_by_index(const uint32_t index, dentry_t* dentry)  {
 int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length)  {
 	inode_t* inode_ptr = (inode_t*)(fs_start + ((1 + inode) * FOUR_KB));
 	uint32_t inode_count = *((int*)(fs_start + 4));
-	uint32_t copied_count;
+	uint32_t copied_count = 0;
 	uint32_t data_block_index;
 	uint32_t byte_number;
 	uint8_t* data_block_address;
@@ -114,7 +123,7 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
 		copied_count++;
 		byte_number++;
 		offset++;
-		if(byte_number >= ONE_KB)  {
+		if(byte_number >= FOUR_KB)  {
 			byte_number = 0;
 			data_block_index++;
 			data_block_address = (uint8_t*)(fs_start + ((inode_count + 1 + inode_ptr->data_block_numbers[data_block_index]) * FOUR_KB));
