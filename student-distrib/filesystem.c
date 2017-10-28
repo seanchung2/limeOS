@@ -71,6 +71,17 @@ int32_t read_dentry_by_index(const uint32_t index, dentry_t* dentry)  {
 	return -1;
 }
 
+/* read_data
+ *
+ * INPUTS:	inode - index number for inode to use
+ 			offset - character to start copying from in file
+ 			buf - pointer to buffer to copy to
+			length - number of bytes to copy
+ * OUTPUTS:	either the number of bits that were copied, or -1
+ 			if an error occured
+ * SIDE EFFECTS:	copys the requested number of bytes starting
+ 					from the given offset to the given buffer
+ */
 int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length)  {
 	inode_t* inode_ptr = (inode_t*)(FS_START + ((1 + inode) * FOUR_KB));
 	uint32_t inode_count = *((int*)(FS_START + 4));
