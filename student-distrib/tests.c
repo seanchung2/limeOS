@@ -249,7 +249,15 @@ void RTC_test(){
 		write_RTC(0, (void*) ptr, 4);
 		putc('\n');
 	}
-	puts("RTC TEST COMPLETE");
+
+	close_RTC(0);
+	for(i=0;i<20;i++)
+	{
+
+		putc(output);
+		read_RTC(0,0,0);
+	}
+	puts("\nRTC TEST COMPLETE\n");
 }
 
 
@@ -450,7 +458,7 @@ int read_dentry_by_name_Test()  {
  * Inputs: None
  * Outputs: PASS/FAIL
  * Side Effects: None
- * Coverage: filesystem.c
+ * Coverage: terminal.c
  */
 int terminal_read_Test()
 {
@@ -474,7 +482,7 @@ int terminal_read_Test()
  * Inputs: None
  * Outputs: PASS/FAIL
  * Side Effects: None
- * Coverage: filesystem.c
+ * Coverage: terminal.c
  */
 int terminal_write_Test()
 {
@@ -495,11 +503,43 @@ int terminal_write_Test()
 	return PASS;
 }
 
+/* terminal_open_Test
+ * 
+ * Test the function "terminal_open_Test"
+ * Inputs: None
+ * Outputs: PASS/FAIL
+ * Side Effects: None
+ * Coverage: terminal.c
+ */
+int terminal_open_Test()
+{
+	if(terminal_open(0) != 0)
+		return FAIL;
+
+	return PASS;
+}
+
+/* terminal_close_Test
+ * 
+ * Test the function "terminal_close_Test"
+ * Inputs: None
+ * Outputs: PASS/FAIL
+ * Side Effects: None
+ * Coverage: terminal.c
+ */
+int terminal_close_Test()
+{
+	if(terminal_close(0) != 0)
+		return FAIL;
+	
+	return PASS;
+}
+
 /* read_file_test
  * 
  * Test the read_file function
  * Inputs: None
- * Side Effects: Displays file contents onthe screen
+ * Side Effects: Displays file contents on the screen
  * Coverage: filesystem.c
  */
 void read_file_test()  {
@@ -511,9 +551,6 @@ void read_file_test()  {
 
 	test_fd = open_file(test_name);
 	read_file(test_fd, test_buf, 50);
-
-//	terminal_read((int8_t*)test_buf);
-//	terminal_write(0);
 
 	close_file(0);
 }
@@ -569,16 +606,18 @@ void launch_tests(){
 
 	// launch your tests here
 
+/* check point 1 */
 	//TEST_OUTPUT("Syscall Test",syscall_test());
 	//TEST_OUTPUT("Paging Test (KERNEL)", paging_test_kernel());
 	//TEST_OUTPUT("Pagint Test (VIDMEM)", paging_test_vidmem());
 	//TEST_OUTPUT("Paging Value Test", paging_value_test());
 
+/* check point 2 */
 	//RTC_test();
-
 	TEST_OUTPUT("Terminal Read Test", terminal_read_Test());
-	TEST_OUTPUT("Terminal Write Test", terminal_write_Test());;
-
+	TEST_OUTPUT("Terminal Write Test", terminal_write_Test());
+	TEST_OUTPUT("Terminal Open Test", terminal_open_Test());
+	TEST_OUTPUT("Terminal Close Test", terminal_close_Test());
 
 	TEST_OUTPUT("Read Dentry by Index Test", read_dentry_by_index_Test());
 	TEST_OUTPUT("Read Dentry by Name Test", read_dentry_by_name_Test());
@@ -587,7 +626,6 @@ void launch_tests(){
 	//TEST_OUTPUT("Open File Test", open_file_test());
 	//read_file_test();
 	TEST_OUTPUT("Close File Test", close_file_test());
-	
 	TEST_OUTPUT("Read Directory Test", read_directory_test());
 }
 
