@@ -351,6 +351,13 @@ int copy_by_fname_test()  {
 	return 0;
 } 
 
+/* read_data_test
+ * 
+ * Test the read_data function
+ * Inputs: None
+ * Side Effects: None
+ * Coverage: filesystem.c
+ */
 int read_data_test()  {
 	TEST_HEADER;
 
@@ -383,6 +390,36 @@ int read_data_test()  {
 	return 0;
 }
 
+void open_file_test()  {
+
+}
+
+void read_file_test()  {
+
+}
+
+void close_file_test()  {
+
+}
+
+void open_directory_test()  {
+
+}
+
+void read_directory_test()  {
+	uint8_t test_name[10];
+	test_name[0] = '.';
+	test_name[1] = '\0';
+	int test_fd;
+
+	test_fd = open_directory(test_name);
+	read_directory(test_fd, 0, 0);
+}
+
+void close_directory_test()  {
+
+}
+
 /* Checkpoint 3 tests */
 /* Checkpoint 4 tests */
 /* Checkpoint 5 tests */
@@ -398,7 +435,8 @@ void launch_tests(){
 	//TEST_OUTPUT("paging_test_vidmem", paging_test_vidmem());
 	//TEST_OUTPUT("paging_value_test", paging_value_test());
 	//RTC_test();
-	copy_by_index_test();
+	//copy_by_index_test();
 	//copy_by_fname_test();
 	//read_data_test();
+	read_directory_test();
 }
