@@ -390,14 +390,14 @@ int read_data_test()  {
 	return 0;
 }
 
-/* copy_by_fname_test
+/* read_dentry_by_index_Test
  * 
- * Test the copy dentry by name function
+ * Test the function "read_dentry_by_index" by checking the name
  * Inputs: None
  * Side Effects: None
  * Coverage: filesystem.c
  */
-int testCopyByIndex()  {
+int read_dentry_by_index_Test()  {
 	TEST_HEADER;
 
 	const uint8_t test_num = 17;
@@ -426,7 +426,7 @@ int testCopyByIndex()  {
 		name_file[13][0] = "testprint\0";								//13
 		name_file[14][0] = "created.txt\0";								//14
 		name_file[15][0] = "frame1.txt\0";								//15
-		name_file[16][0] = "fello\0";									//16
+		name_file[16][0] = "hello\0";									//16
 
 	for(i=0; i<test_num; i++)
 	{
@@ -451,17 +451,6 @@ int testCopyByIndex()  {
 		test_type = test.file_type;
 		test_inode = test.inode_number;
 	}
-	
-/*	while(*char_ptr != '\0' && i < 32)  {
-		putc(*char_ptr);
-		char_ptr++;
-		i++;
-	}
-	
-	puts(name);
-	printf("\nType: %d", test_type); 
-	printf("\nINode: %d", test_inode);
-	putc('\n');*/
 	return result;
 }
 void open_file_test()  {
@@ -513,5 +502,5 @@ void launch_tests(){
 	//copy_by_fname_test();
 	//read_data_test();
 	//read_directory_test();
-	TEST_OUTPUT("Copy by Index Test", testCopyByIndex());
+	TEST_OUTPUT("Read Dentry by Index Test", read_dentry_by_index_Test());
 }
