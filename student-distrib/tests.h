@@ -25,9 +25,9 @@ int copy_by_fname_test();
 int read_data_test();
 int open_file_test();
 void read_file_test();
-void close_file_test();
+int close_file_test();
 void open_directory_test();
-void read_directory_test();
+int read_directory_test();
 void close_directory_test();
 
 #endif /* TESTS_H */

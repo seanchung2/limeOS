@@ -62,4 +62,8 @@ int32_t read_directory(int32_t fd, void* buf, int32_t nbytes);
 int32_t write_directory(int32_t fd, const void* buf, int32_t nbytes);
 int32_t close_directory(int32_t fd);
 
+/* helper functions to set and read flags from tests.c */
+void test_set_flags(int index, int value);
+int test_read_flags(int index);
+
 #endif /* _FILESYSTEM_H */

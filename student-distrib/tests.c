@@ -352,6 +352,8 @@ int read_data_test()  {
  * Coverage: filesystem.c
  */
 int open_file_test()  {
+	TEST_HEADER;
+
 	int32_t test_fd1 = -1;
 	int32_t test_fd2 = -1;
 	uint8_t test_name1[10] = "ls\0";
@@ -449,6 +451,8 @@ int read_dentry_by_index_Test()  {
  * Coverage: filesystem.c
  */
 void read_file_test()  {
+	TEST_HEADER;
+
 	int32_t test_fd;
 	uint8_t test_buf[51];
 	uint8_t test_name[34] = "sigtest\0";
@@ -462,20 +466,40 @@ void read_file_test()  {
 	close_file(0);
 }
 
-void close_file_test()  {
+int close_file_test()  {
+	TEST_HEADER;
 
+	int i;
+
+	for(i = 0; i < 8; i++)  {
+		close_file(i);
+	}
+
+	for(i = 0; i < 8; i++)  {
+		if(test_read_flags(i) != 0)  {
+			return FAIL;
+		}
+	}
+	return PASS;
 }
 
 void open_directory_test()  {
 
 }
 
-void read_directory_test()  {
+int read_directory_test()  {
+	TEST_HEADER;
+
 	uint8_t test_name[34] = ".\0";
 	int test_fd;
+	int error_check;
 
 	test_fd = open_directory(test_name);
-	read_directory(test_fd, 0, 0);
+	error_check = read_directory(test_fd, 0, 0);
+	if(error_check == -1)  {
+		return FAIL;
+	}
+	return PASS;
 }
 
 void close_directory_test()  {
@@ -492,16 +516,17 @@ void launch_tests(){
 	//TEST_OUTPUT("idt_test", idt_test());
 
 	// launch your tests here
-	//TEST_OUTPUT("syscall_test",syscall_test());
-	//TEST_OUTPUT("paging_test_kernel", paging_test_kernel());
-	//TEST_OUTPUT("paging_test_vidmem", paging_test_vidmem());
-	//TEST_OUTPUT("paging_value_test", paging_value_test());
+	//TEST_OUTPUT("Syscall Test",syscall_test());
+	//TEST_OUTPUT("Paging Test (KERNEL)", paging_test_kernel());
+	//TEST_OUTPUT("Pagint Test (VIDMEM)", paging_test_vidmem());
+	//TEST_OUTPUT("Paging Value Test", paging_value_test());
 	//RTC_test();
 	//copy_by_index_test();
 	//copy_by_fname_test();
 	//read_data_test();
-	//read_directory_test();
+	TEST_OUTPUT("Read Directory Test", read_directory_test());
 	//TEST_OUTPUT("Read Dentry by Index Test", read_dentry_by_index_Test());
-	//TEST_OUTPUT("open_file_test", open_file_test());
-	read_file_test();
+	//TEST_OUTPUT("Open File Test", open_file_test());
+	//read_file_test();
+	TEST_OUTPUT("Close File Test", close_file_test());
 }

@@ -208,6 +208,7 @@ int32_t open_directory(const uint8_t* filename)  {
 
 int32_t read_directory(int32_t fd, void* buf, int32_t nbytes)  {
 	int dentry_count = *((int*)(fs_start));
+	int error_check;
 	dentry_t current;
 	int i;
 	int j;
@@ -215,7 +216,10 @@ int32_t read_directory(int32_t fd, void* buf, int32_t nbytes)  {
 
 	for(i = 0; i < dentry_count; i++)  {
 		j = 0;
-		read_dentry_by_index(i, &current);
+		error_check = read_dentry_by_index(i, &current);
+		if(error_check == -1)  {
+			return -1;
+		}
 		char_ptr = (uint8_t*)&current;
 		printf("File Name: ");
 		while(*char_ptr != '\0' && j < 32)  {
@@ -238,4 +242,12 @@ int32_t close_directory(int32_t fd)  {
 	}
 	dentry_table_flags[fd] = 0;
 	return 0;
+}
+
+void test_set_flags(int index, int value)  {
+	dentry_table_flags[index] = value;
+}
+
+int test_read_flags(int index)  {
+	return dentry_table_flags[index];
 }
