@@ -6,6 +6,13 @@
 uint8_t terminal_buf[NUM_COLS*NUM_ROWS];
 uint32_t terminal_index = 0;
 
+/*
+* int terminal_read(const int8_t * buf)
+* read the input from the keyboard and store in terminal buffer
+* input: buf: the input from keyboard
+* output: the number had copied
+* side effect: as description
+*/
 int terminal_read(const int8_t * buf)
 {
 	int i;
@@ -24,7 +31,14 @@ int terminal_read(const int8_t * buf)
 	return size;
 }
 
-
+/*
+* int terminal_write(int enter_flag)
+* show the terminal buffer on the screen
+* input: enter_flag: check if enter is pressed
+* output: success -> return the number put into screen
+		  fail	  -> return -1
+* side effect: as description
+*/
 int terminal_write(int enter_flag)
 {
 	int i;
@@ -60,4 +74,26 @@ int terminal_write(int enter_flag)
 	ret = terminal_index;
 	terminal_index = 0;
 	return ret;
+}
+
+/*
+* int terminal_open()
+* do nothing
+* input:
+* output: none
+*/
+int terminal_open()
+{
+	return 0;
+}
+
+/*
+* int terminal_open()
+* do nothing
+* input:
+* output: none
+*/
+int terminal_close()
+{
+	return 0;
 }
