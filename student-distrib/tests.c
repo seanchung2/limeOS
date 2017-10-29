@@ -504,12 +504,9 @@ void launch_tests(){
 	//copy_by_fname_test();
 	//read_data_test();
 	//read_directory_test();
-<<<<<<< HEAD
 	TEST_OUTPUT("Read Dentry by Index Test", read_dentry_by_index_Test());
 	TEST_OUTPUT("Read Dentry by Name Test", read_dentry_by_name_Test());
-=======
 	//TEST_OUTPUT("Read Dentry by Index Test", read_dentry_by_index_Test());
->>>>>>> 13563e567c04ee5dc80ef655f03c438f4440e65d
 	//TEST_OUTPUT("open_file_test", open_file_test());
 	read_file_test();
 }
