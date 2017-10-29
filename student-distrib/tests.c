@@ -266,11 +266,18 @@ int copy_by_index_test()  {
 	uint8_t test_index = 17;
 	uint32_t test_type = 0;
 	uint32_t test_inode = 0;
+	int i = 0;
+	uint8_t* char_ptr;
 
 	read_dentry_by_index(test_index, &test);
+	char_ptr = (uint8_t*)&test;
 	test_type = test.file_type;
 	test_inode = test.inode_number;
-	puts((int8_t*)&test);
+	while(*char_ptr != '\0' && i < 32)  {
+		putc(*char_ptr);
+		char_ptr++;
+		i++;
+	}
 	printf("\nType: %d", test_type); 
 	printf("\nINode: %d", test_inode);
 	putc('\n');
@@ -291,13 +298,15 @@ int copy_by_fname_test()  {
 	uint8_t test_name[34];
 	uint32_t test_type = 0;
 	uint32_t test_inode = 0;
+	int i = 0;
+	uint8_t* char_ptr;
 
-	test_name[0] = 'v';
-	test_name[1] = 'e';
-	test_name[2] = 'r';
-	test_name[3] = 'y';
+	test_name[0] = 's';
+	test_name[1] = 'h';
+	test_name[2] = 'e';
+	test_name[3] = 'l';
 	test_name[4] = 'l';
-	test_name[5] = 'a';
+	test_name[5] = '\0';
 	test_name[6] = 'r';
 	test_name[7] = 'g';
 	test_name[8] = 'e';
@@ -330,12 +339,17 @@ int copy_by_fname_test()  {
 	read_dentry_by_name(test_name, &test);
 	test_type = test.file_type;
 	test_inode = test.inode_number;
-	puts((int8_t*)&test);
+	char_ptr = (uint8_t*)&test;
+	while(*char_ptr != '\0' && i < 32)  {
+		putc(*char_ptr);
+		char_ptr++;
+		i++;
+	}
 	printf("\nType: %d", test_type);
 	printf("\nINode: %d", test_inode);
 	putc('\n');
 	return 0;
-} 
+}
 
 int read_data_test()  {
 	TEST_HEADER;
@@ -365,6 +379,57 @@ int read_data_test()  {
 	for(i = 0; i < 10; i++)  {
 		printf("%d \n", (int)test[i]);
 	}
+	putc('\n');
+	return 0;
+}
+
+/* copy_by_fname_test
+ * 
+ * Test the copy dentry by name function
+ * Inputs: None
+ * Side Effects: None
+ * Coverage: filesystem.c
+ */
+int testCopyByIndex()  {
+	TEST_HEADER;
+
+	int8_t* index_0[] = ".";
+	int8_t* index_1[] = "sigtest";
+	int8_t* index_2[] = "shell";
+	int8_t* index_3[] = "grep";
+	int8_t* index_4[] = "syserr";
+	int8_t* index_5[] = "rtc";
+	int8_t* index_6[] = "fish";
+	int8_t* index_7[] = "counter";
+	int8_t* index_8[] = ".";
+	int8_t* index_9[] = ".";
+	int8_t* index_10[] = ".";
+	int8_t* index_11[] = ".";
+	int8_t* index_12[] = ".";
+	int8_t* index_13[] = ".";
+	int8_t* index_14[] = ".";
+	int8_t* index_15[] = ".";
+	int8_t* index_16[] = ".";
+	
+
+	dentry_t test;
+	uint8_t test_index = 17;
+	uint32_t test_type = 0;
+	uint32_t test_inode = 0;
+	int i = 0;
+	uint8_t* char_ptr;
+
+	read_dentry_by_index(test_index, &test);
+	char_ptr = (uint8_t*)&test;
+	test_type = test.file_type;
+	test_inode = test.inode_number;
+	while(*char_ptr != '\0' && i < 32)  {
+		putc(*char_ptr);
+		char_ptr++;
+		i++;
+	}
+	printf("\nType: %d", test_type); 
+	printf("\nINode: %d", test_inode);
 	putc('\n');
 	return 0;
 }
