@@ -23,7 +23,7 @@ void RTC_test();
 int copy_by_index_test();
 int copy_by_fname_test();
 int read_data_test();
-void open_file_test();
+int open_file_test();
 void read_file_test();
 void close_file_test();
 void open_directory_test();

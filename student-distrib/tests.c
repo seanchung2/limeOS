@@ -295,46 +295,11 @@ int copy_by_fname_test()  {
 	TEST_HEADER;
 
 	dentry_t test;
-	uint8_t test_name[34];
+	uint8_t test_name[34] = "verylargetextwithverylongname.txt\0";
 	uint32_t test_type = 0;
 	uint32_t test_inode = 0;
 	int i = 0;
 	uint8_t* char_ptr;
-
-	test_name[0] = 's';
-	test_name[1] = 'h';
-	test_name[2] = 'e';
-	test_name[3] = 'l';
-	test_name[4] = 'l';
-	test_name[5] = '\0';
-	test_name[6] = 'r';
-	test_name[7] = 'g';
-	test_name[8] = 'e';
-	test_name[9] = 't';
-	test_name[10] = 'e';
-	test_name[11] = 'x';
-	test_name[12] = 't';
-	test_name[13] = 'w';
-	test_name[14] = 'i';
-	test_name[15] = 't';
-	test_name[16] = 'h';
-	test_name[17] = 'v';
-	test_name[18] = 'e';
-	test_name[19] = 'r';
-	test_name[20] = 'y';
-	test_name[21] = 'l';
-	test_name[22] = 'o';
-	test_name[23] = 'n';
-	test_name[24] = 'g';
-	test_name[25] = 'n';
-	test_name[26] = 'a';
-	test_name[27] = 'm';
-	test_name[28] = 'e';
-	test_name[29] = '.';
-	test_name[30] = 't';
-	test_name[31] = 'x';
-	test_name[32] = 't';
-	test_name[33] = '\0';
 
 	read_dentry_by_name(test_name, &test);
 	test_type = test.file_type;
@@ -365,18 +330,7 @@ int read_data_test()  {
 	uint8_t test[10];
 	dentry_t test_dentry;
 	uint32_t inode_index;
-	uint8_t test_name[10];
-
-	test_name[0] = 's';
-	test_name[1] = 'i';
-	test_name[2] = 'g';
-	test_name[3] = 't';
-	test_name[4] = 'e';
-	test_name[5] = 's';
-	test_name[6] = 't';
-	test_name[7] = '\0';
-	test_name[8] = 'e';
-	test_name[9] = '\0';
+	uint8_t test_name[10] = "sigtest\0";
 
 	read_dentry_by_name(test_name, &test_dentry);
 	inode_index = test_dentry.inode_number;
@@ -390,7 +344,46 @@ int read_data_test()  {
 	return 0;
 }
 
-/* read_dentry_by_index_Test
+/* open_file_test
+ * 
+ * Test the open_data function
+ * Inputs: None
+ * Side Effects: opens 8 files
+ * Coverage: filesystem.c
+ */
+int open_file_test()  {
+	int32_t test_fd1 = -1;
+	int32_t test_fd2 = -1;
+	uint8_t test_name1[10] = "ls\0";
+	uint8_t test_name2[10] = "shell\0";
+
+	test_fd1 = open_file(test_name1);
+	test_fd2 = open_file(test_name2);
+
+	if(test_fd1 < 0 || test_fd1 > 8)  {
+		return FAIL;
+	}
+	if(test_fd2 != (test_fd1 + 1))  {
+		return FAIL;
+	}
+
+	open_file(test_name1);
+	open_file(test_name1);
+	open_file(test_name1);
+	open_file(test_name1);
+	open_file(test_name1);
+	open_file(test_name1);
+
+	test_fd1 = open_file(test_name1);
+
+	if(test_fd1 != -1)  {
+		return FAIL;
+	}
+
+	return PASS;
+}
+
+/* copy_by_fname_test
  * 
  * Test the function "read_dentry_by_index" by checking the name
  * Inputs: None
@@ -402,13 +395,11 @@ int read_dentry_by_index_Test()  {
 
 	const uint8_t test_num = 17;
 	const uint8_t test_size = 35;
+	const uint8_t max_length = 32;
 	dentry_t test;
 	int result = PASS;
-	uint32_t test_type = 0;
-	uint32_t test_inode = 0;
 	int8_t name[test_size];
 	int i = 0;
-	uint8_t* char_ptr;
 	int8_t* name_file[test_num][test_size];
 		name_file[0][0] = ".\0";										//0
 		name_file[1][0] = "sigtest\0";									//1
@@ -436,9 +427,9 @@ int read_dentry_by_index_Test()  {
 		strcpy(name, (int8_t*)&test);
 
 		/* check if the name is the same as expectation */
-		if(strlen(name) > 32)
+		if(strlen(name) > max_length)
 		{
-			if(strncmp(name, name_file[i][0], 32) != 0)
+			if(strncmp(name, name_file[i][0], max_length) != 0)
 				result = FAIL;
 		}
 		else
@@ -446,19 +437,29 @@ int read_dentry_by_index_Test()  {
 			if(strncmp(name, name_file[i][0], strlen(name)) != 0)
 				result = FAIL;
 		}
-
-		char_ptr = (uint8_t*)&test;
-		test_type = test.file_type;
-		test_inode = test.inode_number;
 	}
 	return result;
 }
-void open_file_test()  {
 
-}
-
+/* read_file_test
+ * 
+ * Test the read_file function
+ * Inputs: None
+ * Side Effects: Displays file contents onthe screen
+ * Coverage: filesystem.c
+ */
 void read_file_test()  {
+	int32_t test_fd;
+	uint8_t test_buf[51];
+	uint8_t test_name[34] = "verylargetextwithverylongname.txt\0";
 
+	test_fd = open_file(test_name);
+	read_file(test_fd, test_buf, 10);
+
+	terminal_read((int8_t*)test_buf);
+	terminal_write(0);
+
+	close_file(0);
 }
 
 void close_file_test()  {
@@ -470,9 +471,7 @@ void open_directory_test()  {
 }
 
 void read_directory_test()  {
-	uint8_t test_name[10];
-	test_name[0] = '.';
-	test_name[1] = '\0';
+	uint8_t test_name[34] = ".\0";
 	int test_fd;
 
 	test_fd = open_directory(test_name);
@@ -503,4 +502,6 @@ void launch_tests(){
 	//read_data_test();
 	//read_directory_test();
 	TEST_OUTPUT("Read Dentry by Index Test", read_dentry_by_index_Test());
+	//TEST_OUTPUT("open_file_test", open_file_test());
+	//read_file_test();
 }
