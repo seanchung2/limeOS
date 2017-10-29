@@ -252,69 +252,6 @@ void RTC_test(){
 	puts("RTC TEST COMPLETE");
 }
 
-/* copy_by_index_test
- * 
- * Test the copy dentry by index function
- * Inputs: None
- * Side Effects: None
- * Coverage: filesystem.c
- */
-int copy_by_index_test()  {
-	TEST_HEADER;
-
-	dentry_t test;
-	uint8_t test_index = 17;
-	uint32_t test_type = 0;
-	uint32_t test_inode = 0;
-	int i = 0;
-	uint8_t* char_ptr;
-
-	read_dentry_by_index(test_index, &test);
-	char_ptr = (uint8_t*)&test;
-	test_type = test.file_type;
-	test_inode = test.inode_number;
-	while(*char_ptr != '\0' && i < 32)  {
-		putc(*char_ptr);
-		char_ptr++;
-		i++;
-	}
-	printf("\nType: %d", test_type); 
-	printf("\nINode: %d", test_inode);
-	putc('\n');
-	return 0;
-}
-
-/* copy_by_fname_test
- * 
- * Test the copy dentry by name function
- * Inputs: None
- * Side Effects: None
- * Coverage: filesystem.c
- */
-int copy_by_fname_test()  {
-	TEST_HEADER;
-
-	dentry_t test;
-	uint8_t test_name[34] = "verylargetextwithverylongname.txt\0";
-	uint32_t test_type = 0;
-	uint32_t test_inode = 0;
-	int i = 0;
-	uint8_t* char_ptr;
-
-	read_dentry_by_name(test_name, &test);
-	test_type = test.file_type;
-	test_inode = test.inode_number;
-	char_ptr = (uint8_t*)&test;
-	while(*char_ptr != '\0' && i < 32)  {
-		putc(*char_ptr);
-		char_ptr++;
-		i++;
-	}
-	printf("\nType: %d", test_type);
-	printf("\nINode: %d", test_inode);
-	putc('\n');
-	return 0;
-}
 
 /* read_data_test
  * 
@@ -389,6 +326,7 @@ int open_file_test()  {
  * 
  * Test the function "read_dentry_by_index" by checking the name
  * Inputs: None
+ * Outputs: PASS/FAIL
  * Side Effects: None
  * Coverage: filesystem.c
  */
@@ -399,7 +337,6 @@ int read_dentry_by_index_Test()  {
 	const uint8_t test_size = 35;
 	const uint8_t max_length = 32;
 	dentry_t test;
-	int result = PASS;
 	int8_t name[test_size];
 	int i = 0;
 	int8_t* name_file[test_num][test_size];
@@ -432,15 +369,130 @@ int read_dentry_by_index_Test()  {
 		if(strlen(name) > max_length)
 		{
 			if(strncmp(name, name_file[i][0], max_length) != 0)
-				result = FAIL;
+				return FAIL;
 		}
 		else
 		{
 			if(strncmp(name, name_file[i][0], strlen(name)) != 0)
-				result = FAIL;
+				return FAIL;
 		}
 	}
-	return result;
+	return PASS;
+}
+
+/* read_dentry_by_name_Test
+ * 
+ * Test the function "read_dentry_by_name" by checking the name
+ * Inputs: None
+ * Outputs: PASS/FAIL
+ * Side Effects: None
+ * Coverage: filesystem.c
+ */
+int read_dentry_by_name_Test()  {
+	TEST_HEADER;
+
+	const uint8_t test_num = 17;
+	const uint8_t test_size = 35;
+	const uint8_t max_length = 32;
+	dentry_t test;
+	int8_t name[test_size];
+	int i = 0;
+	int8_t* name_file[test_num][test_size];
+		name_file[0][0] = ".\0";										//0
+		name_file[1][0] = "sigtest\0";									//1
+		name_file[2][0] = "shell\0";									//2
+		name_file[3][0] = "grep\0";										//3
+		name_file[4][0] = "syserr\0";									//4
+		name_file[5][0] = "rtc\0";										//5
+		name_file[6][0] = "fish\0";										//6
+		name_file[7][0] = "counter\0";									//7
+		name_file[8][0] = "pingpong\0";									//8
+		name_file[9][0] = "cat\0";										//9
+		name_file[10][0] = "frame0.txt\0";								//10
+		name_file[11][0] = "verylargetextwithverylongname.txt\0";		//11
+		name_file[12][0] = "ls\0";										//12
+		name_file[13][0] = "testprint\0";								//13
+		name_file[14][0] = "created.txt\0";								//14
+		name_file[15][0] = "frame1.txt\0";								//15
+		name_file[16][0] = "hello\0";
+
+	for(i=0;i<test_num;i++)
+	{
+		read_dentry_by_name((uint8_t*)name_file[i][0], &test);
+
+		/* copy the name of the current file */
+		strcpy(name, (int8_t*)&test);
+
+		/* check if the name is the same as expectation */
+		if(strlen(name) > max_length)
+		{
+			if(strncmp(name, name_file[i][0], max_length) != 0)
+				return FAIL;
+		}
+		else
+		{
+			if(strncmp(name, name_file[i][0], strlen(name)) != 0)
+				return FAIL;
+		}
+	}
+
+	/* test if it will return -1 when the name is not any file we have now */
+	name_file[0][0] = "ece391IsTooExhauting\0";
+	if(read_dentry_by_name((uint8_t*)name_file[0][0], &test) != -1)
+		return FAIL;
+
+	return PASS;
+}
+
+/* terminal_read_Test
+ * 
+ * Test the function "terminal_read"
+ * Inputs: None
+ * Outputs: PASS/FAIL
+ * Side Effects: None
+ * Coverage: filesystem.c
+ */
+int terminal_read_Test()
+{
+	int8_t* test = "sgohosdhfgo;hosdh;fgohsodgoh;sohghsohgfohds?\0";
+
+	if(terminal_read(0, test, strlen(test)) != strlen(test) )
+		return FAIL;
+
+	if(terminal_read(0, NULL, 0) != -1)
+		return FAIL;
+
+	if( terminal_read(0, test, 80*30) != -1)
+		return FAIL;
+
+	return PASS;
+}
+
+/* terminal_write_Test
+ * 
+ * Test the function "terminal_write_Test"
+ * Inputs: None
+ * Outputs: PASS/FAIL
+ * Side Effects: None
+ * Coverage: filesystem.c
+ */
+int terminal_write_Test()
+{
+	int8_t* test = "sgohosdhfgo;hosdh;fgohsodgoh;sohghsohgfohds?\n\0";
+	terminal_read(0, test, strlen(test));
+
+	if(terminal_write(0,strlen(test),0) != strlen(test))
+		return FAIL;
+
+	terminal_read(0, test, strlen(test));
+	if( terminal_write(0,strlen(test)+1000,0) != strlen(test))
+		return FAIL;
+
+	terminal_read(0, test, strlen(test));
+	if(terminal_write(0,strlen(test)+80*30,0) != -1)
+		return FAIL;
+
+	return PASS;
 }
 
 /* read_file_test
@@ -460,8 +512,8 @@ void read_file_test()  {
 	test_fd = open_file(test_name);
 	read_file(test_fd, test_buf, 50);
 
-	terminal_read(0, (int8_t*)test_buf, 50);
-	terminal_write(0, 50, 0);
+//	terminal_read((int8_t*)test_buf);
+//	terminal_write(0);
 
 	close_file(0);
 }
@@ -516,17 +568,26 @@ void launch_tests(){
 	//TEST_OUTPUT("idt_test", idt_test());
 
 	// launch your tests here
+
 	//TEST_OUTPUT("Syscall Test",syscall_test());
 	//TEST_OUTPUT("Paging Test (KERNEL)", paging_test_kernel());
 	//TEST_OUTPUT("Pagint Test (VIDMEM)", paging_test_vidmem());
 	//TEST_OUTPUT("Paging Value Test", paging_value_test());
+
 	//RTC_test();
-	//copy_by_index_test();
-	//copy_by_fname_test();
+
+	TEST_OUTPUT("Terminal Read Test", terminal_read_Test());
+	TEST_OUTPUT("Terminal Write Test", terminal_write_Test());;
+
+
+	TEST_OUTPUT("Read Dentry by Index Test", read_dentry_by_index_Test());
+	TEST_OUTPUT("Read Dentry by Name Test", read_dentry_by_name_Test());
 	//read_data_test();
-	TEST_OUTPUT("Read Directory Test", read_directory_test());
-	//TEST_OUTPUT("Read Dentry by Index Test", read_dentry_by_index_Test());
+
 	//TEST_OUTPUT("Open File Test", open_file_test());
 	//read_file_test();
 	TEST_OUTPUT("Close File Test", close_file_test());
+	
+	TEST_OUTPUT("Read Directory Test", read_directory_test());
 }
+
