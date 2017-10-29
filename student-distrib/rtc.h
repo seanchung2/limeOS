@@ -21,13 +21,7 @@
 /**/
 #define MAX_FREQ			1024
 #define FREQ_FOR_RATE_CALC	32768
-/* initialize_RTC
- *
- * Description: Initializes the RTC
- * Inputs: none
- * Outputs: none
- * Side Effects:
- */
+
 void initialize_RTC();
 
 int32_t open_RTC(const uint8_t* filename);

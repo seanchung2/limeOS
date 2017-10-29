@@ -286,6 +286,6 @@ void launch_tests(){
 	//TEST_OUTPUT("paging_test_kernel", paging_test_kernel());
 	//TEST_OUTPUT("paging_test_vidmem", paging_test_vidmem());
 	//TEST_OUTPUT("paging_value_test", paging_value_test());
-	//RTC_test();
+	RTC_test();
 	copy_by_index_test();
 }
