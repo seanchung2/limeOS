@@ -19,7 +19,7 @@ int terminal_read(int32_t fd, const int8_t* buf, int32_t nbytes)
 {
 	int i;
 
-	if(buf == NULL)
+	if(buf == NULL || nbytes > NUM_COLS*NUM_ROWS)
 	{
 		return -1;
 	}
