@@ -10,10 +10,10 @@ volatile int rtc_interrupt_occured = 1;
 
 /* initialize_RTC
  *
- * Description: Initializes the RTC
- * Inputs: none
- * Outputs: none
- * Side Effects: as description
+ * Description: Initialize the RTC
+ * Inputs: None
+ * Outputs: None
+ * Side Effects: As description
  */
 void initialize_RTC(){
 	//cli();
@@ -34,10 +34,10 @@ void initialize_RTC(){
 
 /* changeFreq_RTC
  *
- * Description: change the rtc frequency
- * Inputs: freq: the frequency that we want to change into
- * Outputs: none
- * Side Effects: as description
+ * Description: Change the rtc frequency
+ * Inputs: freq: The frequency that we want to change into
+ * Outputs: None
+ * Side Effects: As description
  */
 void changeFreq_RTC(uint32_t freq){
 
@@ -65,74 +65,74 @@ void changeFreq_RTC(uint32_t freq){
 
 /* open_RTC
  *
- * Description: basically do nothing, only set the freq to default value 2
- * Inputs: filename: not used for now
- * Outputs: 0, always success
- * Side Effects: as description
+ * Description: Set the freq to default value 2
+ * Inputs: filename, Not used for now
+ * Outputs: 0, Always success
+ * Side Effects: As description
  */
 int32_t open_RTC(const uint8_t* filename){
-	changeFreq_RTC(2);
+	changeFreq_RTC(RTC_DEFAULT_FREQ);
 	return 0;//success
 }
 
 /* read_RTC
  *
- * Description: holding on until another rtc occur
- * Inputs: fd: not used for now
- *			buf: not used for now
- *			nbyte: not used for now
- * Outputs: 0, always success
- * Side Effects: as description
+ * Description: Holding on until another RTC interrupt occur
+ * Inputs: fd: Not used for now
+ *		   buf: Not used for now
+ *		   nbyte: Not used for now
+ * Outputs: 0, Always success
+ * Side Effects: As description
  */
 int32_t read_RTC(int32_t fd, void* buf, int32_t nbytes){
-	rtc_interrupt_occured = 1;
+	rtc_interrupt_occured = 1; //set it to 1, active low methodology followed everywhere
 	while (rtc_interrupt_occured == 1){//like a spin lock
 	}
-	//rtc_interrupt_occured = 1;//reset it to 1... active low methodology followed everywhere
 	return 0;
 }
 
 /* write_RTC
  *
- * Description: change the frequency
- * Inputs: fd: not used for now
- *			buf: the pointer which points to the
- *			nbyte: should be 4, or will not do anything
- * Outputs: 0, success; -1, fail
- * Side Effects: as description
+ * Description: Change the frequency
+ * Inputs: fd: Not used for now
+ *		   buf: A pointer
+ *		   nbyte: Should be 4 (NBYTE_DEFAULT_VAL), or will not do anything
+ * Outputs: 0, Success; -1, Fail
+ * Side Effects: As description
  */
 int32_t write_RTC(int32_t fd, const void* buf, int32_t nbytes){
-	if(buf == NULL || nbytes != 4)
+	if(buf == NULL || nbytes != NBYTE_DEFAULT_VAL)
 		return -1;
-	else
-		changeFreq_RTC(*((int32_t*)buf));//gives the frequency
-	
+	else{
+		uint32_t frequency = *((int32_t*)buf);//gives the frequency
+		changeFreq_RTC(frequency);
+	}
 	return nbytes;
 }
 
 /* close_RTC
  *
- * Description: basically do nothing, only set the freq to default value 2
- * Inputs: fd: not used for now
- * Outputs: 0, always success
- * Side Effects: as description
+ * Description: Set the freq back to default value 2
+ * Inputs: fd: Not used for now
+ * Outputs: 0, Always success
+ * Side Effects: As description
  */
 int32_t close_RTC(int32_t fd){
-	changeFreq_RTC(2);//as RTC interrupts should remain open all the times, therefore we set the rate back to 2.
+	changeFreq_RTC(RTC_DEFAULT_FREQ);//as RTC interrupts should remain open all the times, therefore we set the rate back to 2.
 	return 0;//success
 }
 
 /* RTC_handler
  *
- * Description: only change the rtc flag when rtc interrupt
- * Inputs: none
- * Outputs: none
- * Side Effects: as description
+ * Description: Only changes the RTC flag when RTC interrupt occurs
+ * Inputs: None
+ * Outputs: None
+ * Side Effects: As description
  */
 void RTC_handler(){
 	int8_t garbage;
 	rtc_interrupt_occured = 0;
-	outb(0x0C, 0x70);
-    garbage = inb(0x71);
-    send_eoi(8);
+	outb(RTC_REG_C, RTC_PORT);
+    garbage = inb(COMS_PORT);
+    send_eoi(RTC_EOI);
 }
