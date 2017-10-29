@@ -351,6 +351,13 @@ int copy_by_fname_test()  {
 	return 0;
 }
 
+/* read_data_test
+ * 
+ * Test the read_data function
+ * Inputs: None
+ * Side Effects: None
+ * Coverage: filesystem.c
+ */
 int read_data_test()  {
 	TEST_HEADER;
 
@@ -393,45 +400,98 @@ int read_data_test()  {
 int testCopyByIndex()  {
 	TEST_HEADER;
 
-	int8_t* index_0[] = ".";
-	int8_t* index_1[] = "sigtest";
-	int8_t* index_2[] = "shell";
-	int8_t* index_3[] = "grep";
-	int8_t* index_4[] = "syserr";
-	int8_t* index_5[] = "rtc";
-	int8_t* index_6[] = "fish";
-	int8_t* index_7[] = "counter";
-	int8_t* index_8[] = ".";
-	int8_t* index_9[] = ".";
-	int8_t* index_10[] = ".";
-	int8_t* index_11[] = ".";
-	int8_t* index_12[] = ".";
-	int8_t* index_13[] = ".";
-	int8_t* index_14[] = ".";
-	int8_t* index_15[] = ".";
-	int8_t* index_16[] = ".";
-	
-
+	const uint8_t test_num = 17;
+	const uint8_t test_size = 35;
 	dentry_t test;
-	uint8_t test_index = 17;
+	int result = PASS;
 	uint32_t test_type = 0;
 	uint32_t test_inode = 0;
+	int8_t name[test_size];
 	int i = 0;
 	uint8_t* char_ptr;
+	int8_t* name_file[test_num][test_size];
+		name_file[0][0] = ".\0";										//0
+		name_file[1][0] = "sigtest\0";									//1
+		name_file[2][0] = "shell\0";									//2
+		name_file[3][0] = "grep\0";										//3
+		name_file[4][0] = "syserr\0";									//4
+		name_file[5][0] = "rtc\0";										//5
+		name_file[6][0] = "fish\0";										//6
+		name_file[7][0] = "counter\0";									//7
+		name_file[8][0] = "pingpong\0";									//8
+		name_file[9][0] = "cat\0";										//9
+		name_file[10][0] = "frame0.txt\0";								//10
+		name_file[11][0] = "verylargetextwithverylongname.txt\0";		//11
+		name_file[12][0] = "ls\0";										//12
+		name_file[13][0] = "testprint\0";								//13
+		name_file[14][0] = "created.txt\0";								//14
+		name_file[15][0] = "frame1.txt\0";								//15
+		name_file[16][0] = "fello\0";									//16
 
-	read_dentry_by_index(test_index, &test);
-	char_ptr = (uint8_t*)&test;
-	test_type = test.file_type;
-	test_inode = test.inode_number;
-	while(*char_ptr != '\0' && i < 32)  {
+	for(i=0; i<test_num; i++)
+	{
+		read_dentry_by_index(i, &test);
+
+		/* copy the name of the current file */
+		strcpy(name, (int8_t*)&test);
+
+		/* check if the name is the same as expectation */
+		if(strlen(name) > 32)
+		{
+			if(strncmp(name, name_file[i][0], 32) != 0)
+				result = FAIL;
+		}
+		else
+		{
+			if(strncmp(name, name_file[i][0], strlen(name)) != 0)
+				result = FAIL;
+		}
+
+		char_ptr = (uint8_t*)&test;
+		test_type = test.file_type;
+		test_inode = test.inode_number;
+	}
+	
+/*	while(*char_ptr != '\0' && i < 32)  {
 		putc(*char_ptr);
 		char_ptr++;
 		i++;
 	}
+	
+	puts(name);
 	printf("\nType: %d", test_type); 
 	printf("\nINode: %d", test_inode);
-	putc('\n');
-	return 0;
+	putc('\n');*/
+	return result;
+}
+void open_file_test()  {
+
+}
+
+void read_file_test()  {
+
+}
+
+void close_file_test()  {
+
+}
+
+void open_directory_test()  {
+
+}
+
+void read_directory_test()  {
+	uint8_t test_name[10];
+	test_name[0] = '.';
+	test_name[1] = '\0';
+	int test_fd;
+
+	test_fd = open_directory(test_name);
+	read_directory(test_fd, 0, 0);
+}
+
+void close_directory_test()  {
+
 }
 
 /* Checkpoint 3 tests */
@@ -449,7 +509,9 @@ void launch_tests(){
 	//TEST_OUTPUT("paging_test_vidmem", paging_test_vidmem());
 	//TEST_OUTPUT("paging_value_test", paging_value_test());
 	//RTC_test();
-	copy_by_index_test();
+	//copy_by_index_test();
 	//copy_by_fname_test();
 	//read_data_test();
+	//read_directory_test();
+	TEST_OUTPUT("Copy by Index Test", testCopyByIndex());
 }
