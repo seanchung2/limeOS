@@ -186,3 +186,35 @@ int32_t close_file(int32_t fd)  {
 	dentry_table[fd] = NULL;
 	return 0;
 }
+
+int32_t open_directory(const uint8_t* filename)  {
+	int i = 0;
+
+	while(dentry_table[i] != NULL && i < 8)  {
+		i++;
+	}
+
+	if(i >= 8)  {
+		return -1;
+	}
+
+	read_dentry_by_name(filename, dentry_table[i]);
+
+	return i;
+}
+
+int32_t read_directory(int32_t fd, void* buf, int32_t nbytes)  {
+	return 0;
+}
+
+int32_t write_directory(int32_t fd, const void* buf, int32_t nbytes)  {
+	return -1;
+}
+
+int32_t close_directory(int32_t fd)  {
+	if(fd < 0 || fd > 7)  {
+		return -1;
+	}
+	dentry_table[fd] = NULL;
+	return 0;
+}
