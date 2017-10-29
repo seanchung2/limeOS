@@ -32,7 +32,7 @@ void initialize_RTC();
 
 int32_t open_RTC(const uint8_t* filename);
 
-void changeFreq_RTC(uint8_t rate);
+void changeFreq_RTC(uint32_t freq);
 
 int32_t read_RTC(int32_t fd, void* buf, int32_t nbytes);
 

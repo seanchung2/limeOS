@@ -11,6 +11,7 @@
 #define DENTRY_SIZE 64
 #define FOUR_KB 4096
 #define ONE_KB 1024
+#define FILE_TABLE_SIZE 8
 
 /* directory entry structure */
 typedef struct dentry  {
@@ -35,9 +36,9 @@ typedef struct fd_entry  {
 } fd_entry_t;
 
 /* structure for PCB */
-typedef struct PCB_table  {
-	fd_entry_t* file_descriptors[8];
-} PCB_table_t;
+typedef struct file_descriptor_table  {
+	uint32_t file_descriptors[8];
+} file_descriptor_table_t;
 
 /* function to set memory address for the start of the filesystem */
 void set_fs_start(module_t* mod);
@@ -48,5 +49,11 @@ int32_t read_dentry_by_index(uint32_t index, dentry_t* dentry);
 
 /* function to retrieve data from given file */
 int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length);
+
+/* functions to operate on normal files */
+int32_t open_file(const uint8_t* filename);
+int32_t read_file(int32_t fd, void* buf, int32_t nbytes);
+int32_t write_file(int32_t fd, const void* buf, int32_t nbytes);
+int32_t close_file(int32_t fd);
 
 #endif /* _FILESYSTEM_H */

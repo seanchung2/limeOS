@@ -32,7 +32,7 @@ void initialize_RTC(){
 	inb(COMS_PORT);
 }
 
-void changeFreq_RTC(uint8_t freq){
+void changeFreq_RTC(uint32_t freq){
 
 	uint8_t rate = 1;
 

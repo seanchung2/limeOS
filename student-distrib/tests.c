@@ -6,6 +6,7 @@
 #include "paging.h"
 #include "keyboard.h"
 #include "rtc.h"
+#include "filesystem.h"
 
 
 #define PASS 1
@@ -250,6 +251,27 @@ void RTC_test(){
 	}
 	puts("RTC TEST COMPLETE");
 }
+
+/* copy_by_index_test
+ * 
+ * Test the copy dentry by index function
+ * Inputs: None
+ * Side Effects: None
+ * Coverage: filesystem.c
+ */
+int copy_by_index_test()  {
+	TEST_HEADER;
+
+	dentry_t test;
+	uint8_t test_index = 1;
+
+	read_dentry_by_index(test_index, &test);
+	puts((int8_t*)&test);
+	return 0;
+}
+
+
+
 /* Checkpoint 3 tests */
 /* Checkpoint 4 tests */
 /* Checkpoint 5 tests */
@@ -264,5 +286,6 @@ void launch_tests(){
 	//TEST_OUTPUT("paging_test_kernel", paging_test_kernel());
 	//TEST_OUTPUT("paging_test_vidmem", paging_test_vidmem());
 	//TEST_OUTPUT("paging_value_test", paging_value_test());
-	RTC_test();
+	//RTC_test();
+	copy_by_index_test();
 }

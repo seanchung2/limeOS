@@ -3,18 +3,6 @@
 /* holds the adress for the start of the filesystem */
 static uint32_t fs_start;
 
-/* General PCB for MP3.2 testing */
-//static PCB_table_t PCB;
-
-/* stdin file descriptor entry */
-//static fd_entry_t stdin;
-
-/* stdout file descriptor entry */
-//static fd_entry_t stdout;
-
-//PCB.file_descriptors[0] = &stdin;
-//PCB.file_descriptors[1] = &stdout;
-
 /* read_dentry_by_name
  *
  * INPUTS:	fname - string that represents a file

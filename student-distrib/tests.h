@@ -14,9 +14,13 @@ int paging_test_kernel();
 int paging_test_vidmem();
 
 // test exceptions
-//void type_tester(char c);
+void type_tester(char c);
 
 //test for RTC
 void RTC_test();
+
+//test file system
+int copy_by_index_test();
+int copy_by_fname_test();
 
 #endif /* TESTS_H */
