@@ -4,8 +4,8 @@
 static uint32_t fs_start;
 
 /* temporary dentry table */
-static dentry_t dentry_table[8];
-static int dentry_table_flags[8];
+static dentry_t dentry_table[FILE_TABLE_SIZE];
+static int dentry_table_flags[FILE_TABLE_SIZE];
 
 /* read_dentry_by_name
  *
@@ -150,37 +150,73 @@ void set_fs_start(module_t* mod)  {
 	printf("Dentry Count: %d \n", dentry_count);
 	printf("Inode Count: %d \n", inode_count);
 
-	for(i = 0; i < 8; i++)  {
+	for(i = 0; i < FILE_TABLE_SIZE; i++)  {
 		dentry_table_flags[i] = 0;
 	}
 }
 
+/* open_file
+ *
+ * INPUTS:	filename - string that represents a file
+ * OUTPUTS:	-1 - dentry_table full or file not found
+ *			0 - open successful
+ * SIDE EFFECTS:	copys the requested dentry structure
+ *					to dentry_table at the index returned
+ */
 int32_t open_file(const uint8_t* filename)  {
 	int i = 0;
+	int error_check;
 
-	while(dentry_table_flags[i] != 0 && i < 8)  {
+	while(dentry_table_flags[i] != 0 && i < FILE_TABLE_SIZE)  {
 		i++;
 	}
 
-	if(i >= 8)  {
+	if(i >= FILE_TABLE_SIZE)  {
 		return -1;
 	}
 
-	read_dentry_by_name(filename, &(dentry_table[i]));
+	error_check = read_dentry_by_name(filename, &(dentry_table[i]));
+	if(error_check == -1)  {
+		return -1;
+	}
 	dentry_table_flags[i] = 1;
 
 	return i;
 }
 
+/* read_file
+ *
+ * INPUTS:	fd - file descriptor to read
+ *			buf - buffer to write data into
+ *			nbytes - number of bytes to copy
+ * OUTPUTS:	number of bytes copied
+ * SIDE EFFECTS:	copys data from the requested file
+ *					to the given buffer
+ */
 int32_t read_file(int32_t fd, void* buf, int32_t nbytes)  {
 	uint32_t inode_index = dentry_table[fd].inode_number;
 	return read_data(inode_index, 0, (uint8_t*)buf, nbytes);
 }
 
+/* write_file
+ *
+ * INPUTS:	fd - file descriptor to read
+ *			buf - buffer containing data to write to file
+ *			nbytes - number of bytes to copy
+ * OUTPUTS:	-1 (read only files)
+ * SIDE EFFECTS:	None
+ */
 int32_t write_file(int32_t fd, const void* buf, int32_t nbytes)  {
 	return -1;
 }
 
+/* close_file
+ *
+ * INPUTS:	fd - file descriptor to read
+ * OUTPUTS:	-1 - fd is out of acceptable range
+ *			0 - file closed suffessfully
+ * SIDE EFFECTS:	None
+ */
 int32_t close_file(int32_t fd)  {
 	if(fd < 0 || fd > 7)  {
 		return -1;
@@ -189,23 +225,44 @@ int32_t close_file(int32_t fd)  {
 	return 0;
 }
 
+/* open_directory
+ *
+ * INPUTS:	filename - name of directory to open
+ * OUTPUTS:	-1 - dentry_table is full or directory not found
+ *			0 - directory opened successfully
+ * SIDE EFFECTS:	Fills dentry_table at the returned index
+ *					with dentry for named directory
+ */
 int32_t open_directory(const uint8_t* filename)  {
 	int i = 0;
+	int error_check;
 
-	while(dentry_table_flags[i] != 0 && i < 8)  {
+	while(dentry_table_flags[i] != 0 && i < FILE_TABLE_SIZE)  {
 		i++;
 	}
 
-	if(i >= 8)  {
+	if(i >= FILE_TABLE_SIZE)  {
 		return -1;
 	}
 
-	read_dentry_by_name(filename, &(dentry_table[i]));
+	error_check = read_dentry_by_name(filename, &(dentry_table[i]));
+	if(error_check == -1)  {
+		return -1;
+	}
 	dentry_table_flags[i] = 1;
 
 	return i;
 }
 
+/* read_directory
+ *
+ * INPUTS:	fd - file descriptor for derectory to read
+ *			buf - ignored
+ *			nbytes - ignored
+ * OUTPUTS:	0
+ * SIDE EFFECTS:	prints the file names for all the files in the
+ *					given directory
+ */
 int32_t read_directory(int32_t fd, void* buf, int32_t nbytes)  {
 	int dentry_count = *((int*)(fs_start));
 	int error_check;
@@ -232,22 +289,50 @@ int32_t read_directory(int32_t fd, void* buf, int32_t nbytes)  {
 	return 0;
 }
 
+/* write_directory
+ *
+ * INPUTS:	fd - ignored
+ *			buf - ignored
+ *			nbytes - ignored
+ * OUTPUTS:	-1 (Read Only)
+ * SIDE EFFECTS:	None
+ */
 int32_t write_directory(int32_t fd, const void* buf, int32_t nbytes)  {
 	return -1;
 }
 
+/* close_directory
+ *
+ * INPUTS:	fd - file descriptor for directory to close
+ * OUTPUTS:	-1 - file descriptor outise acceptable range
+ *			0 - file closed successfully
+ * SIDE EFFECTS:	sets flag for given file descriptor to 0
+ */
 int32_t close_directory(int32_t fd)  {
-	if(fd < 0 || fd > 7)  {
+	if(fd < 0 || fd > (FILE_TABLE_SIZE-1))  {
 		return -1;
 	}
 	dentry_table_flags[fd] = 0;
 	return 0;
 }
 
+/* test_set_flags
+ *
+ * INPUTS:	index - index in dentry_table_flags to change
+ *			value - number to change flag to
+ * OUTPUTS:	None
+ * SIDE EFFECTS:	sets flag for given index to a given value
+ */
 void test_set_flags(int index, int value)  {
 	dentry_table_flags[index] = value;
 }
 
+/* test_read_flags
+ *
+ * INPUTS:	index - index in dentry_table_flags to read
+ * OUTPUTS:	value of flag at given index in dentry_table_flags
+ * SIDE EFFECTS:	sNone
+ */
 int test_read_flags(int index)  {
 	return dentry_table_flags[index];
 }

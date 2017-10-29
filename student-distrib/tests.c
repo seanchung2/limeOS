@@ -283,9 +283,11 @@ int read_data_test()  {
 	read_data(inode_index, 0, test, 9);
 
 	for(i = 0; i < 10; i++)  {
-		printf("%d \n", (int)test[i]);
+		putc((int8_t)test[i]);
 	}
+
 	putc('\n');
+	
 	return 0;
 }
 
@@ -462,6 +464,8 @@ int read_dentry_by_name_Test()  {
  */
 int terminal_read_Test()
 {
+	TEST_HEADER;
+
 	int8_t* test = "sgohosdhfgo;hosdh;fgohsodgoh;sohghsohgfohds?\0";
 
 	if(terminal_read(0, test, strlen(test)) != strlen(test) )
@@ -486,6 +490,8 @@ int terminal_read_Test()
  */
 int terminal_write_Test()
 {
+	TEST_HEADER;
+
 	int8_t* test = "sgohosdhfgo;hosdh;fgohsodgoh;sohghsohgfohds?\n\0";
 	terminal_read(0, test, strlen(test));
 
@@ -513,6 +519,8 @@ int terminal_write_Test()
  */
 int terminal_open_Test()
 {
+	TEST_HEADER;
+
 	if(terminal_open(0) != 0)
 		return FAIL;
 
@@ -529,6 +537,8 @@ int terminal_open_Test()
  */
 int terminal_close_Test()
 {
+	TEST_HEADER;
+
 	if(terminal_close(0) != 0)
 		return FAIL;
 	
@@ -552,9 +562,21 @@ void read_file_test()  {
 	test_fd = open_file(test_name);
 	read_file(test_fd, test_buf, 50);
 
+	terminal_read(0, (int8_t*)test_buf, 50);
+	terminal_write(0, 50, 0);
+
+	putc('\n');
+
 	close_file(0);
 }
 
+/* write_file_test
+ * 
+ * Test the write_file function
+ * Inputs: None
+ * Side Effects: None
+ * Coverage: filesystem.c
+ */
 int write_file_test()  {
 	TEST_HEADER;
 
@@ -581,6 +603,14 @@ int close_file_test()  {
 	return PASS;
 }
 
+/* open_directory_test
+ * 
+ * Test the open_directory function
+ * Inputs: None
+ * Side Effects: Sets all entries in
+ 				 dentry_table_flags to 0
+ * Coverage: filesystem.c
+ */
 int open_directory_test()  {
 	TEST_HEADER;
 
@@ -589,7 +619,7 @@ int open_directory_test()  {
 	uint8_t test_name[10] = ".\0";
 
 	for(i = 0; i < 8; i++)  {
-		test_set_flags(i, 1);
+		test_set_flags(i, 0);
 	}
 
 	for(i = 0; i < 8; i++)  {
@@ -612,6 +642,13 @@ int open_directory_test()  {
 	return PASS;
 }
 
+/* read_directory_test
+ * 
+ * Test the read_directory function
+ * Inputs: None
+ * Side Effects: None
+ * Coverage: filesystem.c
+ */
 int read_directory_test()  {
 	TEST_HEADER;
 
@@ -624,9 +661,19 @@ int read_directory_test()  {
 	if(error_check == -1)  {
 		return FAIL;
 	}
+
+	close_directory(test_fd);
+
 	return PASS;
 }
 
+/* write_directory_test
+ * 
+ * Test the write_directory function
+ * Inputs: None
+ * Side Effects: None
+ * Coverage: filesystem.c
+ */
 int write_directory_test()  {
 	TEST_HEADER;
 
@@ -637,7 +684,14 @@ int write_directory_test()  {
 	return PASS;
 }
 
-void close_directory_test()  {
+/* close_directory_test
+ * 
+ * Test the close_directory function
+ * Inputs: None
+ * Side Effects: None
+ * Coverage: filesystem.c
+ */
+int close_directory_test()  {
 	TEST_HEADER;
 
 	int i;
@@ -688,10 +742,10 @@ void launch_tests(){
 
 	// TEST_OUTPUT("Read Dentry by Index Test", read_dentry_by_index_Test());
 	// TEST_OUTPUT("Read Dentry by Name Test", read_dentry_by_name_Test());
-	// read_data_test();
+	 read_data_test();
 
 	// TEST_OUTPUT("Open File Test", open_file_test());
-	// read_file_test();
+	read_file_test();
 	// TEST_OUTPUT("Write File Test", write_file_test());
 	// TEST_OUTPUT("Close File Test", close_file_test());
 

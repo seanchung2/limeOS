@@ -20,8 +20,10 @@ void type_tester(char c);
 void RTC_test();
 
 //test terminal
+int terminal_open_Test();
 int terminal_read_Test();
 int terminal_write_Test();
+int terminal_close_Test();
 
 //test file system
 int read_dentry_by_index_Test();
@@ -33,9 +35,9 @@ void read_file_test();
 int write_file_test();
 int close_file_test();
 
-void open_directory_test();
+int open_directory_test();
 int read_directory_test();
 int write_directory_test();
-void close_directory_test();
+int close_directory_test();
 
 #endif /* TESTS_H */
