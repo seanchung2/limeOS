@@ -3,6 +3,9 @@
 /* holds the adress for the start of the filesystem */
 static uint32_t fs_start;
 
+/* temporary dentry table */
+static dentry_t* dentry_table[8];
+
 /* read_dentry_by_name
  *
  * INPUTS:	fname - string that represents a file
@@ -86,7 +89,7 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
 	inode_t* inode_ptr = (inode_t*)(fs_start + ((1 + inode) * FOUR_KB));
 	uint32_t inode_count = *((int*)(fs_start + 4));
 	uint32_t copied_count = 0;
-	uint32_t data_block_index;
+	uint32_t data_block_index = 0;
 	uint32_t byte_number;
 	uint8_t* data_block_address;
 
@@ -135,5 +138,51 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
  */
 
 void set_fs_start(module_t* mod)  {
+	int i;
+	int32_t dentry_count;
+	int32_t inode_count;
+
 	fs_start = mod->mod_start;
+	dentry_count = *((int32_t*)fs_start);
+	inode_count = *((int32_t*)(fs_start + 4));
+
+	printf("Dentry Count: %d \n", dentry_count);
+	printf("Inode Count: %d \n", inode_count);
+
+	for(i = 0; i < 8; i++)  {
+		dentry_table[i] = NULL;
+	}
+}
+
+int32_t open_file(const uint8_t* filename)  {
+	int i = 0;
+
+	while(dentry_table[i] != NULL && i < 8)  {
+		i++;
+	}
+
+	if(i >= 8)  {
+		return -1;
+	}
+
+	read_dentry_by_name(filename, dentry_table[i]);
+
+	return i;
+}
+
+int32_t read_file(int32_t fd, void* buf, int32_t nbytes)  {
+	uint32_t inode_index = dentry_table[fd]->inode_number;
+	return read_data(inode_index, 0, (uint8_t*)buf, nbytes);
+}
+
+int32_t write_file(int32_t fd, const void* buf, int32_t nbytes)  {
+	return -1;
+}
+
+int32_t close_file(int32_t fd)  {
+	if(fd < 0 || fd > 7)  {
+		return -1;
+	}
+	dentry_table[fd] = NULL;
+	return 0;
 }

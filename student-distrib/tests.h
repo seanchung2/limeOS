@@ -22,5 +22,6 @@ void RTC_test();
 //test file system
 int copy_by_index_test();
 int copy_by_fname_test();
+int read_data_test();
 
 #endif /* TESTS_H */

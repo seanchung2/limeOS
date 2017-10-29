@@ -264,13 +264,110 @@ int copy_by_index_test()  {
 
 	dentry_t test;
 	uint8_t test_index = 1;
+	uint32_t test_type = 0;
+	uint32_t test_inode = 0;
 
 	read_dentry_by_index(test_index, &test);
+	test_type = test.file_type;
+	test_inode = test.inode_number;
 	puts((int8_t*)&test);
+	printf("\nType: %d", test_type); 
+	printf("\nINode: %d", test_inode);
+	putc('\n');
 	return 0;
 }
 
+/* copy_by_fname_test
+ * 
+ * Test the copy dentry by name function
+ * Inputs: None
+ * Side Effects: None
+ * Coverage: filesystem.c
+ */
+int copy_by_fname_test()  {
+	TEST_HEADER;
 
+	dentry_t test;
+	uint8_t test_name[34];
+	uint32_t test_type = 0;
+	uint32_t test_inode = 0;
+
+	test_name[0] = 'v';
+	test_name[1] = 'e';
+	test_name[2] = 'r';
+	test_name[3] = 'y';
+	test_name[4] = 'l';
+	test_name[5] = 'a';
+	test_name[6] = 'r';
+	test_name[7] = 'g';
+	test_name[8] = 'e';
+	test_name[8] = 't';
+	test_name[8] = 'e';
+	test_name[8] = 'x';
+	test_name[8] = 't';
+	test_name[8] = 'w';
+	test_name[8] = 'i';
+	test_name[8] = 't';
+	test_name[8] = 'h';
+	test_name[8] = 'v';
+	test_name[8] = 'e';
+	test_name[8] = 'r';
+	test_name[8] = 'y';
+	test_name[8] = 'l';
+	test_name[8] = 'o';
+	test_name[8] = 'n';
+	test_name[8] = 'g';
+	test_name[8] = 'n';
+	test_name[8] = 'a';
+	test_name[8] = 'm';
+	test_name[8] = 'e';
+	test_name[8] = '.';
+	test_name[8] = 't';
+	test_name[8] = 'x';
+	test_name[8] = 't';
+	test_name[8] = '\0';
+
+	read_dentry_by_name(test_name, &test);
+	test_type = test.file_type;
+	test_inode = test.inode_number;
+	puts((int8_t*)&test);
+	printf("\nType: %d", test_type);
+	printf("\nINode: %d", test_inode);
+	putc('\n');
+	return 0;
+} 
+
+int read_data_test()  {
+	TEST_HEADER;
+
+	int i;
+	uint8_t test[10];
+	dentry_t test_dentry;
+	uint32_t inode_index;
+	uint8_t test_name[10];
+
+	test_name[0] = 's';
+	test_name[1] = 'i';
+	test_name[2] = 'g';
+	test_name[3] = 't';
+	test_name[4] = 'e';
+	test_name[5] = 's';
+	test_name[6] = 't';
+	test_name[7] = '\0';
+	test_name[8] = 'e';
+	test_name[9] = '\0';
+
+	read_dentry_by_name(test_name, &test_dentry);
+	inode_index = test_dentry.inode_number;
+
+	read_data(inode_index, 0, test, 9);
+
+	for(i = 0; i < 10; i++)  {
+		printf("%d \n", (int)test[i]);
+	}
+	putc('\n');
+	return 0;
+}
 
 /* Checkpoint 3 tests */
 /* Checkpoint 4 tests */
@@ -288,4 +385,6 @@ void launch_tests(){
 	//TEST_OUTPUT("paging_value_test", paging_value_test());
 	//RTC_test();
 	copy_by_index_test();
+	copy_by_fname_test();
+	read_data_test();
 }
