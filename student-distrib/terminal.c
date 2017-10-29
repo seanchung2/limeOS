@@ -4,48 +4,50 @@
 #define NUM_ROWS        25
 
 uint8_t terminal_buf[NUM_COLS*NUM_ROWS];
-uint32_t terminal_index = 0;
+uint8_t terminal_index = 0;
 
 /*
-* int terminal_read(const int8_t * buf)
-* read the input from the keyboard and store in terminal buffer
-* input: buf: the input from keyboard
-* output: the number had copied
-* side effect: as description
-*/
-int terminal_read(const int8_t * buf)
+ * int terminal_read(int32_t fd, const int8_t* buf, int32_t nbytes)
+ * read the input from the keyboard and store in terminal buffer
+ * input: 	fd - the index of file
+ * 			buf- the input from keyboard
+ * 			nbytes - how many bytes to read
+ * output: the number had copied
+ * side effect: as description
+ */
+int terminal_read(int32_t fd, const int8_t* buf, int32_t nbytes)
 {
 	int i;
-	int size = strlen(buf);
 
 	if(buf == NULL)
 	{
 		return -1;
 	}
 
-	for(i=0;i<size;i++)
+	for(i=0;i<nbytes;i++)
 	{
 		terminal_buf[i] = buf[i];
 	}
-	terminal_index = size;
-	return size;
+	terminal_index = nbytes;
+	return nbytes;
 }
 
 /*
-* int terminal_write(int enter_flag)
-* show the terminal buffer on the screen
-* input: enter_flag: check if enter is pressed
-* output: success -> return the number put into screen
-		  fail	  -> return -1
-* side effect: as description
-*/
-int terminal_write(int enter_flag)
+ * int terminal_write(int32_t fd, int32_t nbytes,int enter_flag)
+ * show the terminal buffer on the screen
+ * input:   fd - the index of file
+ *			nbytes - how many bytes to write
+ * 			enter_flag - check if enter is pressed 
+ * output: success -> return the number put into screen
+ *		   fail	   -> return -1
+ * side effect: as description
+ */
+int terminal_write(int32_t fd, int32_t nbytes,int enter_flag)
 {
 	int i;
-	int ret;
-
+	int write_index;
 	/* index out of bound */
-	if(terminal_index > NUM_COLS*NUM_ROWS)
+	if(nbytes > NUM_COLS*NUM_ROWS)
 	{
 		return -1;
 	}
@@ -61,8 +63,13 @@ int terminal_write(int enter_flag)
 		return 1;
 	}
 
+	if (nbytes > terminal_index)
+		write_index = terminal_index;
+	else
+		write_index = nbytes;
+
 	/* normal charaters */
-	for(i=0; i<terminal_index; i++)
+	for(i=0; i<write_index; i++)
 	{
 		if(check_out_of_bound() == SCROLL_LAST_LETTER)
 		{
@@ -70,30 +77,28 @@ int terminal_write(int enter_flag)
 		}
 		putc(terminal_buf[i]);
 	}
-
-	ret = terminal_index;
 	terminal_index = 0;
-	return ret;
+	return write_index;
 }
 
 /*
-* int terminal_open()
-* do nothing
-* input:
-* output: none
-*/
-int terminal_open()
+ * int terminal_open(const uint8_t* filename)
+ * do nothing right now
+ * input: filename - name to be open
+ * output: none
+ */
+int terminal_open(const uint8_t* filename)
 {
 	return 0;
 }
 
 /*
-* int terminal_open()
-* do nothing
-* input:
-* output: none
-*/
-int terminal_close()
+ * int terminal_close(int32_t fd)
+ * do nothing right now
+ * input: fd - index to be closed
+ * output: none
+ */
+int terminal_close(int32_t fd)
 {
 	return 0;
 }
