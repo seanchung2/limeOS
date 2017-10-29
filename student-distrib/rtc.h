@@ -14,10 +14,13 @@
 #define RTC_PORT 			0x70
 #define COMS_PORT 			0x71
 
-/*Activve Low Implementation Constant*/
+/*Active Low Implementation Constant*/
 #define ACT_LOW				0xFF
 #define RTC_FRQ_ACT_LOW 	0xF0 //The low 4 bits are important for frequency as it is between 2 and 15
 
+/**/
+#define MAX_FREQ			1024
+#define FREQ_FOR_RATE_CALC	32768
 /* initialize_RTC
  *
  * Description: Initializes the RTC

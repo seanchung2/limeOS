@@ -364,11 +364,12 @@ void keyboard_output_dealer (uint8_t c)
 		}
 	}
 
-	if(found==-1 && (c>RELEASE_SCANCODE_UPPERBOUND || c<RELEASE_SCANCODE_LOWERBOUND))
+	if(found==-1 && (c>RELEASE_SCANCODE_UPPERBOUND || c<RELEASE_SCANCODE_LOWERBOUND) && c!=ACK_SCANCODE)
 	{
 		terminal_read_flag = 0;
 		if(check_out_of_bound() == SCROLL_ENTER_PRESSED)
 			scroll_screen();
 		puts("UNKNOWN SCANCODE!\n");
+		printf("%d\n", c);
 	}
 }

@@ -220,27 +220,37 @@ int paging_value_test()  {
 
 /* Checkpoint 2 tests */
 
-/* RTC Test - Example
+/* RTC_test
  * 
- * Asserts that first 10 IDT entries are not NULL
+ * Test changing RTC rate
  * Inputs: None
- * Outputs: PASS/FAIL
  * Side Effects: None
- * Coverage: Load IDT, IDT definition
- * Files: x86_desc.h/S
+ * Coverage: rtc.h
  */
-
 void RTC_test(){
 	open_RTC(0);
 
-	int i;
-	int freq = 4;
+	int i,j;
+	char output;
+	int freq = 2;
 	int* ptr = &freq;
 
 	for(i=0;i<10;i++)
 	{
-		putc('1');
-		read_RTC(0,0,0);
+		for(j=0;j<20;j++)
+		{
+			output = ('0'+i);
+			putc(output);
+			read_RTC(0,0,0);
+		}
+
+		freq <<= 1;
+		write_RTC(0, (void*) ptr, 4);
+		putc('\n');
+	}
+/*
+	for(i=0;i<10;i++)
+	{
 	}
 	putc('\n');
 	write_RTC(0, (void*) ptr, 4);
@@ -259,7 +269,7 @@ void RTC_test(){
 		putc('3');
 		read_RTC(0,0,0);
 	}
-	putc('\n');
+	putc('\n');*/
 	puts("RTC TEST COMPLETE");
 }
 /* Checkpoint 3 tests */

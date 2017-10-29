@@ -32,9 +32,21 @@ void initialize_RTC(){
 	inb(COMS_PORT);
 }
 
-void changeFreq_RTC(uint8_t rate){
-	//Need to make sure that rate is between 2 and 15.
-	if(rate >= 2 && rate <=15){//checking for this as RTC has problems with rate of 1 or 2. It doesn't generate the expected interrupt
+void changeFreq_RTC(uint8_t freq){
+
+	uint8_t rate = 1;
+
+	/* if freq is over 1024, it is an error */
+	if(freq>MAX_FREQ)
+		return;
+	while( ((FREQ_FOR_RATE_CALC)>>(rate-1)) != freq )
+	{
+		rate++;
+		/* if freq is not the power of 2 or over 2^15, it is an error */
+		if(rate>15)
+			return;
+	}
+	//if(rate >= 2 && rate <=15) {//checking for this as RTC has problems with rate of 1 or 2. It doesn't generate the expected interrupt
 		//cli();
 		uint8_t regA = 0x00;
 		outb(RTC_REG_A, RTC_PORT);
@@ -44,12 +56,12 @@ void changeFreq_RTC(uint8_t rate){
 		regA = regA | rate;
 		outb(regA, COMS_PORT);
 		//sti();
-	}
+	//}
 	return;
 }
 
 int32_t open_RTC(const uint8_t* filename){
-	changeFreq_RTC(15);
+	changeFreq_RTC(2);
 	return 0;//success
 }
 
@@ -71,7 +83,7 @@ int32_t write_RTC(int32_t fd, const void* buf, int32_t nbytes){
 }
 
 int32_t close_RTC(int32_t fd){
-	changeFreq_RTC(15);//as RTC interrupts should remain open all the times, therefore we set the rate back to 2.
+	changeFreq_RTC(2);//as RTC interrupts should remain open all the times, therefore we set the rate back to 2.
 	return 0;//success
 }
 

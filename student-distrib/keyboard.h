@@ -21,6 +21,7 @@
 #define CHARACTER_BUFFER_SIZE 		128
 #define RELEASE_SCANCODE_UPPERBOUND 0xB9
 #define RELEASE_SCANCODE_LOWERBOUND 0x81
+#define ACK_SCANCODE				0xFA
 /* keyboard character scancode */
 #define PRESS_ENTER 				0x1C
 #define PRESS_BACKSPACE				0x0E
