@@ -5,6 +5,8 @@
 #include "i8259.h"
 #include "paging.h"
 #include "keyboard.h"
+#include "rtc.h"
+
 
 #define PASS 1
 #define FAIL 0
@@ -217,6 +219,49 @@ int paging_value_test()  {
 }
 
 /* Checkpoint 2 tests */
+
+/* RTC Test - Example
+ * 
+ * Asserts that first 10 IDT entries are not NULL
+ * Inputs: None
+ * Outputs: PASS/FAIL
+ * Side Effects: None
+ * Coverage: Load IDT, IDT definition
+ * Files: x86_desc.h/S
+ */
+
+void RTC_test(){
+	open_RTC(0);
+
+	int i;
+	int freq = 4;
+	int* ptr = &freq;
+
+	for(i=0;i<10;i++)
+	{
+		putc('1');
+		read_RTC(0,0,0);
+	}
+	putc('\n');
+	write_RTC(0, (void*) ptr, 4);
+
+	for(i=0;i<10;i++)
+	{
+		putc('2');
+		read_RTC(0,0,0);
+	}
+	putc('\n');
+	freq = 8;
+	write_RTC(0, (void*) ptr, 4);
+
+	for(i=0;i<10;i++)
+	{
+		putc('3');
+		read_RTC(0,0,0);
+	}
+	putc('\n');
+	puts("RTC TEST COMPLETE");
+}
 /* Checkpoint 3 tests */
 /* Checkpoint 4 tests */
 /* Checkpoint 5 tests */
@@ -224,12 +269,12 @@ int paging_value_test()  {
 
 /* Test suite entry point */
 void launch_tests(){
-	TEST_OUTPUT("idt_test", idt_test());
+	//TEST_OUTPUT("idt_test", idt_test());
 
 	// launch your tests here
-	TEST_OUTPUT("syscall_test",syscall_test());
-	TEST_OUTPUT("paging_test_kernel", paging_test_kernel());
-	TEST_OUTPUT("paging_test_vidmem", paging_test_vidmem());
-	TEST_OUTPUT("paging_value_test", paging_value_test());
-
+	//TEST_OUTPUT("syscall_test",syscall_test());
+	//TEST_OUTPUT("paging_test_kernel", paging_test_kernel());
+	//TEST_OUTPUT("paging_test_vidmem", paging_test_vidmem());
+	//TEST_OUTPUT("paging_value_test", paging_value_test());
+	RTC_test();
 }

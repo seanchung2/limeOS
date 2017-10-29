@@ -1,6 +1,6 @@
 /* lib.c - Some basic library functions (printf, strlen, etc.)
  * vim:ts=4 noexpandtab */
-
+#include "rtc.h"
 #include "lib.h"
 #define VIDEO           0xB8000
 #define NUM_COLS        80
@@ -482,6 +482,9 @@ void test_interrupts(void) {
     cli();
     int32_t i;
     int8_t garbage;
+
+    RTC_STATUS = 1;
+
     for (i = 0; i < NUM_ROWS * NUM_COLS; i++) {
         if(RTC_STATUS == 1) {
             video_mem[(i << 1) + 1]++;
@@ -494,6 +497,8 @@ void test_interrupts(void) {
     garbage = inb(0x71);
     send_eoi(8);
     sti();
+
+    RTC_handler();
 }
 
 

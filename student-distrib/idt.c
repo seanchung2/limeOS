@@ -1,5 +1,5 @@
 #include "idt.h"
-
+#include "rtc.h"
 /* init_idt
  *
  * Set the gates and load IDT with correct vectors
@@ -121,7 +121,7 @@ void R_handler()
 						"pushl	%eax;"
 						"pushl	%ecx;"
 						"pushl	%edx;"
-							"call 	test_interrupts;"
+							"call 	RTC_handler;"
 						"popl	%edx;"
 						"popl	%ecx;"
 						"popl	%eax;"
@@ -131,4 +131,11 @@ void R_handler()
 					"leave;"
 					"iret;"
 									);
+}
+//test_interrupts
+//RTC_handler
+
+void rtc_linker()  {
+	RTC_handler();
+	return;
 }

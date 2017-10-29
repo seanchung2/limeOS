@@ -13,7 +13,10 @@ int syscall_test();
 int paging_test_kernel();
 int paging_test_vidmem();
 
-// test exceptions, rtc
-void type_tester(char c);
+// test exceptions
+//void type_tester(char c);
+
+//test for RTC
+void RTC_test();
 
 #endif /* TESTS_H */
