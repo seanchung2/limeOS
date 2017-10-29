@@ -335,7 +335,6 @@ int read_dentry_by_index_Test()  {
 	const uint8_t test_size = 35;
 	const uint8_t max_length = 32;
 	dentry_t test;
-	int result = PASS;
 	int8_t name[test_size];
 	int i = 0;
 	int8_t* name_file[test_num][test_size];
@@ -368,15 +367,15 @@ int read_dentry_by_index_Test()  {
 		if(strlen(name) > max_length)
 		{
 			if(strncmp(name, name_file[i][0], max_length) != 0)
-				result = FAIL;
+				return FAIL;
 		}
 		else
 		{
 			if(strncmp(name, name_file[i][0], strlen(name)) != 0)
-				result = FAIL;
+				return FAIL;
 		}
 	}
-	return result;
+	return PASS;
 }
 
 /* read_dentry_by_name_Test
@@ -394,7 +393,6 @@ int read_dentry_by_name_Test()  {
 	const uint8_t test_size = 35;
 	const uint8_t max_length = 32;
 	dentry_t test;
-	int result = PASS;
 	int8_t name[test_size];
 	int i = 0;
 	int8_t* name_file[test_num][test_size];
@@ -427,21 +425,72 @@ int read_dentry_by_name_Test()  {
 		if(strlen(name) > max_length)
 		{
 			if(strncmp(name, name_file[i][0], max_length) != 0)
-				result = FAIL;
+				return FAIL;
 		}
 		else
 		{
 			if(strncmp(name, name_file[i][0], strlen(name)) != 0)
-				result = FAIL;
+				return FAIL;
 		}
 	}
 
 	/* test if it will return -1 when the name is not any file we have now */
 	name_file[0][0] = "ece391IsTooExhauting\0";
 	if(read_dentry_by_name((uint8_t*)name_file[0][0], &test) != -1)
-		result = FAIL;
+		return FAIL;
 
-	return result;
+	return PASS;
+}
+
+/* terminal_read_Test
+ * 
+ * Test the function "terminal_read"
+ * Inputs: None
+ * Outputs: PASS/FAIL
+ * Side Effects: None
+ * Coverage: filesystem.c
+ */
+int terminal_read_Test()
+{
+	int8_t* test = "sgohosdhfgo;hosdh;fgohsodgoh;sohghsohgfohds?\0";
+
+	if(terminal_read(0, test, strlen(test)) != strlen(test) )
+		return FAIL;
+
+	if(terminal_read(0, NULL, 0) != -1)
+		return FAIL;
+
+	if( terminal_read(0, test, 80*30) != -1)
+		return FAIL;
+
+	return PASS;
+}
+
+/* terminal_write_Test
+ * 
+ * Test the function "terminal_write_Test"
+ * Inputs: None
+ * Outputs: PASS/FAIL
+ * Side Effects: None
+ * Coverage: filesystem.c
+ */
+int terminal_write_Test()
+{
+	int8_t* test = "sgohosdhfgo;hosdh;fgohsodgoh;sohghsohgfohds?\n\0";
+	terminal_read(0, test, strlen(test));
+
+	if(terminal_write(0,strlen(test),0) != strlen(test))
+		return FAIL;
+
+	terminal_read(0, test, strlen(test));
+	if( terminal_write(0,strlen(test)+1000,0) != strlen(test))
+		return FAIL;
+
+	terminal_read(0, test, strlen(test));
+	if(terminal_write(0,strlen(test)+80*30,0) != -1)
+		return FAIL;
+
+	return PASS;
 }
 
 /* read_file_test
@@ -499,13 +548,15 @@ void launch_tests(){
 	//TEST_OUTPUT("paging_test_kernel", paging_test_kernel());
 	//TEST_OUTPUT("paging_test_vidmem", paging_test_vidmem());
 	//TEST_OUTPUT("paging_value_test", paging_value_test());
-	//RTC_test();
-	//copy_by_index_test();
-	//copy_by_fname_test();
+
 	//read_data_test();
 	//read_directory_test();
+
+	//RTC_test();
 	TEST_OUTPUT("Read Dentry by Index Test", read_dentry_by_index_Test());
 	TEST_OUTPUT("Read Dentry by Name Test", read_dentry_by_name_Test());
+	TEST_OUTPUT("Terminal Read Test", terminal_read_Test());
+	TEST_OUTPUT("Terminal Write Test", terminal_write_Test());
 	//TEST_OUTPUT("Read Dentry by Index Test", read_dentry_by_index_Test());
 	//TEST_OUTPUT("open_file_test", open_file_test());
 	read_file_test();
