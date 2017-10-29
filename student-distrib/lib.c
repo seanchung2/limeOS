@@ -56,6 +56,10 @@ int32_t printf(int8_t *format, ...) {
     int32_t* esp = (void *)&format;
     esp++;
 
+    /*test*/
+    if(check_out_of_bound())
+        scroll_screen();
+
     while (*buf != '\0') {
         switch (*buf) {
             case '%':
