@@ -62,11 +62,11 @@ void keyboard_handler ()
 
     char_buf[buf_index+1] = '\0';
     if (terminal_read_flag && add_or_not)
-    	terminal_read((int8_t*)(char_buf+buf_index));
+    	terminal_read( 0, (int8_t*)(char_buf+buf_index), 1);
     terminal_read_flag = 0;
     add_or_not = 0;
     /* call terminal write to write buffer to screen */
-    terminal_write(enter_flag);
+    terminal_write(0, 1, enter_flag);
     enter_flag = 0;
 
     /* Send end-of-interrupt signal for the specified IRQ */
