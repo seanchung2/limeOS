@@ -263,7 +263,7 @@ int copy_by_index_test()  {
 	TEST_HEADER;
 
 	dentry_t test;
-	uint8_t test_index = 1;
+	uint8_t test_index = 17;
 	uint32_t test_type = 0;
 	uint32_t test_inode = 0;
 
@@ -301,31 +301,31 @@ int copy_by_fname_test()  {
 	test_name[6] = 'r';
 	test_name[7] = 'g';
 	test_name[8] = 'e';
-	test_name[8] = 't';
-	test_name[8] = 'e';
-	test_name[8] = 'x';
-	test_name[8] = 't';
-	test_name[8] = 'w';
-	test_name[8] = 'i';
-	test_name[8] = 't';
-	test_name[8] = 'h';
-	test_name[8] = 'v';
-	test_name[8] = 'e';
-	test_name[8] = 'r';
-	test_name[8] = 'y';
-	test_name[8] = 'l';
-	test_name[8] = 'o';
-	test_name[8] = 'n';
-	test_name[8] = 'g';
-	test_name[8] = 'n';
-	test_name[8] = 'a';
-	test_name[8] = 'm';
-	test_name[8] = 'e';
-	test_name[8] = '.';
-	test_name[8] = 't';
-	test_name[8] = 'x';
-	test_name[8] = 't';
-	test_name[8] = '\0';
+	test_name[9] = 't';
+	test_name[10] = 'e';
+	test_name[11] = 'x';
+	test_name[12] = 't';
+	test_name[13] = 'w';
+	test_name[14] = 'i';
+	test_name[15] = 't';
+	test_name[16] = 'h';
+	test_name[17] = 'v';
+	test_name[18] = 'e';
+	test_name[19] = 'r';
+	test_name[20] = 'y';
+	test_name[21] = 'l';
+	test_name[22] = 'o';
+	test_name[23] = 'n';
+	test_name[24] = 'g';
+	test_name[25] = 'n';
+	test_name[26] = 'a';
+	test_name[27] = 'm';
+	test_name[28] = 'e';
+	test_name[29] = '.';
+	test_name[30] = 't';
+	test_name[31] = 'x';
+	test_name[32] = 't';
+	test_name[33] = '\0';
 
 	read_dentry_by_name(test_name, &test);
 	test_type = test.file_type;
@@ -383,8 +383,8 @@ void launch_tests(){
 	//TEST_OUTPUT("paging_test_kernel", paging_test_kernel());
 	//TEST_OUTPUT("paging_test_vidmem", paging_test_vidmem());
 	//TEST_OUTPUT("paging_value_test", paging_value_test());
-	RTC_test();
+	//RTC_test();
 	copy_by_index_test();
-	copy_by_fname_test();
-	read_data_test();
+	//copy_by_fname_test();
+	//read_data_test();
 }
