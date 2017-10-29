@@ -248,28 +248,6 @@ void RTC_test(){
 		write_RTC(0, (void*) ptr, 4);
 		putc('\n');
 	}
-/*
-	for(i=0;i<10;i++)
-	{
-	}
-	putc('\n');
-	write_RTC(0, (void*) ptr, 4);
-
-	for(i=0;i<10;i++)
-	{
-		putc('2');
-		read_RTC(0,0,0);
-	}
-	putc('\n');
-	freq = 8;
-	write_RTC(0, (void*) ptr, 4);
-
-	for(i=0;i<10;i++)
-	{
-		putc('3');
-		read_RTC(0,0,0);
-	}
-	putc('\n');*/
 	puts("RTC TEST COMPLETE");
 }
 /* Checkpoint 3 tests */
