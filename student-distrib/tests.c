@@ -454,10 +454,10 @@ int read_dentry_by_name_Test()  {
 void read_file_test()  {
 	int32_t test_fd;
 	uint8_t test_buf[51];
-	uint8_t test_name[34] = "verylargetextwithverylongname.txt\0";
+	uint8_t test_name[34] = "sigtest\0";
 
 	test_fd = open_file(test_name);
-	read_file(test_fd, test_buf, 10);
+	read_file(test_fd, test_buf, 50);
 
 //	terminal_read((int8_t*)test_buf);
 //	terminal_write(0);
@@ -504,8 +504,12 @@ void launch_tests(){
 	//copy_by_fname_test();
 	//read_data_test();
 	//read_directory_test();
+<<<<<<< HEAD
 	TEST_OUTPUT("Read Dentry by Index Test", read_dentry_by_index_Test());
 	TEST_OUTPUT("Read Dentry by Name Test", read_dentry_by_name_Test());
+=======
+	//TEST_OUTPUT("Read Dentry by Index Test", read_dentry_by_index_Test());
+>>>>>>> 13563e567c04ee5dc80ef655f03c438f4440e65d
 	//TEST_OUTPUT("open_file_test", open_file_test());
-	//read_file_test();
+	read_file_test();
 }
