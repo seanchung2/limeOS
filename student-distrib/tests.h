@@ -19,15 +19,23 @@ void type_tester(char c);
 //test for RTC
 void RTC_test();
 
+//test terminal
+int terminal_read_Test();
+int terminal_write_Test();
+
 //test file system
-int copy_by_index_test();
-int copy_by_fname_test();
+int read_dentry_by_index_Test();
+int read_dentry_by_name_Test();
 int read_data_test();
+
 int open_file_test();
 void read_file_test();
+int write_file_test();
 int close_file_test();
+
 void open_directory_test();
 int read_directory_test();
+int write_directory_test();
 void close_directory_test();
 
 #endif /* TESTS_H */

@@ -518,6 +518,15 @@ void read_file_test()  {
 	close_file(0);
 }
 
+int write_file_test()  {
+	TEST_HEADER;
+
+	if(write_file(0, 0, 0) != -1)  {
+		return FAIL;
+	}
+	return PASS;
+}
+
 int close_file_test()  {
 	TEST_HEADER;
 
@@ -535,8 +544,35 @@ int close_file_test()  {
 	return PASS;
 }
 
-void open_directory_test()  {
+int open_directory_test()  {
+	TEST_HEADER;
 
+	int i;
+	int test_fd;
+	uint8_t test_name[10] = ".\0";
+
+	for(i = 0; i < 8; i++)  {
+		test_set_flags(i, 1);
+	}
+
+	for(i = 0; i < 8; i++)  {
+		test_fd = open_directory(test_name);
+	}
+
+	if(test_fd != 7)  {
+		return FAIL;
+	}
+
+	test_fd = open_directory(test_name);
+
+	if(test_fd != -1)  {
+		return FAIL;
+	}
+
+	for(i = 0; i < 8; i++)  {
+		test_set_flags(i, 0);
+	}
+	return PASS;
 }
 
 int read_directory_test()  {
@@ -554,8 +590,36 @@ int read_directory_test()  {
 	return PASS;
 }
 
-void close_directory_test()  {
+int write_directory_test()  {
+	TEST_HEADER;
 
+	if(write_directory(0, 0, 0) != -1)  {
+		return FAIL;
+	}
+
+	return PASS;
+}
+
+void close_directory_test()  {
+	TEST_HEADER;
+
+	int i;
+
+	for(i = 0; i < 8; i++)  {
+		test_set_flags(i, 1);
+	}
+
+	for(i = 0; i < 8; i++)  {
+		close_directory(i);
+	}
+
+	for(i = 0; i < 8; i++)  {
+		if(test_read_flags(i) != 0)  {
+			return FAIL;
+		}
+	}
+
+	return PASS;
 }
 
 /* Checkpoint 3 tests */
@@ -569,25 +633,31 @@ void launch_tests(){
 
 	// launch your tests here
 
+	/* Checkpoint 1 */
 	//TEST_OUTPUT("Syscall Test",syscall_test());
 	//TEST_OUTPUT("Paging Test (KERNEL)", paging_test_kernel());
 	//TEST_OUTPUT("Pagint Test (VIDMEM)", paging_test_vidmem());
 	//TEST_OUTPUT("Paging Value Test", paging_value_test());
 
-	//RTC_test();
+	/* Checkpoint 2 */
+	// RTC_test();
 
-	TEST_OUTPUT("Terminal Read Test", terminal_read_Test());
-	TEST_OUTPUT("Terminal Write Test", terminal_write_Test());;
+	// TEST_OUTPUT("Terminal Read Test", terminal_read_Test());
+	// TEST_OUTPUT("Terminal Write Test", terminal_write_Test());;
 
 
-	TEST_OUTPUT("Read Dentry by Index Test", read_dentry_by_index_Test());
-	TEST_OUTPUT("Read Dentry by Name Test", read_dentry_by_name_Test());
-	//read_data_test();
+	// TEST_OUTPUT("Read Dentry by Index Test", read_dentry_by_index_Test());
+	// TEST_OUTPUT("Read Dentry by Name Test", read_dentry_by_name_Test());
+	// read_data_test();
 
-	//TEST_OUTPUT("Open File Test", open_file_test());
-	//read_file_test();
-	TEST_OUTPUT("Close File Test", close_file_test());
-	
-	TEST_OUTPUT("Read Directory Test", read_directory_test());
+	// TEST_OUTPUT("Open File Test", open_file_test());
+	// read_file_test();
+	// TEST_OUTPUT("Write File Test", write_file_test());
+	// TEST_OUTPUT("Close File Test", close_file_test());
+
+	// TEST_OUTPUT("Open Directory Test", open_directory_test());
+	// TEST_OUTPUT("Read Directory Test", read_directory_test());
+	// TEST_OUTPUT("Write Directory Test", write_directory_test());
+	// TEST_OUTPUT("Close Directory Test", close_directory_test());
 }
 
