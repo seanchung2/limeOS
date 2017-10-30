@@ -4,7 +4,7 @@
 #define _TERMINAL_H
 
 /* output the buffer */
-extern int terminal_write(int32_t fd, int32_t nbytes,int enter_flag);
+extern int terminal_write(int32_t fd, int32_t nbytes);
 
 /* write the buffer into terminal buffer */
 extern int terminal_read(int32_t fd, const int8_t* buf, int32_t nbytes);

@@ -60,14 +60,17 @@ void keyboard_handler ()
     /* deal with the received character */
     keyboard_output_dealer(c);
 
-    char_buf[buf_index+1] = '\0';
     if (terminal_read_flag && add_or_not)
     	terminal_read( 0, (int8_t*)(char_buf+buf_index), 1);
     terminal_read_flag = 0;
     add_or_not = 0;
     /* call terminal write to write buffer to screen */
-    terminal_write(0, 1, enter_flag);
-    enter_flag = 0;
+    terminal_write(0, 1);
+    if (enter_flag == 1)
+    {	
+    	buf_index=-1;
+    	enter_flag = 0;
+    }
 
     /* Send end-of-interrupt signal for the specified IRQ */
     send_eoi(KEYBOARD_IRQ);
@@ -87,7 +90,7 @@ void keyboard_output_dealer (uint8_t c)
 	int found = -1;
 
 	/* if the scancode is "enter" */
-	if(c == PRESS_ENTER) { buf_index = -1; enter_flag = 1; found = 1; }
+	if(c == PRESS_ENTER) { terminal_read_flag = 1; enter_flag = 1; char_buf[++buf_index] = '\n'; found = 1; add_or_not = 1; }
 
 	/* if the scancode is "press_shift" */
 	if (c == PRESS_LEFT_SHIFT || c == PRESS_RIGHT_SHIFT) { shift_flag = 1; found = 1; }

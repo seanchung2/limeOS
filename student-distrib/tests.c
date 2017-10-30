@@ -492,18 +492,18 @@ int terminal_write_Test()
 {
 	TEST_HEADER;
 
-	int8_t* test = "sgohosdhfgo;hosdh;fgohsodgoh;sohghsohgfohds?\n\0";
+	int8_t* test = "sgohosdhfgo;hosdh;fgohsodgoh;sohghsohgfohds?\n";
 	terminal_read(0, test, strlen(test));
 
-	if(terminal_write(0,strlen(test),0) != strlen(test))
+	if(terminal_write(0,strlen(test)) != strlen(test))
 		return FAIL;
 
 	terminal_read(0, test, strlen(test));
-	if( terminal_write(0,strlen(test)+1000,0) != strlen(test))
+	if( terminal_write(0,strlen(test)+1000) != strlen(test))
 		return FAIL;
 
 	terminal_read(0, test, strlen(test));
-	if(terminal_write(0,strlen(test)+80*30,0) != -1)
+	if(terminal_write(0,strlen(test)+80*30) != -1)
 		return FAIL;
 
 	return PASS;
@@ -563,7 +563,7 @@ void read_file_test()  {
 	read_file(test_fd, test_buf, 50);
 
 	terminal_read(0, (int8_t*)test_buf, 50);
-	terminal_write(0, 50, 0);
+	terminal_write(0, 50);
 
 	putc('\n');
 
@@ -733,25 +733,25 @@ void launch_tests(){
 
 
 	/* Checkpoint 2 */
-	// RTC_test();
+	//RTC_test();
 
-	// TEST_OUTPUT("Terminal Read Test", terminal_read_Test());
-	// TEST_OUTPUT("Terminal Write Test", terminal_write_Test());
-	// TEST_OUTPUT("Terminal Open Test", terminal_open_Test());
-	// TEST_OUTPUT("Terminal Close Test", terminal_close_Test());
+	//TEST_OUTPUT("Terminal Read Test", terminal_read_Test());
+	//TEST_OUTPUT("Terminal Write Test", terminal_write_Test());
+	//TEST_OUTPUT("Terminal Open Test", terminal_open_Test());
+	//TEST_OUTPUT("Terminal Close Test", terminal_close_Test());
 
-	// TEST_OUTPUT("Read Dentry by Index Test", read_dentry_by_index_Test());
-	// TEST_OUTPUT("Read Dentry by Name Test", read_dentry_by_name_Test());
-	 read_data_test();
+	//TEST_OUTPUT("Read Dentry by Index Test", read_dentry_by_index_Test());
+	//TEST_OUTPUT("Read Dentry by Name Test", read_dentry_by_name_Test());
+	read_data_test();
 
-	// TEST_OUTPUT("Open File Test", open_file_test());
+	//TEST_OUTPUT("Open File Test", open_file_test());
 	read_file_test();
-	// TEST_OUTPUT("Write File Test", write_file_test());
-	// TEST_OUTPUT("Close File Test", close_file_test());
+	//TEST_OUTPUT("Write File Test", write_file_test());
+	//TEST_OUTPUT("Close File Test", close_file_test());
 
-	// TEST_OUTPUT("Open Directory Test", open_directory_test());
-	// TEST_OUTPUT("Read Directory Test", read_directory_test());
-	// TEST_OUTPUT("Write Directory Test", write_directory_test());
-	// TEST_OUTPUT("Close Directory Test", close_directory_test());
+	//TEST_OUTPUT("Open Directory Test", open_directory_test());
+	//TEST_OUTPUT("Read Directory Test", read_directory_test());
+	//TEST_OUTPUT("Write Directory Test", write_directory_test());
+	//TEST_OUTPUT("Close Directory Test", close_directory_test());
 }
 

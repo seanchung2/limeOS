@@ -42,7 +42,7 @@ int terminal_read(int32_t fd, const int8_t* buf, int32_t nbytes)
  *		   fail	   -> return -1
  * side effect: as description
  */
-int terminal_write(int32_t fd, int32_t nbytes,int enter_flag)
+int terminal_write(int32_t fd, int32_t nbytes)
 {
 	int i;
 	int write_index;
@@ -50,17 +50,6 @@ int terminal_write(int32_t fd, int32_t nbytes,int enter_flag)
 	if(nbytes > NUM_COLS*NUM_ROWS)
 	{
 		return -1;
-	}
-
-	/* enter pressed */
-	if(enter_flag == 1)
-	{
-		if(check_out_of_bound() == SCROLL_ENTER_PRESSED)
-		{
-			scroll_screen();
-		}
-		putc('\n');
-		return 1;
 	}
 
 	if (nbytes > terminal_index)
@@ -71,6 +60,16 @@ int terminal_write(int32_t fd, int32_t nbytes,int enter_flag)
 	/* normal charaters */
 	for(i=0; i<write_index; i++)
 	{
+		if(terminal_buf[i] == '\n')
+		{
+			if(check_out_of_bound() == SCROLL_ENTER_PRESSED)
+			{
+				scroll_screen();
+			}
+			putc('\n');
+			i++;
+			break;
+		}
 		if(check_out_of_bound() == SCROLL_LAST_LETTER)
 		{
 			scroll_screen();
@@ -78,7 +77,7 @@ int terminal_write(int32_t fd, int32_t nbytes,int enter_flag)
 		putc(terminal_buf[i]);
 	}
 	terminal_index = 0;
-	return write_index;
+	return i;
 }
 
 /*
