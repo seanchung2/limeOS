@@ -272,17 +272,17 @@ int read_data_test()  {
 	TEST_HEADER;
 
 	int i;
-	uint8_t test[10];
+	uint8_t test[186];
 	dentry_t test_dentry;
 	uint32_t inode_index;
-	uint8_t test_name[10] = "sigtest\0";
+	uint8_t test_name[11] = "frame1.txt\0";
 
 	read_dentry_by_name(test_name, &test_dentry);
 	inode_index = test_dentry.inode_number;
 
-	read_data(inode_index, 0, test, 9);
+	read_data(inode_index, 0, test, 186);
 
-	for(i = 0; i < 10; i++)  {
+	for(i = 0; i < 186; i++)  {
 		putc((int8_t)test[i]);
 	}
 

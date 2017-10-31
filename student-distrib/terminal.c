@@ -37,7 +37,6 @@ int terminal_read(int32_t fd, const int8_t* buf, int32_t nbytes)
  * show the terminal buffer on the screen
  * input:   fd - the index of file
  *			nbytes - how many bytes to write
- * 			enter_flag - check if enter is pressed 
  * output: success -> return the number put into screen
  *		   fail	   -> return -1
  * side effect: as description
@@ -60,15 +59,9 @@ int terminal_write(int32_t fd, int32_t nbytes)
 	/* normal charaters */
 	for(i=0; i<write_index; i++)
 	{
-		if(terminal_buf[i] == '\n')
+		if(check_out_of_bound() == SCROLL_ENTER_PRESSED && terminal_buf[i] == '\n')
 		{
-			if(check_out_of_bound() == SCROLL_ENTER_PRESSED)
-			{
-				scroll_screen();
-			}
-			putc('\n');
-			i++;
-			break;
+			scroll_screen();
 		}
 		if(check_out_of_bound() == SCROLL_LAST_LETTER)
 		{
