@@ -3,6 +3,9 @@
 /* holds the adress for the start of the filesystem */
 static uint32_t fs_start;
 
+/* holds the dentry number to print next with read_directory */
+static uint32_t directory_position;
+
 /* temporary dentry table */
 static dentry_t dentry_table[FILE_TABLE_SIZE];
 static int dentry_table_flags[FILE_TABLE_SIZE];
@@ -237,6 +240,8 @@ int32_t open_directory(const uint8_t* filename)  {
 	int i = 0;
 	int error_check;
 
+	directory_position = 0;
+
 	while(dentry_table_flags[i] != 0 && i < FILE_TABLE_SIZE)  {
 		i++;
 	}
@@ -256,7 +261,7 @@ int32_t open_directory(const uint8_t* filename)  {
 
 /* read_directory
  *
- * INPUTS:	fd - file descriptor for derectory to read
+ * INPUTS:	fd - file descriptor for directory to read
  *			buf - ignored
  *			nbytes - ignored
  * OUTPUTS:	0
@@ -268,26 +273,36 @@ int32_t read_directory(int32_t fd, void* buf, int32_t nbytes)  {
 	int error_check;
 	dentry_t current;
 	int i;
-	int j;
+	uint32_t inode_number;
 	uint8_t* char_ptr;
+	uint32_t* length;
 
-	for(i = 0; i < dentry_count; i++)  {
-		j = 0;
-		error_check = read_dentry_by_index(i, &current);
-		if(error_check == -1)  {
-			return -1;
-		}
-		char_ptr = (uint8_t*)&current;
-		printf("File Name: ");
-		while(*char_ptr != '\0' && j < 32)  {
-			putc(*char_ptr);
-			char_ptr++;
-			j++;
-		}
-		putc('\n');
+	if(directory_position >= dentry_count)  {
+		return -1;
 	}
+
+	error_check = read_dentry_by_index(directory_position, &current);
+	if(error_check == -1)  {
+		return -1;
+	}
+
+	char_ptr = (uint8_t*)&current;
+	printf("Filename: ");
+	for(i = 0; i < MAX_NAME_LENGTH; i++)  {
+		putc(char_ptr[i]);
+	}
+
+	putc('\n');
+	inode_number  = current.inode_number;
+	length = (uint32_t*)(fs_start + (inode_number + 1)*FOUR_KB);
+	printf("Length: %d", *length);
+	putc('\n');
+
+	directory_position++;
+
 	return 0;
 }
+
 
 /* write_directory
  *
@@ -304,7 +319,7 @@ int32_t write_directory(int32_t fd, const void* buf, int32_t nbytes)  {
 /* close_directory
  *
  * INPUTS:	fd - file descriptor for directory to close
- * OUTPUTS:	-1 - file descriptor outise acceptable range
+ * OUTPUTS:	-1 - file descriptor outside acceptable range
  *			0 - file closed successfully
  * SIDE EFFECTS:	sets flag for given file descriptor to 0
  */
@@ -331,7 +346,7 @@ void test_set_flags(int index, int value)  {
  *
  * INPUTS:	index - index in dentry_table_flags to read
  * OUTPUTS:	value of flag at given index in dentry_table_flags
- * SIDE EFFECTS:	sNone
+ * SIDE EFFECTS:	None
  */
 int test_read_flags(int index)  {
 	return dentry_table_flags[index];

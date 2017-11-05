@@ -12,6 +12,7 @@
 #define FOUR_KB 4096
 #define ONE_KB 1024
 #define FILE_TABLE_SIZE 8
+#define INODE_OFFSET 40
 
 /* directory entry structure */
 typedef struct dentry  {

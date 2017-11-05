@@ -655,14 +655,22 @@ int read_directory_test()  {
 	uint8_t test_name[34] = ".\0";
 	int test_fd;
 	int error_check;
+	int i;
 
 	test_fd = open_directory(test_name);
+	for(i = 0; i < 17; i++)  {
+		error_check = read_directory(test_fd, 0, 0);
+		if(error_check == -1)  {
+			return FAIL;
+		}
+	}
+
 	error_check = read_directory(test_fd, 0, 0);
-	if(error_check == -1)  {
+	if(error_check != -1)  {
 		return FAIL;
 	}
 
-	close_directory(test_fd);
+		close_directory(test_fd);
 
 	return PASS;
 }
@@ -742,15 +750,15 @@ void launch_tests(){
 
 	//TEST_OUTPUT("Read Dentry by Index Test", read_dentry_by_index_Test());
 	//TEST_OUTPUT("Read Dentry by Name Test", read_dentry_by_name_Test());
-	read_data_test();
+	//read_data_test();
 
 	//TEST_OUTPUT("Open File Test", open_file_test());
-	read_file_test();
+	//read_file_test();
 	//TEST_OUTPUT("Write File Test", write_file_test());
 	//TEST_OUTPUT("Close File Test", close_file_test());
 
 	//TEST_OUTPUT("Open Directory Test", open_directory_test());
-	//TEST_OUTPUT("Read Directory Test", read_directory_test());
+	TEST_OUTPUT("Read Directory Test", read_directory_test());
 	//TEST_OUTPUT("Write Directory Test", write_directory_test());
 	//TEST_OUTPUT("Close Directory Test", close_directory_test());
 }
