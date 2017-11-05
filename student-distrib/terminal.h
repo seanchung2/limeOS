@@ -5,7 +5,10 @@
 
 #define CHARACTER_BUFFER_SIZE 		128
 uint8_t command_buf[CHARACTER_BUFFER_SIZE];
-volatile uint8_t t_enter_flag;
+
+/* set the t_enter_flag to 1 */
+extern void set_t_enter_flag();
+
 /* output the buffer */
 extern int terminal_write(int32_t fd, const int8_t* buf, int32_t nbytes);
 

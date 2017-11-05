@@ -754,7 +754,7 @@ void launch_tests(){
 	//TEST_OUTPUT("Close File Test", close_file_test());
 
 	//TEST_OUTPUT("Open Directory Test", open_directory_test());
-	TEST_OUTPUT("Read Directory Test", read_directory_test());
+	//TEST_OUTPUT("Read Directory Test", read_directory_test());
 	//TEST_OUTPUT("Write Directory Test", write_directory_test());
 	//TEST_OUTPUT("Close Directory Test", close_directory_test());
 }
