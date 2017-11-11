@@ -75,7 +75,7 @@
 #define QUESTION   					0x3F
 #define SLASH   					0x2F
 #define BACKSLASH   				0x5C
-
+/*
 static const uint8_t *special_character[50][3];
 special_character[0][0] = {0x0F, 0x09};			// Tab
 special_character[1][0] = {0x39, 0x20};			// Space
@@ -85,6 +85,7 @@ special_character[4][0] = {0x2B, 0x5C, 0x7C};	// Backslash, Vertical slash
 special_character[5][0] = {0x0D, 0x3D, 0x2B};	// Equal, Plus
 special_character[6][0] = {0x0D, 0x3D, 0x2B};	// Equal, Plus
 special_character[7][0] = {0x0D, 0x3D, 0x2B};	// Equal, Plus
+*/
 static const uint8_t letter_code[LETTER_NUM] = {	0x1E, 0x30, 0x2E, 0x20,
 													0x12, 0x21, 0x22, 0x23,
 													0x17, 0x24, 0x25, 0x26,

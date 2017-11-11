@@ -61,6 +61,9 @@ int terminal_write(int32_t fd, const int8_t* buf, int32_t nbytes)
 {
 	int i;
 
+	if(buf == NULL)
+		return -1;
+
 	/* normal charaters */
 	for(i=0; i<nbytes; i++)
 	{

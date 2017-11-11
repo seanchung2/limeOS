@@ -21,8 +21,15 @@
 #define PROGRAM_PROPERTIES	0x97
 #define MAX_PID				2
 
+/* for pid status and jumptable */
+enum pidStatus{FREE = 0, INUSE};
+enum jumpTable{OPEN = 0, READ, WRITE, CLOSE};
+
 /*The first 4 bytes of the file represent a magic number that identies the file as an exeutable.*/
 const int8_t magic_number[4] = {0x7f, 0x45, 0x4c, 0x46};
+
+/* do nothing, just for padding */
+int32_t null_func() { return 0; }
 
 /* handle system call "halt" */
 int32_t halt (uint8_t status);

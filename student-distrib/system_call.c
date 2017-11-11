@@ -4,6 +4,7 @@
 int32_t current_pid = 0;
 
 /* array of possible pid's */
+
 int32_t pid_flags[MAX_PID];
 
 /*
@@ -13,35 +14,32 @@ int32_t pid_flags[MAX_PID];
  * write function
  * close function
  */
-uint32_t stdin_table[4] = { (uint32_t)(null_func),
+int32_t stdin_table[4] = { (uint32_t)(null_func),
 							(uint32_t)(terminal_read),
 							(uint32_t)(null_func),
 							(uint32_t)(null_func) };
 
-uint32_t stdout_table[4] = {(uint32_t)(null_func),
+int32_t stdout_table[4] = {(uint32_t)(null_func),
 							(uint32_t)(null_func),
 							(uint32_t)(terminal_write),
 							(uint32_t)(null_func) };
 
-uint32_t rtc_table[4] = { 	(uint32_t)(open_RTC),
+int32_t rtc_table[4] = { 	(uint32_t)(open_RTC),
 							(uint32_t)(read_RTC),
 							(uint32_t)(write_RTC),
 							(uint32_t)(close_RTC) };
 
-uint32_t file_table[4] = { 	(uint32_t)(open_file),
+int32_t file_table[4] = { 	(uint32_t)(open_file),
 							(uint32_t)(read_file),
 							(uint32_t)(write_file),
 							(uint32_t)(close_file) };
 
-uint32_t directory_table[4] = { (uint32_t)(open_directory),
+int32_t directory_table[4] = { (uint32_t)(open_directory),
 								(uint32_t)(read_directory),
 								(uint32_t)(write_directory),
 								(uint32_t)(close_directory) };
 
-/* do nothing, just for padding */
-int32_t null_func(){
-	return 0;
-}
+
 
 /*
 * halt (uint8_t status)
@@ -157,21 +155,23 @@ int32_t execute (const uint8_t* command){
 */
 int32_t read (int32_t fd, void* buf, int32_t nbytes)
 {
+	/* fetch the pcb in current process */
 	pcb_t * pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
 	int ret;
+
 	/* call the file's read function */
 	asm volatile("pushl	%4;"
 				 "pushl	%3;"
 				 "pushl	%2;"
 				 "call  *%1;"
-		 		 "movl 	%eax,%0;"
-		 		 "addl	$12,%esp;"
+		 		 "movl 	%%eax,%0;"
+		 		 "addl	$12,%%esp;"
 		 		 : "=r"(ret)
-		 		 : "g" (pcb->fd_entry[i].operations_pointer[0]),
+		 		 : "g" (pcb->fd_entry[fd].operations_pointer[READ]),
 		 		   "g" (fd),
 		 		   "g" (buf),
 		 		   "g" (nbytes)
-		 		 : "%eax");
+		 		 : "eax", "cc");
 	return ret;
 }
 
@@ -184,7 +184,24 @@ int32_t read (int32_t fd, void* buf, int32_t nbytes)
 */
 int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 {
-	
+	/* fetch the pcb in current process */
+	pcb_t * pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
+	int ret;
+
+	/* call the file's read function */
+	asm volatile("pushl	%4;"
+				 "pushl	%3;"
+				 "pushl	%2;"
+				 "call  *%1;"
+		 		 "movl 	%%eax,%0;"
+		 		 "addl	$12,%%esp;"
+		 		 : "=r"(ret)
+		 		 : "g" (pcb->fd_entry[fd].operations_pointer[WRITE]),
+		 		   "g" (fd),
+		 		   "g" (buf),
+		 		   "g" (nbytes)
+		 		 : "eax", "cc");
+	return ret;
 }
 
 /*
@@ -199,26 +216,27 @@ int32_t open (const uint8_t* filename)
 	dentry_t* dentry;
 	int i;
 	int ret;
+	/* fetch the pcb in current process */
 	pcb_t * pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
 
 	/* if filename is "stdin" */
-	if( strncmp(filename, (uint8_t*)"stdin" , 5) == 0)
+	if( strncmp((int8_t*)filename, (int8_t*)"stdin", 5) == 0)
 	{
 		pcb->fd_entry[0].operations_pointer = stdin_table;
-		pcb->fd_entry[0].flags = 1;
+		pcb->fd_entry[0].flags = INUSE;
 		return 0;
 	}
 
 	/* if filename is "stdout" */
-	if( strncmp(filename, (uint8_t*)"stdout" , 6) == 0)
+	if( strncmp((int8_t*)filename, (int8_t*)"stdout", 6) == 0)
 	{
 		pcb->fd_entry[1].operations_pointer = stdout_table;
-		pcb->fd_entry[1].flags = 1;
+		pcb->fd_entry[1].flags = INUSE;
 		return 1;
 	}
 
-	/* if filename is not found , return -1 */
-	if (read_dentry_by_name(filename,dentry) < 0)
+	/* if filename is not found, return -1 */
+	if (read_dentry_by_name(filename, dentry) < 0)
 		return -1;
 
 	for(i=2; i<MAX_FD_NUM; i++)
@@ -239,17 +257,17 @@ int32_t open (const uint8_t* filename)
 			}
 			pcb->fd_entry[i].inode_index = dentry->inode_number;
 			pcb->fd_entry[i].file_position = 0;
-			pcb->fd_entry[i].flags = 1;
+			pcb->fd_entry[i].flags = INUSE;
 
 			/* call the file's open function */
 			asm volatile("pushl	%2;"
 						 "call  *%1;"
-				 		 "movl 	%eax,%0;"
-				 		 "addl	$4,%esp;"
+				 		 "movl 	%%eax,%0;"
+				 		 "addl	$4,%%esp;"
 				 		 : "=r"(ret)
-				 		 : "g" (pcb->fd_entry[i].operations_pointer[0]),
+				 		 : "g" (pcb->fd_entry[i].operations_pointer[OPEN]),
 				 		   "g" (filename)
-				 		 : "%eax");
+				 		 : "eax", "cc");
 			if (ret < 0)
 				return -1;
 			return i;
@@ -278,7 +296,7 @@ int32_t close (int32_t fd)
 		 		 "movl 	%eax,%0;"
 		 		 "addl	$4,%esp;"
 		 		 : "=r"(ret)
-		 		 : "g" (pcb->fd_entry[fd].operations_pointer[3]),
+		 		 : "g" (pcb->fd_entry[fd].operations_pointer[CLOSE]),
 		 		   "g" (fd)
 		 		 : "%eax");
 	if (ret < 0)
@@ -287,7 +305,7 @@ int32_t close (int32_t fd)
 	pcb->fd_entry[fd].operations_pointer = NULL;
 	pcb->fd_entry[fd].inode_index = -1;
 	pcb->fd_entry[fd].file_position = -1;
-	pcb->fd_entry[fd].flags = 0;
+	pcb->fd_entry[fd].flags = INUSE;
 	return 0;
 }
 
