@@ -46,9 +46,11 @@ int32_t directory_table[4] = { (uint32_t)(open_directory),
 void setup_PCB ()
 {
 	int i;
+	char* ignore = "ignore";
 	/* fetch the pcb in current process */
 	pcb_t * pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
 
+	/* initialize the fd_entry */
 	for(i=0; i<MAX_FD_NUM; i++)
 	{
 		pcb->fd_entry[i].operations_pointer = NULL;
@@ -56,10 +58,16 @@ void setup_PCB ()
 		pcb->fd_entry[i].file_position = -1;
 		pcb->fd_entry[i].flags = FREE;
 	}
-
+	/* initial the rest fields in PCB */
 	pcb->process_id = current_pid;
 	pcb->parent_id = -1;
 	pcb->child_id = -1;
+
+	/* automatically setup stdin and stdout */
+	pcb->fd_entry[STDIN].operations_pointer = stdin_table;
+	pcb->fd_entry[STDIN].flags = IN_USE;
+	pcb->fd_entry[STDOUT].operations_pointer = stdout_table;
+	pcb->fd_entry[STDOUT].flags = IN_USE;
 }
 /*
 * halt (uint8_t status)
