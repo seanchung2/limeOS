@@ -1,7 +1,10 @@
 #include "lib.h"
+#include "filesystem.h"
 
 #ifndef _SYSTEM_CALL_H
 #define _SYSTEM_CALL_H
+
+#define MAX_LENGTH_ARG 128
 
 /* handle system call "halt" */
 int32_t halt (uint8_t status);
