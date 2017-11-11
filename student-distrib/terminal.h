@@ -13,7 +13,7 @@ extern void set_t_enter_flag();
 extern int terminal_write(int32_t fd, const int8_t* buf, int32_t nbytes);
 
 /* write the buffer into terminal buffer */
-extern int terminal_read(int32_t fd, int8_t* buf);
+extern int terminal_read(int32_t fd, void* buf, int32_t nbytes);
 
 /* do nothing for now */
 extern int terminal_open(const uint8_t* filename);

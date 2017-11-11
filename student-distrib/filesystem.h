@@ -30,16 +30,19 @@ typedef struct inode  {
 
 /* entry in file array of PCB */
 typedef struct fd_entry  {
-	int32_t operations_pointer;
+	int32_t* operations_pointer;
 	int32_t inode_index;
 	int32_t file_position;
 	int32_t flags;
 } fd_entry_t;
 
 /* structure for PCB */
-typedef struct file_descriptor_table  {
-	uint32_t file_descriptors[8];
-} file_descriptor_table_t;
+typedef struct process_control_block  {
+	fd_entry_t fd_entry[8];
+	uint32_t process_id;
+	uint32_t parent_id;
+	uint32_t child_id;
+} pcb_t;
 
 /* function to set memory address for the start of the filesystem */
 void set_fs_start(module_t* mod);

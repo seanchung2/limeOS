@@ -118,7 +118,7 @@ int32_t write_RTC(int32_t fd, const void* buf, int32_t nbytes){
  * Side Effects: As description
  */
 int32_t close_RTC(int32_t fd){
-	changeFreq_RTC(RTC_DEFAULT_FREQ);//as RTC interrupts should remain open all the times, therefore we set the rate back to 2.
+	//changeFreq_RTC(RTC_DEFAULT_FREQ);	//as RTC interrupts should remain open all the times, therefore we set the rate back to 2.
 	return 0;//success
 }
 
