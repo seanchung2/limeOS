@@ -1,7 +1,17 @@
 #include "lib.h"
+#include "filesystem.h"
+#include "rtc.h"
+#include "terminal.h"
 
 #ifndef _SYSTEM_CALL_H
 #define _SYSTEM_CALL_H
+
+#define KERNEL_BOT_ADDR	0x800000
+#define EIGHT_KB		0x2000
+#define MAX_FD_NUM		8
+#define FILE_TYPE_RTC	0
+#define FILE_TYPE_DIR	1
+#define FILE_TYPE_FILE	2
 
 /* handle system call "halt" */
 int32_t halt (uint8_t status);
