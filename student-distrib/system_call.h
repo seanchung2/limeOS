@@ -10,6 +10,7 @@
 
 #define KERNEL_BOT_ADDR		0x800000
 #define FOUR_MB				0x400000
+#define LOAD_ADDR			0x08048000
 #define EIGHT_KB			0x2000
 #define MAX_FD_NUM			8
 #define FILE_TYPE_RTC		0

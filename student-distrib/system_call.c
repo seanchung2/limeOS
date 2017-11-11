@@ -113,12 +113,17 @@ int32_t execute (const uint8_t* command){
 	//Executable check
 	
 	/*read_file check*/
-	if(read_file((int32_t*)file_name, buffer, 4) == -1){
+	dentry_t program;
+	if(read_dentry_by_name((uint8_t*) file_name, &program) == -1){
+		return -1;
+	}
+
+	if(read_data(program.inode_number, 0, buffer, 4) == -1){
 		return -1;
 	}
 
 	/*string comparison between buf and magic numbers to make sure that file is executable or not*/
-	if(strncmp((const int8_t*)buffer, (const int8_t*)magic_number, 4) != 0){
+	if(strncmp((int8_t*)buffer, (int8_t*)magic_number, 4) != 0){
 		return -1;
 	}
 
@@ -146,6 +151,24 @@ int32_t execute (const uint8_t* command){
 						: "r" (PDT_addr)
 						: "eax", "cc"
 					);
+
+	/*Getting the entry point*/
+	uint8_t entry_point[BUF_SIZE];
+	read_data(program.inode_number, 24, entry_point, 4);
+	
+	/*Copying the entire file into meemory starting at virtual address LOAD_ADDR*/
+	uint8_t* start_point = LOAD_ADDR;
+	uint32_t j;
+	uint32_t c;
+
+	i = 0;
+	while((c = read_data(program.inode_number, i*BUF_SIZE, buffer, BUF_SIZE)) > 0){
+		for(j = 0; j < c; j++){
+			*(LOAD_ADDR + (i*BUF_SIZE) + j) = buffer[j];
+		}
+		i++;
+	}
+
 }
 
 /*
