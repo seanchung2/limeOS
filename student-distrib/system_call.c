@@ -3,6 +3,9 @@
 /* initial current pid */
 int32_t current_pid = 0;
 
+/* array of possible pid's */
+int32_t pid_flags[MAX_PID];
+
 /*
  * jump table:
  * open function
@@ -120,11 +123,29 @@ int32_t execute (const uint8_t* command){
 	}
 
 	//Paging
-	
+	page_table_t* PDT = (page_table_t*)PDT_addr;
 
+	for(i = 0; i < MAX_PID; i++)  {
+		if(pid_flags[i] == 0)  {
+			break;
+		}
+	}
 
+	if(i >= MAX_PID)  {
+		return -1;
+	}
 
+	PDT->entries[PROGRAM_PDT_INDEX] = (KERNEL_BOT_ADDR + (FOUR_MB*i)) || PROGRAM_PROPERTIES;
 
+	/*flush TLBs */
+	asm volatile (	"movl %%CR3, %%eax;"	
+					"andl $0xFFF, %%eax;"
+					"addl %0, %%eax;"
+					"movl %%eax, %%CR3;"
+						:
+						: "r" (PDT_addr)
+						: "eax", "cc"
+					);
 }
 
 /*
