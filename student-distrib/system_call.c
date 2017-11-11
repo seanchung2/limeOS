@@ -257,26 +257,31 @@ int32_t open (const uint8_t* filename)
 	/* if filename is "stdin" */
 	if( strncmp((int8_t*)filename, (int8_t*)"stdin", 5) == 0)
 	{
-		pcb->fd_entry[0].operations_pointer = stdin_table;
-		pcb->fd_entry[0].flags = IN_USE;
-		return 0;
+		pcb->fd_entry[STDIN].operations_pointer = stdin_table;
+		pcb->fd_entry[STDIN].flags = IN_USE;
+		return STDIN;
 	}
 
 	/* if filename is "stdout" */
 	if( strncmp((int8_t*)filename, (int8_t*)"stdout", 6) == 0)
 	{
-		pcb->fd_entry[1].operations_pointer = stdout_table;
-		pcb->fd_entry[1].flags = IN_USE;
-		return 1;
+		pcb->fd_entry[STDOUT].operations_pointer = stdout_table;
+		pcb->fd_entry[STDOUT].flags = IN_USE;
+		return STDOUT;
 	}
 
 	/* if filename is not found, return -1 */
 	if (read_dentry_by_name(filename, dentry) < 0)
 		return -1;
 
+	/* find a vacant block in PCB to store the opened file */
 	for(i=2; i<MAX_FD_NUM; i++)
 	{
-		if( pcb->fd_entry[i].flags == 0 ){
+		/* if found a vacant block */
+		if( pcb->fd_entry[i].flags == 0 )
+		{
+			/* check what kind of file type the new file is,
+				then initializing the operation ptr */
 			switch(dentry->file_type){
 				case FILE_TYPE_RTC:
 					pcb->fd_entry[i].operations_pointer = rtc_table;
@@ -287,9 +292,13 @@ int32_t open (const uint8_t* filename)
 				case FILE_TYPE_FILE:
 					pcb->fd_entry[i].operations_pointer = file_table;
 					break;
+
+				/* if the file type is unknown, return -1 */	
 				default:
 					return -1;
 			}
+
+			/* initialize the field in fd_entry */
 			pcb->fd_entry[i].inode_index = dentry->inode_number;
 			pcb->fd_entry[i].file_position = 0;
 			pcb->fd_entry[i].flags = IN_USE;
@@ -305,26 +314,39 @@ int32_t open (const uint8_t* filename)
 				 		 : "eax", "cc");
 			if (ret < 0)
 				return -1;
+
+			/* return the fd number */
 			return i;
 		}
 	}
+
+	/* if no vacant block found */
 	return -1;
 }
 
 /*
 * close (int32_t fd)
 * hanlder for system call "close"
-* input: none
-* output: none
+* input: fd is file descriptor 
+* output: 
+*			0: successfully closed
+*			-1: error
 * side effect: as description
 */
 int32_t close (int32_t fd)
 {
-	pcb_t * pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
 	int ret;
+	/* fetch the pcb in current process */
+	pcb_t * pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
+
 	/* if user try to close stdin/stdout or an invalid fd, return -1 */
 	if (fd <2 || fd >= MAX_FD_NUM)
 		return -1;
+	
+	/* if the fd is not in used, then return -1 */
+	if (pcb->fd_entry[fd].flags == FREE)
+		return -1;
+
 	/* call the file's close function */
 	asm volatile("pushl	%2;"
 				 "call  *%1;"
@@ -336,28 +358,12 @@ int32_t close (int32_t fd)
 		 		 : "eax");
 	if (ret < 0)
 		return -1;
+
 	/* free the current PCB block */
 	pcb->fd_entry[fd].operations_pointer = NULL;
 	pcb->fd_entry[fd].inode_index = -1;
 	pcb->fd_entry[fd].file_position = -1;
 	pcb->fd_entry[fd].flags = IN_USE;
-	return 0;
-}
 
-/*
-* asm_jump(pcb_t* pcb, int32_t fd,int32_t index)
-* hanlder for system call "close"
-* input: none
-* output: none
-* side effect: as description
-*/
-int32_t asm_jump(pcb_t* pcb, int32_t fd,int32_t index)
-{
-	int32_t ret;
-	asm volatile("call  *%1		;"
-				 "movl 	%%eax,%0;"
-				 : "=r"(ret)
-				 : "g" (pcb->fd_entry[fd].operations_pointer[index])
-				 : "eax");
-	return ret;
+	return 0;
 }
