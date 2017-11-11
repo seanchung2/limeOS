@@ -1,8 +1,5 @@
 #include "system_call.h"
 
-/* initial current pid */
-int32_t current_pid = 0;
-
 /* array of possible pid's */
 int32_t pid_flags[MAX_PID];
 

@@ -5,14 +5,18 @@
 #include "lib.h"
 #include "multiboot.h"
 
-#define MAX_NAME_LENGTH 32
-#define RESERVED_LENGTH 24
-#define DATA_BLOCK_COUNT 1023
-#define DENTRY_SIZE 64
-#define FOUR_KB 4096
-#define ONE_KB 1024
-#define FILE_TABLE_SIZE 8
-#define INODE_OFFSET 40
+#define MAX_NAME_LENGTH 	32
+#define RESERVED_LENGTH 	24
+#define DATA_BLOCK_COUNT 	1023
+#define DENTRY_SIZE 		64
+#define FOUR_KB 			4096
+#define ONE_KB 				1024
+#define FILE_TABLE_SIZE 	8
+#define INODE_OFFSET 		40
+#define KERNEL_BOT_ADDR		0x800000
+#define EIGHT_KB			0x2000
+
+extern static int32_t current_pid;
 
 /* directory entry structure */
 typedef struct dentry  {
