@@ -231,9 +231,9 @@ int32_t read_directory(int32_t fd, void* buf, int32_t nbytes)  {
 	int dentry_count = *((int*)(fs_start));
 	dentry_t current;
 	int i;
-	uint32_t inode_number;
+	//uint32_t inode_number;
 	uint8_t* char_ptr;
-	uint32_t* length;
+	//uint32_t* length;
 
 	if(directory_position >= dentry_count)  {
 		return 0;
@@ -248,7 +248,7 @@ int32_t read_directory(int32_t fd, void* buf, int32_t nbytes)  {
 		if(char_ptr[i] == '\0')  {
 			break;
 		}
-		buf[i] = char_ptr[i];
+		(uint8_t)buf[i] = char_ptr[i];
 	}
 	return i;
 }
