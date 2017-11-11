@@ -2,19 +2,24 @@
 #include "filesystem.h"
 #include "rtc.h"
 #include "terminal.h"
+#include "paging.h"
 
 
 #ifndef _SYSTEM_CALL_H
 #define _SYSTEM_CALL_H
 
-#define KERNEL_BOT_ADDR	0x800000
-#define EIGHT_KB		0x2000
-#define MAX_FD_NUM		8
-#define FILE_TYPE_RTC	0
-#define FILE_TYPE_DIR	1
-#define FILE_TYPE_FILE	2
-#define MAX_LENGTH_ARG 128
-#define BUF_SIZE 4
+#define KERNEL_BOT_ADDR		0x800000
+#define FOUR_MB				0x400000
+#define EIGHT_KB			0x2000
+#define MAX_FD_NUM			8
+#define FILE_TYPE_RTC		0
+#define FILE_TYPE_DIR		1
+#define FILE_TYPE_FILE		2
+#define MAX_LENGTH_ARG 		128
+#define BUF_SIZE			4
+#define PROGRAM_PDT_INDEX	32
+#define PROGRAM_PROPERTIES	0x97
+#define MAX_PID				2
 
 /*The first 4 bytes of the file represent a magic number that identies the file as an exeutable.*/
 const int8_t magic_number[4] = {0x7f, 0x45, 0x4c, 0x46};
