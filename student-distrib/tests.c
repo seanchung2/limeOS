@@ -1,7 +1,7 @@
 #include "tests.h"
 #include "x86_desc.h"
 #include "lib.h"
-#include "int_handler.h"
+#include "system_call.h"
 #include "i8259.h"
 #include "paging.h"
 #include "keyboard.h"
@@ -466,15 +466,18 @@ int terminal_read_Test()
 {
 	TEST_HEADER;
 
-	int8_t* test = "sgohosdhfgo;hosdh;fgohsodgoh;sohghsohgfohds?\0";
+	int8_t buf[128];
+	int byte;
+	int count = 0;
 
-	if(terminal_read(0, test, strlen(test)) != strlen(test) )
+	byte = terminal_read(0, buf);
+	while(buf[count] != '\n')
+		count++;
+
+	if(count != byte)
 		return FAIL;
 
-	if(terminal_read(0, NULL, 0) != -1)
-		return FAIL;
-
-	if( terminal_read(0, test, 80*30) != -1)
+	if(terminal_read(0, NULL) != -1)
 		return FAIL;
 
 	return PASS;
@@ -493,17 +496,11 @@ int terminal_write_Test()
 	TEST_HEADER;
 
 	int8_t* test = "sgohosdhfgo;hosdh;fgohsodgoh;sohghsohgfohds?\n";
-	terminal_read(0, test, strlen(test));
 
-	if(terminal_write(0,strlen(test)) != strlen(test))
+	if(terminal_write(0,test,strlen(test)) != strlen(test))
 		return FAIL;
 
-	terminal_read(0, test, strlen(test));
-	if( terminal_write(0,strlen(test)+1000) != strlen(test))
-		return FAIL;
-
-	terminal_read(0, test, strlen(test));
-	if(terminal_write(0,strlen(test)+80*30) != -1)
+	if( terminal_write(0,test,strlen(test)+1000) != strlen(test)+1000)
 		return FAIL;
 
 	return PASS;
@@ -557,13 +554,12 @@ void read_file_test()  {
 
 	int32_t test_fd;
 	uint8_t test_buf[51];
-	uint8_t test_name[34] = "sigtest\0";
+	uint8_t test_name[34] = "frame0.txt";
 
 	test_fd = open_file(test_name);
 	read_file(test_fd, test_buf, 50);
 
-	terminal_read(0, (int8_t*)test_buf, 50);
-	terminal_write(0, 50);
+	terminal_write(0, (int8_t*)test_buf, 50);
 
 	putc('\n');
 
@@ -655,14 +651,22 @@ int read_directory_test()  {
 	uint8_t test_name[34] = ".\0";
 	int test_fd;
 	int error_check;
+	int i;
 
 	test_fd = open_directory(test_name);
+	for(i = 0; i < 17; i++)  {
+		error_check = read_directory(test_fd, 0, 0);
+		if(error_check == -1)  {
+			return FAIL;
+		}
+	}
+
 	error_check = read_directory(test_fd, 0, 0);
-	if(error_check == -1)  {
+	if(error_check != -1)  {
 		return FAIL;
 	}
 
-	close_directory(test_fd);
+		close_directory(test_fd);
 
 	return PASS;
 }
@@ -742,10 +746,10 @@ void launch_tests(){
 
 	//TEST_OUTPUT("Read Dentry by Index Test", read_dentry_by_index_Test());
 	//TEST_OUTPUT("Read Dentry by Name Test", read_dentry_by_name_Test());
-	read_data_test();
+	//read_data_test();
 
 	//TEST_OUTPUT("Open File Test", open_file_test());
-	read_file_test();
+	//read_file_test();
 	//TEST_OUTPUT("Write File Test", write_file_test());
 	//TEST_OUTPUT("Close File Test", close_file_test());
 

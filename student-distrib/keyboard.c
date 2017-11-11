@@ -59,13 +59,11 @@ void keyboard_handler ()
 
     /* deal with the received character */
     keyboard_output_dealer(c);
-
-    if (terminal_read_flag && add_or_not)
-    	terminal_read( 0, (int8_t*)(char_buf+buf_index), 1);
-    terminal_read_flag = 0;
-    add_or_not = 0;
+    
     /* call terminal write to write buffer to screen */
-    terminal_write(0, 1);
+    if (add_or_not == 1)
+    	terminal_write(0,(int8_t*)(char_buf+buf_index) , 1);
+    add_or_not = 0;
     if (enter_flag == 1)
     {	
     	buf_index=-1;
@@ -90,7 +88,23 @@ void keyboard_output_dealer (uint8_t c)
 	int found = -1;
 
 	/* if the scancode is "enter" */
-	if(c == PRESS_ENTER) { terminal_read_flag = 1; enter_flag = 1; char_buf[++buf_index] = '\n'; found = 1; add_or_not = 1; }
+	if(c == PRESS_ENTER) { 
+		enter_flag = 1; 
+		char_buf[++buf_index] = '\n';
+
+		if(command_buf[0] =='\0')
+			for(i=0;i<CHARACTER_BUFFER_SIZE;i++)
+			{
+				command_buf[i] = char_buf[i]; 
+				if(char_buf[i] == '\n')
+				{
+					set_t_enter_flag();
+					break;
+				}
+			}
+		found = 1; 
+		add_or_not = 1; 
+	}
 
 	/* if the scancode is "press_shift" */
 	if (c == PRESS_LEFT_SHIFT || c == PRESS_RIGHT_SHIFT) { shift_flag = 1; found = 1; }
@@ -137,7 +151,6 @@ void keyboard_output_dealer (uint8_t c)
 	
 	/* if the scancode is "PRESS_SPACE" */
 	if (c == PRESS_SPACE) {
-		terminal_read_flag = 1;
 		if(buf_index < CHARACTER_BUFFER_SIZE-2)
 		{
 			add_or_not = 1;
@@ -148,7 +161,6 @@ void keyboard_output_dealer (uint8_t c)
 
 	/* if the scancode is "PRESS_TAB" */
 	if (c == PRESS_TAB) {
-		terminal_read_flag = 1;
 		if(buf_index < CHARACTER_BUFFER_SIZE-2)
 		{
 			add_or_not = 1;
@@ -159,7 +171,6 @@ void keyboard_output_dealer (uint8_t c)
 
 	/* if the scancode is "PRESS_EQUAL" */
 	if (c == PRESS_EQUAL) {
-		terminal_read_flag = 1;
 		if(buf_index < CHARACTER_BUFFER_SIZE-2) {
 			/* if shift pressed 	-> plus */
 			if(shift_flag)
@@ -174,7 +185,6 @@ void keyboard_output_dealer (uint8_t c)
 
 	/* if the scancode is "PRESS_HYPHEN" */
 	if (c == PRESS_HYPHEN) {
-		terminal_read_flag = 1;
 		if(buf_index < CHARACTER_BUFFER_SIZE-2) {
 			/* if shift pressed 	-> underscope */
 			if(shift_flag)
@@ -189,7 +199,6 @@ void keyboard_output_dealer (uint8_t c)
 
 	/* if the scancode is "PRESS_BACKSLASH" */
 	if (c == PRESS_BACKSLASH) {
-		terminal_read_flag = 1;
 		if(buf_index < CHARACTER_BUFFER_SIZE-2) {
 			/* if shift pressed 	-> vertical_slash */
 			if(shift_flag)
@@ -204,7 +213,6 @@ void keyboard_output_dealer (uint8_t c)
 
 	/* if the scancode is "PRESS_SINGLE_QUOTE" */
 	if (c == PRESS_SINGLE_QUOTE) {
-		terminal_read_flag = 1;
 		if(buf_index < CHARACTER_BUFFER_SIZE-2) {
 			/* if shift pressed 	-> double_quote */
 			if(shift_flag)
@@ -219,7 +227,6 @@ void keyboard_output_dealer (uint8_t c)
 
 	/* if the scancode is "PRESS_BACK_TICK" */
 	if (c == PRESS_BACK_TICK) {
-		terminal_read_flag = 1;
 		if(buf_index < CHARACTER_BUFFER_SIZE-2) {
 			/* if shift pressed 	-> tilde */
 			if(shift_flag)
@@ -234,7 +241,6 @@ void keyboard_output_dealer (uint8_t c)
 
 	/* if the scancode is "PRESS_COMMA" */
 	if (c == PRESS_COMMA) {
-		terminal_read_flag = 1;
 		if(buf_index < CHARACTER_BUFFER_SIZE-2) {
 			/* if shift pressed 	-> less */
 			if(shift_flag)
@@ -249,7 +255,6 @@ void keyboard_output_dealer (uint8_t c)
 
 	/* if the scancode is "PRESS_DOT" */
 	if (c == PRESS_DOT) {
-		terminal_read_flag = 1;
 		if(buf_index < CHARACTER_BUFFER_SIZE-2) {
 			/* if shift pressed 	-> greater */
 			if(shift_flag)
@@ -264,7 +269,6 @@ void keyboard_output_dealer (uint8_t c)
 
 	/* if the scancode is "PRESS_SLASH" */
 	if (c == PRESS_SLASH) {
-		terminal_read_flag = 1;
 		if(buf_index < CHARACTER_BUFFER_SIZE-2) {
 			/* if shift pressed 	-> question */
 			if(shift_flag)
@@ -279,7 +283,6 @@ void keyboard_output_dealer (uint8_t c)
 
 	/* if the scancode is "PRESS_SEMICOLON" */
 	if (c == PRESS_SEMICOLON) {
-		terminal_read_flag = 1;
 		if(buf_index < CHARACTER_BUFFER_SIZE-2) {
 			/* if shift pressed 	-> colon */
 			if(shift_flag)
@@ -294,7 +297,6 @@ void keyboard_output_dealer (uint8_t c)
 
 	/* if the scancode is "PRESS_LEFT_SQUARE_BRACKET" */
 	if (c == PRESS_LEFT_SQUARE_BRACKET) {
-		terminal_read_flag = 1;
 		if(buf_index < CHARACTER_BUFFER_SIZE-2) {
 			/* if shift pressed 	-> left_curly_bracket */
 			if(shift_flag)
@@ -309,7 +311,6 @@ void keyboard_output_dealer (uint8_t c)
 
 	/* if the scancode is "PRESS_RIGHT_SQUARE_BRACKET" */
 	if (c == PRESS_RIGHT_SQUARE_BRACKET) {
-		terminal_read_flag = 1;
 		if(buf_index < CHARACTER_BUFFER_SIZE-2) {
 			/* if shift pressed 	-> right_curly_bracket */
 			if(shift_flag)
@@ -354,7 +355,6 @@ void keyboard_output_dealer (uint8_t c)
 					}
 				}
 				found = i;
-				terminal_read_flag = 1;
 				break;
 			}
 		}
@@ -384,7 +384,6 @@ void keyboard_output_dealer (uint8_t c)
 					}
 				}
 				found = i;
-				terminal_read_flag = 1;
 				break;
 			}
 		}
@@ -393,10 +392,6 @@ void keyboard_output_dealer (uint8_t c)
 	/* if the scandcode is neither recognized code nor release code, print "Unknown Scandcode" */
 	if(found==-1 && (c>RELEASE_SCANCODE_UPPERBOUND || c<RELEASE_SCANCODE_LOWERBOUND) && c!=ACK_SCANCODE)
 	{
-		terminal_read_flag = 0;
-		if(check_out_of_bound() == SCROLL_ENTER_PRESSED)
-			scroll_screen();
-		puts("UNKNOWN SCANCODE!\n");
-		printf("%d\n", c);
+		add_or_not = 0;
 	}
 }

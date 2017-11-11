@@ -3,63 +3,68 @@
 #define NUM_COLS        80
 #define NUM_ROWS        25
 
-uint8_t terminal_buf[NUM_COLS*NUM_ROWS];
-uint8_t terminal_index = 0;
+volatile uint8_t t_enter_flag;
 
 /*
- * int terminal_read(int32_t fd, const int8_t* buf, int32_t nbytes)
+ * void set_t_enter_flag()
+ * set t_enter_flag to 1
+ * input: 	none
+ * output: none
+ * side effect: as description
+ */
+void set_t_enter_flag()
+{
+	t_enter_flag = 1;
+}
+/*
+ * int terminal_read(int32_t fd, int8_t* buf)
  * read the input from the keyboard and store in terminal buffer
  * input: 	fd - the index of file
  * 			buf- the input from keyboard
- * 			nbytes - how many bytes to read
  * output: the number had copied
  * side effect: as description
  */
-int terminal_read(int32_t fd, const int8_t* buf, int32_t nbytes)
+int terminal_read(int32_t fd, int8_t* buf)
 {
-	int i;
-
-	if(buf == NULL || nbytes > NUM_COLS*NUM_ROWS)
-	{
+	if(buf == NULL)
 		return -1;
+
+	int i = 0;
+	t_enter_flag = 0;
+	command_buf[0] = '\0';
+
+	while(!t_enter_flag);
+
+	while(1)
+	{
+		buf[i] = command_buf[i];
+		
+		if(command_buf[i] == '\n')
+			break;
+		i++;
 	}
 
-	for(i=0;i<nbytes;i++)
-	{
-		terminal_buf[i] = buf[i];
-	}
-	terminal_index = nbytes;
-	return nbytes;
+	return i;
 }
 
 /*
- * int terminal_write(int32_t fd, int32_t nbytes,int enter_flag)
+ * int terminal_write(int32_t fd, const int8_t* buf, int32_t nbytes)
  * show the terminal buffer on the screen
  * input:   fd - the index of file
+ 			buf- the input from keyboard
  *			nbytes - how many bytes to write
  * output: success -> return the number put into screen
  *		   fail	   -> return -1
  * side effect: as description
  */
-int terminal_write(int32_t fd, int32_t nbytes)
+int terminal_write(int32_t fd, const int8_t* buf, int32_t nbytes)
 {
 	int i;
-	int write_index;
-	/* index out of bound */
-	if(nbytes > NUM_COLS*NUM_ROWS)
-	{
-		return -1;
-	}
-
-	if (nbytes > terminal_index)
-		write_index = terminal_index;
-	else
-		write_index = nbytes;
 
 	/* normal charaters */
-	for(i=0; i<write_index; i++)
+	for(i=0; i<nbytes; i++)
 	{
-		if(check_out_of_bound() == SCROLL_ENTER_PRESSED && terminal_buf[i] == '\n')
+		if(check_out_of_bound() == SCROLL_ENTER_PRESSED && buf[i] == '\n')
 		{
 			scroll_screen();
 		}
@@ -67,9 +72,8 @@ int terminal_write(int32_t fd, int32_t nbytes)
 		{
 			scroll_screen();
 		}
-		putc(terminal_buf[i]);
+		putc(buf[i]);
 	}
-	terminal_index = 0;
 	return i;
 }
 

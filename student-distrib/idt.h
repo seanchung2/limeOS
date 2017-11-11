@@ -5,7 +5,7 @@
 #include "lib.h"
 #include "i8259.h"
 #include "idt.h"
-#include "int_handler.h"
+#include "system_call.h"
 #include "keyboard.h"
 
 /* Define variables */
