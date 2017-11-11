@@ -10,7 +10,6 @@ static uint32_t directory_position;
 int32_t current_pid = 0;
 
 /* temporary dentry table */
-static dentry_t dentry_table[FILE_TABLE_SIZE];
 static int dentry_table_flags[FILE_TABLE_SIZE];
 
 /* read_dentry_by_name
