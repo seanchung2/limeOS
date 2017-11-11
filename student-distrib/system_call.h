@@ -23,7 +23,7 @@
 #define MAX_PID				2
 
 /* for pid status and jumptable */
-enum pidStatus{FREE = 0, INUSE};
+enum pidStatus{FREE = 0, IN_USE};
 enum jumpTable{OPEN = 0, READ, WRITE, CLOSE};
 
 /*The first 4 bytes of the file represent a magic number that identies the file as an exeutable.*/

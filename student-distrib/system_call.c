@@ -170,8 +170,11 @@ int32_t execute (const uint8_t* command){
 /*
 * read (int32_t fd, void* buf, int32_t nbytes)
 * hanlder for system call "read"
-* input: none
-* output: none
+* input: 
+*		fd: file descriptor
+*		buf: buffer which will be filled out in each read function
+*		nbyte: how many bytes we want
+* output: number of bytes copied or -1 for error happened
 * side effect: as description
 */
 int32_t read (int32_t fd, void* buf, int32_t nbytes)
@@ -179,6 +182,10 @@ int32_t read (int32_t fd, void* buf, int32_t nbytes)
 	/* fetch the pcb in current process */
 	pcb_t * pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
 	int ret;
+
+	/* fd must be between 0-7 */
+	if(fd >= MAX_FD_NUM || fd < 0)
+		return -1;
 
 	/* call the file's read function */
 	asm volatile("pushl	%4;"
@@ -199,23 +206,30 @@ int32_t read (int32_t fd, void* buf, int32_t nbytes)
 /*
 * write (int32_t fd, const void* buf, int32_t nbytes)
 * hanlder for system call "write"
-* input: none
-* output: none
+* input: 
+*		fd: file descriptor
+*		buf: buffer which will provide data each write function need
+*		nbyte: how many bytes we want
+* output: number of bytes written or -1 for error happened
 * side effect: as description
 */
 int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 {
+	int ret;
 	/* fetch the pcb in current process */
 	pcb_t * pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
-	int ret;
 
+	/* fd must be between 0-7 */
+	if(fd >= MAX_FD_NUM || fd < 0)
+		return -1;
+	
 	/* call the file's read function */
 	asm volatile("pushl	%4;"
 				 "pushl	%3;"
 				 "pushl	%2;"
 				 "call  *%1;"
-		 		 "movl 	%%eax,%0;"
-		 		 "addl	$12,%%esp;"
+		 		 "movl 	%%eax, %0;"
+		 		 "addl	$12, %%esp;"
 		 		 : "=r"(ret)
 		 		 : "g" (pcb->fd_entry[fd].operations_pointer[WRITE]),
 		 		   "g" (fd),
@@ -228,8 +242,8 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 /*
 * open (const uint8_t* filename)
 * hanlder for system call "open"
-* input: none
-* output: none
+* input: filename is file name 
+* output: fd value or -1 for error
 * side effect: as description
 */
 int32_t open (const uint8_t* filename)
@@ -244,7 +258,7 @@ int32_t open (const uint8_t* filename)
 	if( strncmp((int8_t*)filename, (int8_t*)"stdin", 5) == 0)
 	{
 		pcb->fd_entry[0].operations_pointer = stdin_table;
-		pcb->fd_entry[0].flags = INUSE;
+		pcb->fd_entry[0].flags = IN_USE;
 		return 0;
 	}
 
@@ -252,7 +266,7 @@ int32_t open (const uint8_t* filename)
 	if( strncmp((int8_t*)filename, (int8_t*)"stdout", 6) == 0)
 	{
 		pcb->fd_entry[1].operations_pointer = stdout_table;
-		pcb->fd_entry[1].flags = INUSE;
+		pcb->fd_entry[1].flags = IN_USE;
 		return 1;
 	}
 
@@ -278,7 +292,7 @@ int32_t open (const uint8_t* filename)
 			}
 			pcb->fd_entry[i].inode_index = dentry->inode_number;
 			pcb->fd_entry[i].file_position = 0;
-			pcb->fd_entry[i].flags = INUSE;
+			pcb->fd_entry[i].flags = IN_USE;
 
 			/* call the file's open function */
 			asm volatile("pushl	%2;"
@@ -326,7 +340,7 @@ int32_t close (int32_t fd)
 	pcb->fd_entry[fd].operations_pointer = NULL;
 	pcb->fd_entry[fd].inode_index = -1;
 	pcb->fd_entry[fd].file_position = -1;
-	pcb->fd_entry[fd].flags = INUSE;
+	pcb->fd_entry[fd].flags = IN_USE;
 	return 0;
 }
 
