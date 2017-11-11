@@ -31,6 +31,9 @@ const int8_t magic_number[4] = {0x7f, 0x45, 0x4c, 0x46};
 /* do nothing, just for padding */
 int32_t null_func() { return 0; }
 
+/* initialize the new PCB */
+void setup_PCB ();
+
 /* handle system call "halt" */
 int32_t halt (uint8_t status);
 

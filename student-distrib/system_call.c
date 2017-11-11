@@ -36,8 +36,31 @@ int32_t directory_table[4] = { (uint32_t)(open_directory),
 								(uint32_t)(write_directory),
 								(uint32_t)(close_directory) };
 
+/*
+* setup_PCB ()
+* initialize a new PCB for a new process
+* input: none
+* output: none
+* side effect: as description
+*/
+void setup_PCB ()
+{
+	int i;
+	/* fetch the pcb in current process */
+	pcb_t * pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
 
+	for(i=0; i<MAX_FD_NUM; i++)
+	{
+		pcb->fd_entry[i].operations_pointer = NULL;
+		pcb->fd_entry[i].inode_index = -1;
+		pcb->fd_entry[i].file_position = -1;
+		pcb->fd_entry[i].flags = FREE;
+	}
 
+	pcb->process_id = current_pid;
+	pcb->parent_id = -1;
+	pcb->child_id = -1;
+}
 /*
 * halt (uint8_t status)
 * hanlder for system call "halt"
@@ -179,9 +202,9 @@ int32_t execute (const uint8_t* command){
 */
 int32_t read (int32_t fd, void* buf, int32_t nbytes)
 {
+	int ret;
 	/* fetch the pcb in current process */
 	pcb_t * pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
-	int ret;
 
 	/* fd must be between 0-7 */
 	if(fd >= MAX_FD_NUM || fd < 0)
