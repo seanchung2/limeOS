@@ -6,6 +6,9 @@ static uint32_t fs_start;
 /* holds the dentry number to print next with read_directory */
 static uint32_t directory_position;
 
+/* initial current pid */
+int32_t current_pid = 0;
+
 /* temporary dentry table */
 static dentry_t dentry_table[FILE_TABLE_SIZE];
 static int dentry_table_flags[FILE_TABLE_SIZE];
@@ -161,30 +164,11 @@ void set_fs_start(module_t* mod)  {
 /* open_file
  *
  * INPUTS:	filename - string that represents a file
- * OUTPUTS:	-1 - dentry_table full or file not found
- *			0 - open successful
- * SIDE EFFECTS:	copys the requested dentry structure
- *					to dentry_table at the index returned
+ * OUTPUTS:	1
+ * SIDE EFFECTS: none
  */
 int32_t open_file(const uint8_t* filename)  {
-	int i = 0;
-	int error_check;
-
-	while(dentry_table_flags[i] != 0 && i < FILE_TABLE_SIZE)  {
-		i++;
-	}
-
-	if(i >= FILE_TABLE_SIZE)  {
-		return -1;
-	}
-
-	error_check = read_dentry_by_name(filename, &(dentry_table[i]));
-	if(error_check == -1)  {
-		return -1;
-	}
-	dentry_table_flags[i] = 1;
-
-	return i;
+	return 1;
 }
 
 /* read_file
@@ -197,7 +181,8 @@ int32_t open_file(const uint8_t* filename)  {
  *					to the given buffer
  */
 int32_t read_file(int32_t fd, void* buf, int32_t nbytes)  {
-	uint32_t inode_index = dentry_table[fd].inode_number;
+	pcb_t* pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
+	uint32_t inode_index = pcb->fd_entry[fd].inode_index;
 	return read_data(inode_index, 0, (uint8_t*)buf, nbytes);
 }
 
@@ -216,61 +201,34 @@ int32_t write_file(int32_t fd, const void* buf, int32_t nbytes)  {
 /* close_file
  *
  * INPUTS:	fd - file descriptor to read
- * OUTPUTS:	-1 - fd is out of acceptable range
- *			0 - file closed suffessfully
+ * OUTPUTS: 0
  * SIDE EFFECTS:	None
  */
 int32_t close_file(int32_t fd)  {
-	if(fd < 0 || fd > 7)  {
-		return -1;
-	}
-	dentry_table_flags[fd] = 0;
 	return 0;
 }
 
 /* open_directory
  *
  * INPUTS:	filename - name of directory to open
- * OUTPUTS:	-1 - dentry_table is full or directory not found
- *			0 - directory opened successfully
- * SIDE EFFECTS:	Fills dentry_table at the returned index
- *					with dentry for named directory
+ * OUTPUTS:	0
+ * SIDE EFFECTS:	None
  */
 int32_t open_directory(const uint8_t* filename)  {
-	int i = 0;
-	int error_check;
-
-	directory_position = 0;
-
-	while(dentry_table_flags[i] != 0 && i < FILE_TABLE_SIZE)  {
-		i++;
-	}
-
-	if(i >= FILE_TABLE_SIZE)  {
-		return -1;
-	}
-
-	error_check = read_dentry_by_name(filename, &(dentry_table[i]));
-	if(error_check == -1)  {
-		return -1;
-	}
-	dentry_table_flags[i] = 1;
-
-	return i;
+	return 0;
 }
 
 /* read_directory
  *
  * INPUTS:	fd - file descriptor for directory to read
- *			buf - ignored
+ *			buf - buffer to copy next entry's name into
  *			nbytes - ignored
- * OUTPUTS:	0
- * SIDE EFFECTS:	prints the file names for all the files in the
- *					given directory
+ * OUTPUTS:	number of bytes written to buf
+ *			0 - all entries have been read
+ * SIDE EFFECTS:	copies name of next entry to buf
  */
 int32_t read_directory(int32_t fd, void* buf, int32_t nbytes)  {
 	int dentry_count = *((int*)(fs_start));
-	int error_check;
 	dentry_t current;
 	int i;
 	uint32_t inode_number;
@@ -278,29 +236,21 @@ int32_t read_directory(int32_t fd, void* buf, int32_t nbytes)  {
 	uint32_t* length;
 
 	if(directory_position >= dentry_count)  {
-		return -1;
+		return 0;
 	}
 
-	error_check = read_dentry_by_index(directory_position, &current);
-	if(error_check == -1)  {
+	if(read_dentry_by_index(directory_position, &current) == -1)  {
 		return -1;
 	}
 
 	char_ptr = (uint8_t*)&current;
-	printf("Filename: ");
 	for(i = 0; i < MAX_NAME_LENGTH; i++)  {
-		putc(char_ptr[i]);
+		if(char_ptr[i] == '\0')  {
+			break;
+		}
+		buf[i] = char_ptr[i];
 	}
-
-	putc('\n');
-	inode_number  = current.inode_number;
-	length = (uint32_t*)(fs_start + (inode_number + 1)*FOUR_KB);
-	printf("Length: %d", *length);
-	putc('\n');
-
-	directory_position++;
-
-	return 0;
+	return i;
 }
 
 
@@ -319,15 +269,10 @@ int32_t write_directory(int32_t fd, const void* buf, int32_t nbytes)  {
 /* close_directory
  *
  * INPUTS:	fd - file descriptor for directory to close
- * OUTPUTS:	-1 - file descriptor outside acceptable range
- *			0 - file closed successfully
- * SIDE EFFECTS:	sets flag for given file descriptor to 0
+ * OUTPUTS:	0
+ * SIDE EFFECTS:	None
  */
 int32_t close_directory(int32_t fd)  {
-	if(fd < 0 || fd > (FILE_TABLE_SIZE-1))  {
-		return -1;
-	}
-	dentry_table_flags[fd] = 0;
 	return 0;
 }
 
