@@ -30,13 +30,15 @@ int32_t execute (const uint8_t* command){
 		return -1;
 	}
 	//Variable Initialization
-	int8_t file_name[MAX_NAME_LENGTH];
-	int8_t local_arg[MAX_LENGTH_ARG];
-	int8_t file_length = 0;
-	int8_t spaces = 0;
+	uint8_t file_name[MAX_NAME_LENGTH];
+	uint8_t local_arg[MAX_LENGTH_ARG];
+	uint8_t buffer[BUF_SIZE];
 
-	int8_t i = 0;
-	int8_t end_of_file_name = 0;
+	uint32_t file_length = 0;
+	uint32_t spaces = 0;
+	uint32_t i = 0;
+	uint32_t end_of_file_name = 0;
+	uint32_t local_arg_start_flag = 0;
 	//Parsing
 	while(command[i] != '\0'){
 		if(command[i] != ' ' && spaces == 0){
@@ -44,7 +46,7 @@ int32_t execute (const uint8_t* command){
 		}
 		else{
 			end_of_file_name++;
-			if(command[i] == ' '){
+			if(command[i] == ' ' && local_arg_start_flag == 0){
 				spaces++;
 			}
 			if(end_of_file_name == 1){
@@ -52,7 +54,8 @@ int32_t execute (const uint8_t* command){
 				file_name[i] = '\0';
 				end_of_file_name++;//Temp fix... Just to be on a safer side
 			}
-			if(command[i] != ' '){
+			if(command[i] != ' ' || local_arg_start_flag == 1){
+				local_arg_start_flag = 1;
 				local_arg[i - (file_length + spaces)] = command[i];
 			}
 		}
@@ -66,6 +69,18 @@ int32_t execute (const uint8_t* command){
 
 	//Executable check
 	
+	/*read_file check*/
+	if(read_file((int32_t*)file_name, buffer, 4) == -1){
+		return -1;
+	}
+
+	/*string comparison between buf and magic numbers to make sure that file is executable or not*/
+	if(strncmp((const int8_t*)buffer, (const int8_t*)magic_number, 4) != 0){
+		return -1;
+	}
+
+
+
 }
 
 /*

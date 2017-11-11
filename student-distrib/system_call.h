@@ -5,6 +5,10 @@
 #define _SYSTEM_CALL_H
 
 #define MAX_LENGTH_ARG 128
+#define BUF_SIZE 4
+
+/*The first 4 bytes of the file represent a magic number that identies the file as an exeutable.*/
+const int8_t magic_number[4] = {0x7f, 0x45, 0x4c, 0x46};
 
 /* handle system call "halt" */
 int32_t halt (uint8_t status);
