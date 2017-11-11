@@ -17,29 +17,29 @@ void set_t_enter_flag()
 	t_enter_flag = 1;
 }
 /*
- * int terminal_read(int32_t fd, int8_t* buf)
+ * int terminal_read(int32_t fd, void* buf, int32_t nbytes)
  * read the input from the keyboard and store in terminal buffer
  * input: 	fd - the index of file
  * 			buf- the input from keyboard
  * output: the number had copied
  * side effect: as description
  */
-int terminal_read(int32_t fd, int8_t* buf)
+int terminal_read(int32_t fd, void* buf, int32_t nbytes)
 {
 	if(buf == NULL)
 		return -1;
 
 	int i = 0;
 	t_enter_flag = 0;
-	command_buf[0] = '\0';
+	(int8_t)command_buf[0] = '\0';
 
 	while(!t_enter_flag);
 
 	while(1)
 	{
-		buf[i] = command_buf[i];
+		buf[i] = (int8_t)command_buf[i];
 		
-		if(command_buf[i] == '\n')
+		if((int8_t)command_buf[i] == '\n')
 			break;
 		i++;
 	}

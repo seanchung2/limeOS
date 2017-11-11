@@ -133,7 +133,21 @@ int32_t execute (const uint8_t* command){
 int32_t read (int32_t fd, void* buf, int32_t nbytes)
 {
 	pcb_t * pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
-
+	int ret;
+	/* call the file's read function */
+	asm volatile("pushl	%4;"
+				 "pushl	%3;"
+				 "pushl	%2;"
+				 "call  *%1;"
+		 		 "movl 	%eax,%0;"
+		 		 "addl	$12,%esp;"
+		 		 : "=r"(ret)
+		 		 : "g" (pcb->fd_entry[i].operations_pointer[0]),
+		 		   "g" (fd),
+		 		   "g" (buf),
+		 		   "g" (nbytes)
+		 		 : "%eax");
+	return ret;
 }
 
 /*
@@ -159,6 +173,7 @@ int32_t open (const uint8_t* filename)
 {
 	dentry_t* dentry;
 	int i;
+	int ret;
 	pcb_t * pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
 
 	/* if filename is "stdin" */
@@ -200,8 +215,17 @@ int32_t open (const uint8_t* filename)
 			pcb->fd_entry[i].inode_index = dentry->inode_number;
 			pcb->fd_entry[i].file_position = 0;
 			pcb->fd_entry[i].flags = 1;
-			/* call the file's open function. */
-			if (asm_jump(pcb,i,0) < 0)
+
+			/* call the file's open function */
+			asm volatile("pushl	%2;"
+						 "call  *%1;"
+				 		 "movl 	%eax,%0;"
+				 		 "addl	$4,%esp;"
+				 		 : "=r"(ret)
+				 		 : "g" (pcb->fd_entry[i].operations_pointer[0]),
+				 		   "g" (filename)
+				 		 : "%eax");
+			if (ret < 0)
 				return -1;
 			return i;
 		}
@@ -219,12 +243,20 @@ int32_t open (const uint8_t* filename)
 int32_t close (int32_t fd)
 {
 	pcb_t * pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
-
+	int ret;
 	/* if user try to close stdin/stdout or an invalid fd, return -1 */
 	if (fd <2 || fd >= MAX_FD_NUM)
 		return -1;
-	/* call the file's close function. */
-	if (asm_jump(pcb,fd,3) < 0)
+	/* call the file's close function */
+	asm volatile("pushl	%2;"
+				 "call  *%1;"
+		 		 "movl 	%eax,%0;"
+		 		 "addl	$4,%esp;"
+		 		 : "=r"(ret)
+		 		 : "g" (pcb->fd_entry[fd].operations_pointer[3]),
+		 		   "g" (fd)
+		 		 : "%eax");
+	if (ret < 0)
 		return -1;
 	/* free the current PCB block */
 	pcb->fd_entry[fd].operations_pointer = NULL;
