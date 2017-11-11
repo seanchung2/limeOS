@@ -1,7 +1,7 @@
 #include "tests.h"
 #include "x86_desc.h"
 #include "lib.h"
-#include "int_handler.h"
+#include "system_call.h"
 #include "i8259.h"
 #include "paging.h"
 #include "keyboard.h"

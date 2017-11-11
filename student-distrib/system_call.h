@@ -1,9 +1,9 @@
 #include "lib.h"
 
-#ifndef _INT_HANDLER_H
-#define _INT_HANDLER_H
+#ifndef _SYSTEM_CALL_H
+#define _SYSTEM_CALL_H
 
 /* System call interrupt asm wrapper */
 extern void sys_handler();
 
-#endif /* _INT_HANDLER_H */
+#endif /* _SYSTEM_CALL_H */
