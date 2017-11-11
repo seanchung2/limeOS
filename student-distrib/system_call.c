@@ -47,7 +47,7 @@ int32_t directory_table[4] = { (uint32_t)(open_directory),
 */
 int32_t halt (uint8_t status)
 {
-	
+	return 0;
 }
 
 /*
@@ -152,14 +152,14 @@ int32_t execute (const uint8_t* command){
 	read_data(program.inode_number, 24, entry_point, 4);
 	
 	/*Copying the entire file into meemory starting at virtual address LOAD_ADDR*/
-	uint8_t* start_point = LOAD_ADDR;
+	uint8_t* start_point = (uint8_t*)LOAD_ADDR;
 	uint32_t j;
 	uint32_t c;
 
 	i = 0;
 	while((c = read_data(program.inode_number, i*BUF_SIZE, buffer, BUF_SIZE)) > 0){
-		for(j = 0; j < c; j++){
-			*(LOAD_ADDR + (i*BUF_SIZE) + j) = buffer[j];
+		for(j = 0; j < c; j++)  {
+			*((uint8_t*)(LOAD_ADDR + (i*BUF_SIZE)) + j) = buffer[j];
 		}
 		i++;
 	}
@@ -314,12 +314,12 @@ int32_t close (int32_t fd)
 	/* call the file's close function */
 	asm volatile("pushl	%2;"
 				 "call  *%1;"
-		 		 "movl 	%eax,%0;"
-		 		 "addl	$4,%esp;"
+		 		 "movl 	%%eax,%0;"
+		 		 "addl	$4,%%esp;"
 		 		 : "=r"(ret)
 		 		 : "g" (pcb->fd_entry[fd].operations_pointer[CLOSE]),
 		 		   "g" (fd)
-		 		 : "%eax");
+		 		 : "eax");
 	if (ret < 0)
 		return -1;
 	/* free the current PCB block */
@@ -341,9 +341,9 @@ int32_t asm_jump(pcb_t* pcb, int32_t fd,int32_t index)
 {
 	int32_t ret;
 	asm volatile("call  *%1		;"
-				 "movl 	%eax,%0;"
+				 "movl 	%%eax,%0;"
 				 : "=r"(ret)
 				 : "g" (pcb->fd_entry[fd].operations_pointer[index])
-				 : "%eax");
+				 : "eax");
 	return ret;
 }
