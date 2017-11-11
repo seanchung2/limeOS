@@ -12,8 +12,8 @@
 #define VID_MEM_ENTRY	0xB8117		//initial PTE for video memory
 #define T_ZERO_MASK		0x17		//mask to set the helper bits
 
-extern int PDT_addr;
-extern int PT0_addr;
+extern static int PDT_addr;
+extern static int PT0_addr;
 
 // struct for creating page tables
 typedef struct page_table_t  {
