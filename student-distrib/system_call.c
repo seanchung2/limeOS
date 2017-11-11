@@ -153,7 +153,7 @@ int32_t execute (const uint8_t* command){
 					);
 
 	/*Getting the entry point*/
-	uint8_t entry_point[BUF_SIZE];
+	uint8_t entry_point[BUF_SIZE];//first instruction’s address
 	read_data(program.inode_number, 24, entry_point, 4);
 	
 	/*Copying the entire file into meemory starting at virtual address LOAD_ADDR*/
@@ -169,6 +169,7 @@ int32_t execute (const uint8_t* command){
 		i++;
 	}
 
+	//Note: Have to take care of "It then must jump to the entry point of the program to begin execution" --> probably in context switch
 }
 
 /*
