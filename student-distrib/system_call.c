@@ -215,7 +215,7 @@ int32_t execute (const uint8_t* command){
 	new_process->parent_esp0 = reg_esp;
 
 	tss.ss0 = KERNEL_DS;
-	tss.esp0 = (KERNEL_BOT_ADDR - ((new_pid) * EIGHT_KB)) - 1;
+	tss.esp0 = (KERNEL_BOT_ADDR - ((new_pid) * EIGHT_KB)) - 4;
 
 	/* setup IRET context */
 	uint32_t target_instruction = *((uint32_t*)entry_point);
