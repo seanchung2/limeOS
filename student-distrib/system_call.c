@@ -111,7 +111,7 @@ int32_t halt_256(uint32_t status){
 	//close any relevant FDs
 	uint32_t i;
 	for(i = 0; i < 8; i++){
-		pcb_current->fd_entry[i].flags = 0;
+		pcb_halt->fd_entry[i].flags = 0;
 	}
 
 	current_pid = pcb_halt->parent_id;
@@ -132,12 +132,7 @@ int32_t halt_256(uint32_t status){
 
 
 	tss.ss0 = KERNEL_DS;
-	tss.esp0 = pcb_current->parent_esp0;
-
-	uint32_t target_instruction = pcb_halt->return_instruction + 1;
-	uint32_t code_segment = USER_CS;
-	uint32_t stack_pointer = VIRTUAL_BLOCK_BOTTOM - 4;//Need to change this! ????
-	uint32_t stack_segment = USER_DS;
+	tss.esp0 = pcb_halt->parent_esp0;
 
 	asm volatile(	"jmp execute_return;");
 
