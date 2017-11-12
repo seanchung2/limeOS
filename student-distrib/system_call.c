@@ -91,23 +91,31 @@ int32_t halt (uint8_t status)
 	return 0;
 }
 
+/*
+* halt_256 (uint8_t status)
+* hanlder for system call "halt"
+* input: none
+* output: none
+* side effect: as description
+*/
+
 int32_t halt_256(uint32_t status){
-	pcb_t* pcb_halt = KERNEL_BOT_ADDR - EIGHT_KB *(current_pid + 1);//current PCB
 	//May need to look into parent-child flag thing... kind of a parent-child relationship
 
-	//restore parent data
-	pcb_t* pcb_parent = KERNEL_BOT_ADDR - EIGHT_KB * (pcb_halt->parent_id + 1);//parent PCB ????
+
+	pcb_t* pcb_current = KERNEL_BOT_ADDR - EIGHT_KB *(current_pid + 1);//current PCB
+	pcb_t* pcb_parent = KERNEL_BOT_ADDR - EIGHT_KB * (pcb_current->parent_id + 1);//parent PCB ????
 	pcb_parent->return_value = status;
 
 
 	//restore parent paging
 	page_table_t* PDT = (page_table_t*)PDT_addr;
-	PDT->entries[PROGRAM_PDT_INDEX] = (KERNEL_BOT_ADDR + (FOUR_MB*(pcb_halt->parent_id))) | PROGRAM_PROPERTIES;
+	PDT->entries[PROGRAM_PDT_INDEX] = (KERNEL_BOT_ADDR + (FOUR_MB*(pcb_current->parent_id))) | PROGRAM_PROPERTIES;
 
 	//close any relevant FDs
 	uint32_t i;
 	for(i = 0; i < 8; i++){
-		pcb_halt->fd_entry[i].flags = 0;
+		pcb_current->fd_entry[i].flags = 0;
 	}
 
 
@@ -123,9 +131,9 @@ int32_t halt_256(uint32_t status){
 
 
 	tss.ss0 = KERNEL_DS;
-	tss.esp0 = pcb_halt->parent_esp0;
+	tss.esp0 = pcb_current->parent_esp0;
 
-	uint32_t target_instruction = pcb_halt->return_instruction + 1;
+	uint32_t target_instruction = pcb_current->return_instruction + 1;
 	uint32_t code_segment = USER_CS;
 	uint32_t stack_pointer = VIRTUAL_BLOCK_BOTTOM - 4;//Need to change this! ????
 	uint32_t stack_segment = USER_DS;
