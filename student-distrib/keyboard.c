@@ -74,7 +74,7 @@ void keyboard_handler ()
     	enter_flag = 0;
     }
 
-   /*test*/printf(" ------> press:%d  release:%d", count[0], count[1]); putc('\n');
+	///*test*/printf(" ------> press:%d  release:%d", count[0], count[1]); putc('\n');
 
     /* Send end-of-interrupt signal for the specified IRQ */
     send_eoi(KEYBOARD_IRQ);
