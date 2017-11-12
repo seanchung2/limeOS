@@ -127,7 +127,7 @@ int32_t halt_256(uint32_t status){
 
 	uint32_t target_instruction = pcb_halt->return_instruction + 1;
 	uint32_t code_segment = USER_CS;
-	uint32_t stack_pointer = 
+	uint32_t stack_pointer = VIRTUAL_BLOCK_BOTTOM - 4;//Need to change this! ????
 	uint32_t stack_segment = USER_DS;
 
 	asm volatile (	"pushl %4;"
