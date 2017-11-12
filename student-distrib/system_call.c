@@ -100,17 +100,13 @@ int32_t halt (uint8_t status)
 */
 
 int32_t halt_256(uint32_t status){
+
+	pcb_t* pcb_halt = (pcb_t*)(KERNEL_BOT_ADDR - EIGHT_KB *(current_pid + 1));//current PCB
 	//May need to look into parent-child flag thing... kind of a parent-child relationship
 
-
-	pcb_t* pcb_current = KERNEL_BOT_ADDR - EIGHT_KB *(current_pid + 1);//current PCB
-	pcb_t* pcb_parent = KERNEL_BOT_ADDR - EIGHT_KB * (pcb_current->parent_id + 1);//parent PCB ????
+	//restore parent data
+	pcb_t* pcb_parent = (pcb_t*)(KERNEL_BOT_ADDR - EIGHT_KB * (pcb_halt->parent_id + 1));//parent PCB ????
 	pcb_parent->return_value = status;
-
-
-	//restore parent paging
-	page_table_t* PDT = (page_table_t*)PDT_addr;
-	PDT->entries[PROGRAM_PDT_INDEX] = (KERNEL_BOT_ADDR + (FOUR_MB*(pcb_current->parent_id))) | PROGRAM_PROPERTIES;
 
 	//close any relevant FDs
 	uint32_t i;
@@ -118,6 +114,11 @@ int32_t halt_256(uint32_t status){
 		pcb_current->fd_entry[i].flags = 0;
 	}
 
+	current_pid = pcb_halt->parent_id;
+
+	//restore parent paging
+	page_table_t* PDT = (page_table_t*)PDT_addr;
+	PDT->entries[PROGRAM_PDT_INDEX] = (KERNEL_BOT_ADDR + (FOUR_MB*(pcb_halt->parent_id))) | PROGRAM_PROPERTIES;
 
 	/*flush TLBs */
 	asm volatile (	"movl %%CR3, %%eax;"	
@@ -133,24 +134,12 @@ int32_t halt_256(uint32_t status){
 	tss.ss0 = KERNEL_DS;
 	tss.esp0 = pcb_current->parent_esp0;
 
-	uint32_t target_instruction = pcb_current->return_instruction + 1;
+	uint32_t target_instruction = pcb_halt->return_instruction + 1;
 	uint32_t code_segment = USER_CS;
 	uint32_t stack_pointer = VIRTUAL_BLOCK_BOTTOM - 4;//Need to change this! ????
 	uint32_t stack_segment = USER_DS;
 
-	asm volatile (	"pushl %4;"
-					"pushl %3;"
-					"pushfl;"
-					"pushl %2;"
-					"pushl %1;"
-					"movl %%eip, %0"
-					"iret"
-						: "=g" (PCB->return_instruction)
-						: "g" (target_instruction),
-						  "g" (code_segment),
-						  "g" (stack_pointer),
-						  "g" (stack_segment)
-				);
+	asm volatile(	"jmp execute_return;");
 
 	return 0;
 
@@ -211,8 +200,6 @@ int32_t execute (const uint8_t* command){
 	}
 
 	//Executable check
-	
-	/*read_file check*/
 	dentry_t program;
 	if(read_dentry_by_name((uint8_t*) file_name, &program) == -1){
 		return -1;
@@ -259,7 +246,7 @@ int32_t execute (const uint8_t* command){
 	uint8_t entry_point[BUF_SIZE];//first instruction’s address
 	read_data(program.inode_number, 24, entry_point, 4);
 	
-	/*Copying the entire file into meemory starting at virtual address LOAD_ADDR*/
+	/*Copying the entire file into memory starting at virtual address LOAD_ADDR*/
 	uint32_t j;
 	uint32_t c;
 
@@ -295,9 +282,9 @@ int32_t execute (const uint8_t* command){
 					"pushfl;"
 					"pushl %2;"
 					"pushl %1;"
-					"movl %%eip, %0"
-					"iret"
-						: "=g" (PCB->return_instruction)
+					"iret;"
+					"execute_return:;"
+						: "=g" (new_process->return_instruction)
 						: "g" (target_instruction),
 						  "g" (code_segment),
 						  "g" (stack_pointer),
