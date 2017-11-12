@@ -8,16 +8,17 @@
 #include "paging.h"
 #include "x86_desc.h"
 
-#define KERNEL_BOT_ADDR		0x800000
-#define FOUR_MB				0x400000
-#define LOAD_ADDR			0x08048000
-#define EIGHT_KB			0x2000
-#define MAX_FD_NUM			8
-#define MAX_LENGTH_ARG 		128
-#define BUF_SIZE			4
-#define PROGRAM_PDT_INDEX	32
-#define PROGRAM_PROPERTIES	0x97
-#define MAX_PID				2
+#define KERNEL_BOT_ADDR			0x800000
+#define FOUR_MB					0x400000
+#define LOAD_ADDR				0x08048000
+#define EIGHT_KB				0x2000
+#define MAX_FD_NUM				8
+#define MAX_LENGTH_ARG 			128
+#define BUF_SIZE				4
+#define PROGRAM_PDT_INDEX		32
+#define PROGRAM_PROPERTIES		0x97
+#define MAX_PID					2
+#define VIRTUAL_BLOCK_BOTTOM	0x08400000
 
 /* for pid status, PCB entries, and jumptable */
 enum pidStatus{FREE = 0, IN_USE};

@@ -176,7 +176,8 @@ int32_t execute (const uint8_t* command){
 	pid_flags[i] = 1;
 	new_pid = i;
 
-	PDT->entries[PROGRAM_PDT_INDEX] = (KERNEL_BOT_ADDR + (FOUR_MB*i)) || PROGRAM_PROPERTIES;
+
+	PDT->entries[PROGRAM_PDT_INDEX] = (KERNEL_BOT_ADDR + (FOUR_MB*i)) | PROGRAM_PROPERTIES;
 
 	/*flush TLBs */
 	asm volatile (	"movl %%CR3, %%eax;"	
@@ -217,16 +218,16 @@ int32_t execute (const uint8_t* command){
 	tss.esp0 = (KERNEL_BOT_ADDR - ((new_pid) * EIGHT_KB)) - 1;
 
 	/* setup IRET context */
-	uint32_t target_instruction = LOAD_ADDR + *((uint32_t*)entry_point);
+	uint32_t target_instruction = *((uint32_t*)entry_point);
 	uint32_t code_segment = USER_CS;
-	uint32_t stack_pointer = (new_process->process_id + 1) * FOUR_MB + KERNEL_BOT_ADDR - 1;
+	uint32_t stack_pointer = VIRTUAL_BLOCK_BOTTOM - 4;
 	uint32_t stack_segment = USER_DS;
 
-	asm volatile (	"pushl %0;"
-					"pushl %1;"
-					"pushfl;"
+	asm volatile (	"pushl %3;"
 					"pushl %2;"
-					"pushl %3;"
+					"pushfl;"
+					"pushl %1;"
+					"pushl %0;"
 					"iret"
 						:
 						: "g" (target_instruction),
