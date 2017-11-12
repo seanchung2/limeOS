@@ -131,8 +131,12 @@ int32_t halt_256(uint32_t status){
 
 
 	tss.ss0 = KERNEL_DS;
-	tss.esp0 = pcb_halt->parent_esp0;
+	//tss.esp0 = pcb_halt->parent_esp0;
 
+	asm volatile(	"movl %0, %%esp;"
+						:
+						: "g" (pcb_halt->parent_esp0)
+					);
 	asm volatile(	"jmp execute_return;"
 					);
 
