@@ -43,6 +43,9 @@ sys_handler:
 	call 	*%eax
 
 restore:
+	popl 	%ebx
+	popl 	%ecx
+	popl 	%edx
 	popfl
 	popl	%ebx
 	popl	%ecx
