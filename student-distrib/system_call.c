@@ -144,6 +144,8 @@ int32_t halt_256(uint32_t status){
 						  "g" (stack_segment)
 				);
 
+	return 0;
+
 }
 /*
 * execute (const uint8_t* command)
