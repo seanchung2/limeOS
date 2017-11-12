@@ -113,6 +113,7 @@ int32_t halt_256(uint32_t status){
 		pcb_halt->fd_entry[i].flags = 0;
 	}
 
+	pid_flags[current_pid] = 0;
 	current_pid = pcb_halt->parent_id;
 
 	//restore parent paging
@@ -131,12 +132,14 @@ int32_t halt_256(uint32_t status){
 
 
 	tss.ss0 = KERNEL_DS;
-	//tss.esp0 = pcb_halt->parent_esp0;
 
-	asm volatile(	"movl %0, %%esp;"
+	asm volatile (	"movl %0, %%esp;"
+					"movl %1, %%ebp;"
 						:
-						: "g" (pcb_halt->parent_esp0)
+						: "g" (pcb_halt->parent_esp),
+						  "g" (pcb_halt->parent_ebp)
 					);
+
 	asm volatile(	"jmp execute_return;"
 					);
 
@@ -154,8 +157,7 @@ int32_t halt_256(uint32_t status){
 	0 to 255: If the program halts, as given by the halt()
 * side effect: as description
 */
-int32_t execute (const uint8_t* command){
-	
+int32_t execute (const uint8_t* command){	
 	//null check of cmd
 	if(command == NULL){
 		return -1;
@@ -260,11 +262,15 @@ int32_t execute (const uint8_t* command){
 	pcb_t *new_process = setup_PCB(new_pid);
 	current_pid = new_pid;
 
-	uint32_t reg_esp;//Kernel stack pointer stored 
+	uint32_t reg_esp;//Kernel stack pointer stored
+	uint32_t reg_ebp; 
 	asm volatile (	"movl %%esp, %0;"
-						: "=g" (reg_esp)
+					"movl %%ebp, %1;"
+						: "=g" (reg_esp),
+						  "=g" (reg_ebp)
 					);
-	new_process->parent_esp0 = reg_esp;
+	new_process->parent_esp = reg_esp;
+	new_process->parent_ebp = reg_ebp;
 
 	tss.ss0 = KERNEL_DS;
 	tss.esp0 = (KERNEL_BOT_ADDR - ((new_pid) * EIGHT_KB)) - 4;
@@ -290,6 +296,7 @@ int32_t execute (const uint8_t* command){
 						  "g" (stack_segment)
 				);
 
+	printf("\nReturn from Execute\n");
 	return 0;
 }
 
