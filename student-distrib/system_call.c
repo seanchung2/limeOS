@@ -126,7 +126,7 @@ int32_t execute (const uint8_t* command){
 
 	//Paging
 	page_table_t* PDT = (page_table_t*)PDT_addr;
-
+	int32_t new_pid;
 	for(i = 0; i < MAX_PID; i++)  {
 		if(pid_flags[i] == 0)  {
 			break;
@@ -136,6 +136,8 @@ int32_t execute (const uint8_t* command){
 	if(i >= MAX_PID)  {
 		return -1;
 	}
+	pid_flags[i] = 1;
+	new_pid = i;
 
 	PDT->entries[PROGRAM_PDT_INDEX] = (KERNEL_BOT_ADDR + (FOUR_MB*i)) || PROGRAM_PROPERTIES;
 
@@ -167,6 +169,22 @@ int32_t execute (const uint8_t* command){
 	}
 
 	//Note: Have to take care of "It then must jump to the entry point of the program to begin execution" --> probably in context switch
+	pcb_t *new_process = KERNEL_BOT_ADDR - EIGHT_KB*(new_pid + 1);
+	new_process->process_id = new_pid;
+	new_process->parent_id = current_pid;
+	new_process->child_id = 0;
+	new_process->fd_entry[0].operations_pointer = stdin_table;
+	new_process->fd_entry[0].flags = 1;
+	new_process->fd_entry[1].operations_pointer = stdout_table;
+	new_process->fd_entry[1].flags = 1;
+
+	uint32_t reg_esp;//Kernel stack pointer stored 
+	asm volatile (	"movl %%esp, %0;"
+						: "=g" (reg_esp)
+					);
+	new_process->parent_esp0 = reg_esp;
+
+
 }
 
 /*

@@ -3,6 +3,7 @@
 #include "rtc.h"
 #include "terminal.h"
 #include "paging.h"
+#include "x86_desc.h"
 
 
 #ifndef _SYSTEM_CALL_H
