@@ -470,14 +470,14 @@ int terminal_read_Test()
 	int byte;
 	int count = 0;
 
-	byte = terminal_read(0, buf);
+	byte = terminal_read(0, buf, 0);
 	while(buf[count] != '\n')
 		count++;
 
 	if(count != byte)
 		return FAIL;
 
-	if(terminal_read(0, NULL) != -1)
+	if(terminal_read(0, NULL, 0) != -1)
 		return FAIL;
 
 	return PASS;
@@ -757,5 +757,8 @@ void launch_tests(){
 	//TEST_OUTPUT("Read Directory Test", read_directory_test());
 	//TEST_OUTPUT("Write Directory Test", write_directory_test());
 	//TEST_OUTPUT("Close Directory Test", close_directory_test());
+
+
+	/* Checkpoint 3 */
 }
 

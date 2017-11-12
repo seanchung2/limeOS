@@ -1,8 +1,15 @@
 #include "system_call.h"
 
 /* array of possible pid's */
-
 int32_t pid_flags[MAX_PID];
+
+/* Do nothing, return 0 */
+int32_t null_func()  {
+	return 0;
+}
+
+/*The first 4 bytes of the file represent a magic number that identies the file as an exeutable.*/
+const int8_t magic_number[4] = {0x7f, 0x45, 0x4c, 0x46};
 
 /*
  * jump table:
@@ -43,12 +50,11 @@ int32_t directory_table[4] = { (uint32_t)(open_directory),
 * output: none
 * side effect: as description
 */
-void setup_PCB ()
+pcb_t* setup_PCB (int32_t new_pid)
 {
 	int i;
-	char* ignore = "ignore";
 	/* fetch the pcb in current process */
-	pcb_t * pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
+	pcb_t * pcb = (pcb_t *)(KERNEL_BOT_ADDR - (new_pid+1) * EIGHT_KB);
 
 	/* initialize the fd_entry */
 	for(i=0; i<MAX_FD_NUM; i++)
@@ -68,6 +74,8 @@ void setup_PCB ()
 	pcb->fd_entry[STDIN].flags = IN_USE;
 	pcb->fd_entry[STDOUT].operations_pointer = stdout_table;
 	pcb->fd_entry[STDOUT].flags = IN_USE;
+
+	return pcb;
 }
 /*
 * halt (uint8_t status)
@@ -185,7 +193,6 @@ int32_t execute (const uint8_t* command){
 	read_data(program.inode_number, 24, entry_point, 4);
 	
 	/*Copying the entire file into meemory starting at virtual address LOAD_ADDR*/
-	uint8_t* start_point = (uint8_t*)LOAD_ADDR;
 	uint32_t j;
 	uint32_t c;
 
@@ -198,14 +205,7 @@ int32_t execute (const uint8_t* command){
 	}
 
 	//Note: Have to take care of "It then must jump to the entry point of the program to begin execution" --> probably in context switch
-	pcb_t *new_process = KERNEL_BOT_ADDR - EIGHT_KB*(new_pid + 1);
-	new_process->process_id = new_pid;
-	new_process->parent_id = current_pid;
-	new_process->child_id = 0;
-	new_process->fd_entry[0].operations_pointer = stdin_table;
-	new_process->fd_entry[0].flags = 1;
-	new_process->fd_entry[1].operations_pointer = stdout_table;
-	new_process->fd_entry[1].flags = 1;
+	pcb_t *new_process = setup_PCB(new_pid);
 
 	uint32_t reg_esp;//Kernel stack pointer stored 
 	asm volatile (	"movl %%esp, %0;"
@@ -213,7 +213,29 @@ int32_t execute (const uint8_t* command){
 					);
 	new_process->parent_esp0 = reg_esp;
 
+	tss.ss0 = KERNEL_DS;
+	tss.esp0 = (KERNEL_BOT_ADDR - ((new_pid) * EIGHT_KB)) - 1;
 
+	/* setup IRET context */
+	uint32_t target_instruction = LOAD_ADDR + *((uint32_t*)entry_point);
+	uint32_t code_segment = USER_CS;
+	uint32_t stack_pointer = (new_process->process_id + 1) * FOUR_MB + KERNEL_BOT_ADDR - 1;
+	uint32_t stack_segment = USER_DS;
+
+	asm volatile (	"pushl %0;"
+					"pushl %1;"
+					"pushfl;"
+					"pushl %2;"
+					"pushl %3;"
+					"iret"
+						:
+						: "g" (target_instruction),
+						  "g" (code_segment),
+						  "g" (stack_pointer),
+						  "g" (stack_segment)
+				);
+
+	return 0;
 }
 
 /*

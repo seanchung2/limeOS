@@ -1,13 +1,12 @@
+#ifndef SYSTEM_CALL_H
+#define SYSTEM_CALL_H
+
 #include "lib.h"
 #include "filesystem.h"
 #include "rtc.h"
 #include "terminal.h"
 #include "paging.h"
 #include "x86_desc.h"
-
-
-#ifndef _SYSTEM_CALL_H
-#define _SYSTEM_CALL_H
 
 #define KERNEL_BOT_ADDR		0x800000
 #define FOUR_MB				0x400000
@@ -26,14 +25,11 @@ enum jumpTable{OPEN = 0, READ, WRITE, CLOSE};
 enum PCB_entry{STDIN = 0, STDOUT};
 enum fileType{FILE_TYPE_RTC = 0, FILE_TYPE_DIR, FILE_TYPE_FILE};
 
-/*The first 4 bytes of the file represent a magic number that identies the file as an exeutable.*/
-const int8_t magic_number[4] = {0x7f, 0x45, 0x4c, 0x46};
-
 /* do nothing, just for padding */
-int32_t null_func() { return 0; }
+int32_t null_func();
 
 /* initialize the new PCB */
-void setup_PCB ();
+pcb_t* setup_PCB (int32_t new_pid);
 
 /* handle system call "halt" */
 int32_t halt (uint8_t status);

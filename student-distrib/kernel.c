@@ -12,6 +12,7 @@
 #include "keyboard.h"
 #include "filesystem.h"
 #include "rtc.h"
+#include "system_call.h"
 
 #define RUN_TESTS
 
@@ -178,6 +179,7 @@ void entry(unsigned long magic, unsigned long addr) {
 #endif
     sti();
     /* Execute the first program ("shell") ... */
+    execute("shell");
 
     /* Spin (nicely, so we don't chew up cycles) */
     asm volatile (".1: hlt; jmp .1;");
