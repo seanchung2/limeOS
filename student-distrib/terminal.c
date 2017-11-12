@@ -31,15 +31,15 @@ int terminal_read(int32_t fd, void* buf, int32_t nbytes)
 
 	int i = 0;
 	t_enter_flag = 0;
-	(int8_t)command_buf[0] = '\0';
+	((int8_t*)command_buf)[0] = '\0';
 
 	while(!t_enter_flag);
 
 	while(1)
 	{
-		buf[i] = (int8_t)command_buf[i];
+		((int8_t*)buf)[i] = ((int8_t*)command_buf)[i];
 		
-		if((int8_t)command_buf[i] == '\n')
+		if(((int8_t*)command_buf)[i] == '\n')
 			break;
 		i++;
 	}
@@ -60,6 +60,9 @@ int terminal_read(int32_t fd, void* buf, int32_t nbytes)
 int terminal_write(int32_t fd, const int8_t* buf, int32_t nbytes)
 {
 	int i;
+
+	if(buf == NULL)
+		return -1;
 
 	/* normal charaters */
 	for(i=0; i<nbytes; i++)

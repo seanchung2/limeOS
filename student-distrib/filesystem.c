@@ -10,7 +10,6 @@ static uint32_t directory_position;
 int32_t current_pid = 0;
 
 /* temporary dentry table */
-static dentry_t dentry_table[FILE_TABLE_SIZE];
 static int dentry_table_flags[FILE_TABLE_SIZE];
 
 /* read_dentry_by_name
@@ -231,9 +230,7 @@ int32_t read_directory(int32_t fd, void* buf, int32_t nbytes)  {
 	int dentry_count = *((int*)(fs_start));
 	dentry_t current;
 	int i;
-	uint32_t inode_number;
 	uint8_t* char_ptr;
-	uint32_t* length;
 
 	if(directory_position >= dentry_count)  {
 		return 0;
@@ -248,7 +245,7 @@ int32_t read_directory(int32_t fd, void* buf, int32_t nbytes)  {
 		if(char_ptr[i] == '\0')  {
 			break;
 		}
-		buf[i] = char_ptr[i];
+		((uint8_t*)buf)[i] = char_ptr[i];
 	}
 	return i;
 }

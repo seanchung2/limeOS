@@ -34,11 +34,11 @@
 #define RELEASE_RIGHT_SHIFT			0xB6
 #define PRESS_CAPSLOCK				0x3A
 #define RELEASE_CAPSLOCK			0xBA
-#define PRESS_SPACE 				0x39
-#define PRESS_TAB 					0x0F
 #define PRESS_ALT 					0x38
 #define RELEASE_ALT					0xB8
 
+#define PRESS_TAB 					0x0F
+#define PRESS_SPACE 				0x39
 #define PRESS_EQUAL					0x0D
 #define PRESS_HYPHEN				0x0C
 #define PRESS_BACKSLASH				0x2B
@@ -75,7 +75,17 @@
 #define QUESTION   					0x3F
 #define SLASH   					0x2F
 #define BACKSLASH   				0x5C
-
+/*
+static const uint8_t *special_character[50][3];
+special_character[0][0] = {0x0F, 0x09};			// Tab
+special_character[1][0] = {0x39, 0x20};			// Space
+special_character[2][0] = {0x0D, 0x3D, 0x2B};	// Equal, Plus
+special_character[3][0] = {0x0C, 0x2D, 0x5F};	// Dash, Underscope
+special_character[4][0] = {0x2B, 0x5C, 0x7C};	// Backslash, Vertical slash
+special_character[5][0] = {0x0D, 0x3D, 0x2B};	// Equal, Plus
+special_character[6][0] = {0x0D, 0x3D, 0x2B};	// Equal, Plus
+special_character[7][0] = {0x0D, 0x3D, 0x2B};	// Equal, Plus
+*/
 static const uint8_t letter_code[LETTER_NUM] = {	0x1E, 0x30, 0x2E, 0x20,
 													0x12, 0x21, 0x22, 0x23,
 													0x17, 0x24, 0x25, 0x26,

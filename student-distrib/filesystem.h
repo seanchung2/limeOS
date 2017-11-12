@@ -16,7 +16,7 @@
 #define KERNEL_BOT_ADDR		0x800000
 #define EIGHT_KB			0x2000
 
-extern static int32_t current_pid;
+extern int32_t current_pid;
 
 /* directory entry structure */
 typedef struct dentry  {
