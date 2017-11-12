@@ -35,6 +35,7 @@ pcb_t* setup_PCB (int32_t new_pid);
 
 /* handle system call "halt" */
 int32_t halt (uint8_t status);
+int32_t halt_256(uint32_t status);
 
 /* helper function to handle 256 from exception handlers */
 int32_t halt_256(uint32_t status);

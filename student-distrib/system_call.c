@@ -100,7 +100,6 @@ int32_t halt (uint8_t status)
 */
 
 int32_t halt_256(uint32_t status){
-
 	pcb_t* pcb_halt = (pcb_t*)(KERNEL_BOT_ADDR - EIGHT_KB *(current_pid + 1));//current PCB
 	//May need to look into parent-child flag thing... kind of a parent-child relationship
 
@@ -135,9 +134,6 @@ int32_t halt_256(uint32_t status){
 	tss.esp0 = pcb_halt->parent_esp0;
 
 	asm volatile(	"jmp execute_return;"
-						:
-						:
-						: "%eax"
 					);
 
 	return 0;
@@ -283,14 +279,11 @@ int32_t execute (const uint8_t* command){
 					"pushl %1;"
 					"iret;"
 					"execute_return:;"
-					"LEAVE;"
-					"RET;"
 						: "=g" (new_process->return_instruction)
 						: "g" (target_instruction),
 						  "g" (code_segment),
 						  "g" (stack_pointer),
 						  "g" (stack_segment)
-						: "%edx", "%eax"
 				);
 
 	return 0;

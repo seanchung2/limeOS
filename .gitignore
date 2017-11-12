@@ -115,3 +115,4 @@ source/
 # limeOS
 *.dep
 bootimg
+cifsa92f
