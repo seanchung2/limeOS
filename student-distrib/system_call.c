@@ -65,8 +65,8 @@ pcb_t* setup_PCB (int32_t new_pid)
 		pcb->fd_entry[i].flags = FREE;
 	}
 	/* initial the rest fields in PCB */
-	pcb->process_id = current_pid;
-	pcb->parent_id = -1;
+	pcb->process_id = new_pid;
+	pcb->parent_id = current_pid;
 	pcb->child_id = -1;
 
 	/* automatically setup stdin and stdout */
@@ -86,9 +86,65 @@ pcb_t* setup_PCB (int32_t new_pid)
 */
 int32_t halt (uint8_t status)
 {
+	halt_256((uint32_t) status);
+	//return a 32-bit value to parent's program
 	return 0;
 }
 
+int32_t halt_256(uint32_t status){
+	pcb_t* pcb_halt = KERNEL_BOT_ADDR - EIGHT_KB *(current_pid + 1);//current PCB
+	//May need to look into parent-child flag thing... kind of a parent-child relationship
+
+	//restore parent data
+	pcb_t* pcb_parent = KERNEL_BOT_ADDR - EIGHT_KB * (pcb_halt->parent_id + 1);//parent PCB ????
+	pcb_parent->return_value = status;
+
+
+	//restore parent paging
+	page_table_t* PDT = (page_table_t*)PDT_addr;
+	PDT->entries[PROGRAM_PDT_INDEX] = (KERNEL_BOT_ADDR + (FOUR_MB*(pcb_halt->parent_id))) | PROGRAM_PROPERTIES;
+
+	//close any relevant FDs
+	uint32_t i;
+	for(i = 0; i < 8; i++){
+		pcb_halt->fd_entry[i].flags = 0;
+	}
+
+
+	/*flush TLBs */
+	asm volatile (	"movl %%CR3, %%eax;"	
+					"andl $0xFFF, %%eax;"
+					"addl %0, %%eax;"
+					"movl %%eax, %%CR3;"
+						:
+						: "r" (PDT_addr)
+						: "eax", "cc"
+					);
+
+
+	tss.ss0 = KERNEL_DS;
+	tss.esp0 = pcb_halt->parent_esp0;
+
+	uint32_t target_instruction = pcb_halt->return_instruction + 1;
+	uint32_t code_segment = USER_CS;
+	uint32_t stack_pointer = 
+	uint32_t stack_segment = USER_DS;
+
+	asm volatile (	"pushl %4;"
+					"pushl %3;"
+					"pushfl;"
+					"pushl %2;"
+					"pushl %1;"
+					"movl %%eip, %0"
+					"iret"
+						: "=g" (PCB->return_instruction)
+						: "g" (target_instruction),
+						  "g" (code_segment),
+						  "g" (stack_pointer),
+						  "g" (stack_segment)
+				);
+
+}
 /*
 * execute (const uint8_t* command)
 * hanlder for system call "execute"
@@ -205,8 +261,8 @@ int32_t execute (const uint8_t* command){
 		i++;
 	}
 
-	//Note: Have to take care of "It then must jump to the entry point of the program to begin execution" --> probably in context switch
 	pcb_t *new_process = setup_PCB(new_pid);
+	current_pid = new_pid;
 
 	uint32_t reg_esp;//Kernel stack pointer stored 
 	asm volatile (	"movl %%esp, %0;"
@@ -217,19 +273,21 @@ int32_t execute (const uint8_t* command){
 	tss.ss0 = KERNEL_DS;
 	tss.esp0 = (KERNEL_BOT_ADDR - ((new_pid) * EIGHT_KB)) - 4;
 
+
 	/* setup IRET context */
 	uint32_t target_instruction = *((uint32_t*)entry_point);
 	uint32_t code_segment = USER_CS;
 	uint32_t stack_pointer = VIRTUAL_BLOCK_BOTTOM - 4;
 	uint32_t stack_segment = USER_DS;
 
-	asm volatile (	"pushl %3;"
-					"pushl %2;"
+	asm volatile (	"pushl %4;"
+					"pushl %3;"
 					"pushfl;"
+					"pushl %2;"
 					"pushl %1;"
-					"pushl %0;"
+					"movl %%eip, %0"
 					"iret"
-						:
+						: "=g" (PCB->return_instruction)
 						: "g" (target_instruction),
 						  "g" (code_segment),
 						  "g" (stack_pointer),

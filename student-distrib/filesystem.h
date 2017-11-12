@@ -47,6 +47,8 @@ typedef struct process_control_block  {
 	uint32_t parent_id;
 	uint32_t child_id;
 	uint32_t parent_esp0;
+	uint32_t return_value;
+	uint32_t return_instruction;
 } pcb_t;
 
 /* function to set memory address for the start of the filesystem */
