@@ -85,6 +85,7 @@ void init_idt()
  */
 void k_handler()
 {
+	cli();
 	asm volatile (	"pushl	%ebp;"
 					"movl	%ebp,%esp;"
 					"pushl	%ebx;"	

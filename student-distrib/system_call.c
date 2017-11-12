@@ -92,11 +92,11 @@ int32_t halt (uint8_t status)
 }
 
 int32_t halt_256(uint32_t status){
-	pcb_t* pcb_halt = KERNEL_BOT_ADDR - EIGHT_KB *(current_pid + 1);//current PCB
+	pcb_t* pcb_halt = (pcb_t*)(KERNEL_BOT_ADDR - EIGHT_KB *(current_pid + 1));//current PCB
 	//May need to look into parent-child flag thing... kind of a parent-child relationship
 
 	//restore parent data
-	pcb_t* pcb_parent = KERNEL_BOT_ADDR - EIGHT_KB * (pcb_halt->parent_id + 1);//parent PCB ????
+	pcb_t* pcb_parent = (pcb_t*)(KERNEL_BOT_ADDR - EIGHT_KB * (pcb_halt->parent_id + 1));//parent PCB ????
 	pcb_parent->return_value = status;
 
 
@@ -135,13 +135,14 @@ int32_t halt_256(uint32_t status){
 					"pushfl;"
 					"pushl %2;"
 					"pushl %1;"
-					"movl %%eip, %0"
+					"movl %%esp, %0;"
 					"iret"
-						: "=g" (PCB->return_instruction)
+						: "=g" (pcb_halt->return_instruction)				//???????????
 						: "g" (target_instruction),
 						  "g" (code_segment),
 						  "g" (stack_pointer),
 						  "g" (stack_segment)
+						: "cc"
 				);
 
 	return 0;
@@ -287,13 +288,14 @@ int32_t execute (const uint8_t* command){
 					"pushfl;"
 					"pushl %2;"
 					"pushl %1;"
-					"movl %%eip, %0"
+					"movl %%esp, %0;"
 					"iret"
-						: "=g" (PCB->return_instruction)
+						: "=g" (new_process->return_instruction)						//???????????????????????
 						: "g" (target_instruction),
 						  "g" (code_segment),
 						  "g" (stack_pointer),
 						  "g" (stack_segment)
+						: "cc"
 				);
 
 	return 0;
