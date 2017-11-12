@@ -134,7 +134,11 @@ int32_t halt_256(uint32_t status){
 	tss.ss0 = KERNEL_DS;
 	tss.esp0 = pcb_halt->parent_esp0;
 
-	asm volatile(	"jmp execute_return;");
+	asm volatile(	"jmp execute_return;"
+						:
+						:
+						: "%eax"
+					);
 
 	return 0;
 
@@ -279,11 +283,14 @@ int32_t execute (const uint8_t* command){
 					"pushl %1;"
 					"iret;"
 					"execute_return:;"
+					"LEAVE;"
+					"RET;"
 						: "=g" (new_process->return_instruction)
 						: "g" (target_instruction),
 						  "g" (code_segment),
 						  "g" (stack_pointer),
 						  "g" (stack_segment)
+						: "%edx", "%eax"
 				);
 
 	return 0;
