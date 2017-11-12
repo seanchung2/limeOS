@@ -101,7 +101,7 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
 
 	/* check if offset is too large for file */
 	if(offset > inode_ptr->length)  {
-		return -1;
+		return 0;
 	}
 
 	/* determine what offset to start at in which data block */
