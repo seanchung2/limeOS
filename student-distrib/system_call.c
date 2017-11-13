@@ -106,6 +106,8 @@ int32_t halt_256(uint32_t status){
 	pcb_t* pcb_halt = (pcb_t*)(KERNEL_BOT_ADDR - EIGHT_KB *(current_pid + 1));//current PCB, the one to be halted
 	pcb_t* pcb_parent = (pcb_t*)(KERNEL_BOT_ADDR - EIGHT_KB * (pcb_halt->parent_id + 1));//parent PCB
 	
+	pcb_parent->return_value = status;
+
 	//close any relevant FDs
 	uint32_t i;
 	for(i = 0; i < 8; i++){
