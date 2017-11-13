@@ -47,15 +47,9 @@ void keyboard_handler ()
 {
 	/* prevent another keyboard or other interrputs from interrputing this handler */
 	uint8_t c = 0;
-
+	
 	/* get the data from keyboard data port */
-    do {
-        if(inb(KEYBOARD_DATA_PORT) != c) {
-            c = inb(KEYBOARD_DATA_PORT);
-            if(c > 0)
-                break;
-        }
-    } while(1);
+    c = inb(KEYBOARD_DATA_PORT);
 
     /* deal with the received character */
     keyboard_output_dealer(c);

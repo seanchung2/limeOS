@@ -718,6 +718,147 @@ int close_directory_test()  {
 }
 
 /* Checkpoint 3 tests */
+
+/* setup_PCB_test
+ * 
+ * Test the setup_PCB function
+ * Inputs: None
+ * Side Effects: None
+ * Coverage: system_call.c
+ */
+int setup_PCB_test()  {
+	TEST_HEADER;
+
+	if(setup_PCB(-1) != (pcb_t*)-1)
+		return FAIL;
+	if(setup_PCB(100) != (pcb_t*)-1)
+		return FAIL;
+	return PASS;
+}
+
+/* execute_test
+ * 
+ * Test the execute function
+ * Inputs: None
+ * Side Effects: None
+ * Coverage: system_call.c
+ */
+int execute_test()  {
+	TEST_HEADER;
+
+	if(execute(NULL) != -1)
+		return FAIL;
+	if(execute((uint8_t*)"LFKALKF") != -1)
+		return FAIL;
+	if(execute((uint8_t*)"frame0.txt") != -1)
+		return FAIL;
+	return PASS;
+}
+
+/* read_test
+ * 
+ * Test the read function
+ * Inputs: None
+ * Side Effects: None
+ * Coverage: system_call.c
+ */
+int read_test()  {
+	TEST_HEADER;
+
+	uint8_t buf[10]="AAAAAAAAAA";
+	current_pid=2;
+	setup_PCB(2);
+
+	if(read(0,NULL,10) != -1)
+		return FAIL;
+	if(read(100,buf,10) != -1)
+		return FAIL;
+	if(read(-1,buf,10) != -1)
+		return FAIL;
+	if(read(1,buf,10) != -1)
+		return FAIL;
+
+	//test for FREE
+	if(read(5,buf,10) != -1)
+		return FAIL;
+	return PASS;
+}
+
+/* write_test
+ * 
+ * Test the write function
+ * Inputs: None
+ * Side Effects: None
+ * Coverage: system_call.c
+ */
+int write_test()  {
+	TEST_HEADER;
+
+	uint8_t buf[10];
+	current_pid=2;
+	setup_PCB(2);
+
+	if(write(1,NULL,10) != -1)
+		return FAIL;
+	if(write(100,buf,10) != -1)
+		return FAIL;
+	if(write(-1,buf,10) != -1)
+		return FAIL;
+	if(write(0,buf,10) != -1)
+		return FAIL;
+
+	//test for FREE
+	if(write(5,buf,10) != -1)
+		return FAIL;
+	return PASS;
+}
+
+/* open_test
+ * 
+ * Test the open function
+ * Inputs: None
+ * Side Effects: None
+ * Coverage: system_call.c
+ */
+int open_test()  {
+	TEST_HEADER;
+
+	current_pid=2;
+	setup_PCB(2);
+
+	if(open(NULL) != -1)
+		return FAIL;
+	if(open((uint8_t*)"ABCDEFG") != -1)
+		return FAIL;
+
+	return PASS;
+}
+
+/* close_test
+ * 
+ * Test the open function
+ * Inputs: None
+ * Side Effects: None
+ * Coverage: system_call.c
+ */
+int close_test()  {
+	TEST_HEADER;
+
+	current_pid=2;
+	setup_PCB(2);
+
+	if(close(0) != -1)
+		return FAIL;
+	if(close(1) != -1)
+		return FAIL;
+	if(close(8) != -1)
+		return FAIL;
+	if(close(5) != -1)
+		return FAIL;
+
+	return PASS;
+}
+
 /* Checkpoint 4 tests */
 /* Checkpoint 5 tests */
 
@@ -760,5 +901,11 @@ void launch_tests(){
 
 
 	/* Checkpoint 3 */
+	TEST_OUTPUT("setup PCB Test", setup_PCB_test());
+	TEST_OUTPUT("execute Test", execute_test());
+	TEST_OUTPUT("read Test", read_test());
+	TEST_OUTPUT("write Test", write_test());
+	TEST_OUTPUT("open Test", open_test());
+	TEST_OUTPUT("close Test", close_test());
 }
 

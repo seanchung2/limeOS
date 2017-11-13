@@ -40,4 +40,12 @@ int read_directory_test();
 int write_directory_test();
 int close_directory_test();
 
+//test for system call
+int setup_PCB_test();
+int execute_test();
+int read_test();
+int write_test();
+int open_test();
+int close_test();
+
 #endif /* TESTS_H */

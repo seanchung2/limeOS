@@ -54,6 +54,9 @@ pcb_t* setup_PCB (int32_t new_pid)
 {
 	int i;
 	/* fetch the pcb in current process */
+	if(new_pid <0 || new_pid > MAX_PID)
+		return (pcb_t*)-1;
+
 	pcb_t * pcb = (pcb_t *)(KERNEL_BOT_ADDR - (new_pid+1) * EIGHT_KB);
 
 	/* initialize the fd_entry */
@@ -362,6 +365,9 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 	/* fetch the pcb in current process */
 	pcb_t * pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
 
+	if(buf == NULL)
+		return -1;
+
 	/* fd must be between 0-7 */
 	if(fd >= MAX_FD_NUM || fd < 0 || fd == 0)
 		return -1;
@@ -399,6 +405,9 @@ int32_t open (const uint8_t* filename)
 	int ret;
 	/* fetch the pcb in current process */
 	pcb_t * pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
+
+	if(filename == NULL)
+		return -1;
 
 	/* if filename is "stdin" */
 	if( strncmp((int8_t*)filename, (int8_t*)"stdin", 5) == 0)
