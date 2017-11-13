@@ -282,22 +282,22 @@ int32_t execute (const uint8_t* command){
 	uint32_t stack_pointer = VIRTUAL_BLOCK_BOTTOM - 4;
 	uint32_t stack_segment = USER_DS;
 
-	asm volatile (	"pushl %4;"
-					"pushl %3;"
-					"pushfl;"
+	asm volatile (	"pushl %3;"
 					"pushl %2;"
+					"pushfl;"
 					"pushl %1;"
+					"pushl %0;"
 					"iret;"
 					"execute_return:;"
-						: "=g" (new_process->return_instruction)
+						: 
 						: "g" (target_instruction),
 						  "g" (code_segment),
 						  "g" (stack_pointer),
 						  "g" (stack_segment)
 				);
-
-	printf("\nReturn from Execute\n");
-	return 0;
+	pcb_t* PCB = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
+	int32_t return_val = PCB->return_value;	
+	return return_val;
 }
 
 /*
@@ -381,7 +381,7 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 */
 int32_t open (const uint8_t* filename)
 {
-	dentry_t* dentry;
+	dentry_t dentry;
 	int i;
 	int ret;
 	/* fetch the pcb in current process */
@@ -404,7 +404,7 @@ int32_t open (const uint8_t* filename)
 	}
 
 	/* if filename is not found, return -1 */
-	if (read_dentry_by_name(filename, dentry) < 0)
+	if (read_dentry_by_name(filename, &dentry) < 0)
 		return -1;
 
 	/* find a vacant block in PCB to store the opened file */
@@ -415,7 +415,7 @@ int32_t open (const uint8_t* filename)
 		{
 			/* check what kind of file type the new file is,
 				then initializing the operation ptr */
-			switch(dentry->file_type){
+			switch(dentry.file_type){
 				case FILE_TYPE_RTC:
 					pcb->fd_entry[i].operations_pointer = rtc_table;
 					break;
@@ -432,7 +432,7 @@ int32_t open (const uint8_t* filename)
 			}
 
 			/* initialize the field in fd_entry */
-			pcb->fd_entry[i].inode_index = dentry->inode_number;
+			pcb->fd_entry[i].inode_index = dentry.inode_number;
 			pcb->fd_entry[i].file_position = 0;
 			pcb->fd_entry[i].flags = IN_USE;
 
@@ -496,7 +496,7 @@ int32_t close (int32_t fd)
 	pcb->fd_entry[fd].operations_pointer = NULL;
 	pcb->fd_entry[fd].inode_index = -1;
 	pcb->fd_entry[fd].file_position = -1;
-	pcb->fd_entry[fd].flags = IN_USE;
+	pcb->fd_entry[fd].flags = FREE;
 
 	return 0;
 }
