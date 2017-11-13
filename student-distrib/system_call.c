@@ -107,7 +107,7 @@ int32_t halt (uint8_t status)
 * Description: Helper function for the handler for system call "halt'
 * Input: status - 32 bit value of 'status', expanded value of 8 bit 'status'
 * Output: None
-* Return: 
+* Return: 0 (never actually reaches return instruction)
 * Side effect: As description
 */
 int32_t halt_256(uint32_t status){
