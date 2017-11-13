@@ -114,6 +114,11 @@ int32_t halt_256(uint32_t status){
 	}
 
 	pid_flags[current_pid] = 0;
+
+	if(current_pid == pcb_halt->parent_id)  {
+		execute((uint8_t*)"shell");
+	}
+
 	current_pid = pcb_halt->parent_id;
 
 	//restore parent paging
@@ -132,6 +137,7 @@ int32_t halt_256(uint32_t status){
 
 
 	tss.ss0 = KERNEL_DS;
+	tss.esp0 = pcb_halt->parent_esp0;
 
 	asm volatile (	"movl %0, %%esp;"
 					"movl %1, %%ebp;"
@@ -272,6 +278,7 @@ int32_t execute (const uint8_t* command){
 	new_process->parent_esp = reg_esp;
 	new_process->parent_ebp = reg_ebp;
 
+	new_process->parent_esp0 = tss.esp0;
 	tss.ss0 = KERNEL_DS;
 	tss.esp0 = (KERNEL_BOT_ADDR - ((new_pid) * EIGHT_KB)) - 4;
 	new_process->kernel_stack = (KERNEL_BOT_ADDR - ((new_pid) * EIGHT_KB)) - 4;
