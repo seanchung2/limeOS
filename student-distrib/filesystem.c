@@ -41,6 +41,11 @@ int32_t read_dentry_by_name(const uint8_t* fname, dentry_t* dentry)  {
 				break;
 			}
 		}
+		if(match == 1 && j < MAX_NAME_LENGTH)  {
+			if(current->file_name[j+1] != '\0')  {
+				match = 0;
+			}
+		}
 		if(match == 1)  {
 			for(k = 0; k < MAX_NAME_LENGTH; k++)  {
 				dentry->file_name[k] = current->file_name[k];
@@ -247,6 +252,7 @@ int32_t read_directory(int32_t fd, void* buf, int32_t nbytes)  {
 		}
 		((uint8_t*)buf)[i] = char_ptr[i];
 	}
+	directory_position++;
 	return i;
 }
 
