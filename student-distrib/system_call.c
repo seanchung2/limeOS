@@ -118,7 +118,7 @@ int32_t halt_256(uint32_t status){
 
 	//close any relevant FDs
 	uint32_t i;
-	for(i = 0; i < 8; i++){
+	for(i = 0; i < MAX_FD_NUM; i++){
 		pcb_halt->fd_entry[i].flags = 0;
 	}
 
@@ -223,12 +223,12 @@ int32_t execute (const uint8_t* command){
 		return -1;
 	}
 
-	if(read_data(program.inode_number, 0, buffer, 4) == -1){
+	if(read_data(program.inode_number, 0, buffer, BUF_SIZE) == -1){
 		return -1;
 	}
 
 	//String comparison between buf and magic numbers to make sure that file is executable or not
-	if(strncmp((int8_t*)buffer, (int8_t*)magic_number, 4) != 0){
+	if(strncmp((int8_t*)buffer, (int8_t*)magic_number, BUF_SIZE) != 0){
 		return -1;
 	}
 
@@ -263,7 +263,7 @@ int32_t execute (const uint8_t* command){
 
 	//Getting the entry point
 	uint8_t entry_point[BUF_SIZE];//First instruction’s address
-	read_data(program.inode_number, 24, entry_point, 4);
+	read_data(program.inode_number, ENTRY_POINT_LOCATION, entry_point, BUF_SIZE);
 	
 	//Copying the entire file into memory starting at virtual address LOAD_ADDR
 	uint32_t j;
@@ -292,14 +292,14 @@ int32_t execute (const uint8_t* command){
 
 	new_process->parent_esp0 = tss.esp0;
 	tss.ss0 = KERNEL_DS;
-	tss.esp0 = (KERNEL_BOT_ADDR - ((new_pid) * EIGHT_KB)) - 4;
-	new_process->kernel_stack = (KERNEL_BOT_ADDR - ((new_pid) * EIGHT_KB)) - 4;
+	tss.esp0 = (KERNEL_BOT_ADDR - ((new_pid) * EIGHT_KB)) - 1;
+	new_process->kernel_stack = (KERNEL_BOT_ADDR - ((new_pid) * EIGHT_KB)) - 1;
 
 
 	/* setup IRET context */
 	uint32_t target_instruction = *((uint32_t*)entry_point);
 	uint32_t code_segment = USER_CS;
-	uint32_t stack_pointer = VIRTUAL_BLOCK_BOTTOM - 4;
+	uint32_t stack_pointer = VIRTUAL_BLOCK_BOTTOM - 1;
 	uint32_t stack_segment = USER_DS;
 
 	asm volatile (	"pushl %3;"
@@ -429,7 +429,7 @@ int32_t open (const uint8_t* filename)
 		return -1;
 
 	/* if filename is "stdin" */
-	if( strncmp((int8_t*)filename, (int8_t*)"stdin", 5) == 0)
+	if( strncmp((int8_t*)filename, (int8_t*)"stdin", STDIN_LEN) == 0)
 	{
 		pcb->fd_entry[STDIN].operations_pointer = stdin_table;
 		pcb->fd_entry[STDIN].flags = IN_USE;
@@ -437,7 +437,7 @@ int32_t open (const uint8_t* filename)
 	}
 
 	/* if filename is "stdout" */
-	if( strncmp((int8_t*)filename, (int8_t*)"stdout", 6) == 0)
+	if( strncmp((int8_t*)filename, (int8_t*)"stdout", STDOUT_LEN) == 0)
 	{
 		pcb->fd_entry[STDOUT].operations_pointer = stdout_table;
 		pcb->fd_entry[STDOUT].flags = IN_USE;
