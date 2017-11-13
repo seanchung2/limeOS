@@ -406,13 +406,17 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 	return ret;
 }
 
-/*
-* open (const uint8_t* filename)
-* hanlder for system call "open"
-* input: filename is file name 
-* output: fd value or -1 for error
-* side effect: as description
-*/
+/* open
+ * 
+ * DESCRIPTION:	opens a given file and creates a file entry for
+ *				it in the current PCB
+ * INPUT: 	filename - pointer to a buffer containing desired
+ *					   file's name 
+ * OUTPUT: 	fd index for the opened file
+ *			-1 - error
+ * SIDE EFFECT:	sets up a file entry in the current PCB for the
+ *				file
+ */
 int32_t open (const uint8_t* filename)
 {
 	dentry_t dentry;
@@ -494,15 +498,16 @@ int32_t open (const uint8_t* filename)
 	return -1;
 }
 
-/*
-* close (int32_t fd)
-* hanlder for system call "close"
-* input: fd is file descriptor 
-* output: 
-*			0: successfully closed
-*			-1: error
-* side effect: as description
-*/
+/* close
+ * 
+ * DESCRIPTION:	closes the file at the given fd index inside the
+ *				current PCB
+ * INPUT: 	fd - index of desired file in PCB 
+ * OUTPUT: 	0 - file successfully closed
+ *			-1 - error
+ * SIDE EFFECT:	sets the flag field for the fd entry of the given
+ *				index inside the current PCB to 0
+ */
 int32_t close (int32_t fd)
 {
 	int ret;
