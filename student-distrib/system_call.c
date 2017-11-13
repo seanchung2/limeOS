@@ -132,7 +132,7 @@ int32_t halt_256(uint32_t status){
 
 
 	tss.ss0 = KERNEL_DS;
-	
+
 	asm volatile (	"movl %0, %%esp;"
 					"movl %1, %%ebp;"
 						:
