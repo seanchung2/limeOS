@@ -3,9 +3,6 @@
 /* holds the adress for the start of the filesystem */
 static uint32_t fs_start;
 
-/* holds the dentry number to print next with read_directory */
-static uint32_t directory_position;
-
 /* initial current pid */
 int32_t current_pid = 0;
 
@@ -42,7 +39,7 @@ int32_t read_dentry_by_name(const uint8_t* fname, dentry_t* dentry)  {
 			}
 		}
 		if(match == 1 && j < MAX_NAME_LENGTH)  {
-			if(current->file_name[j+1] != '\0')  {
+			if(current->file_name[j] != '\0')  {
 				match = 0;
 			}
 		}
@@ -232,6 +229,8 @@ int32_t open_directory(const uint8_t* filename)  {
  * SIDE EFFECTS:	copies name of next entry to buf
  */
 int32_t read_directory(int32_t fd, void* buf, int32_t nbytes)  {
+	pcb_t* PCB = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
+	int directory_position = PCB->fd_entry[fd].file_position;
 	int dentry_count = *((int*)(fs_start));
 	dentry_t current;
 	int i;
@@ -252,7 +251,7 @@ int32_t read_directory(int32_t fd, void* buf, int32_t nbytes)  {
 		}
 		((uint8_t*)buf)[i] = char_ptr[i];
 	}
-	directory_position++;
+	PCB->fd_entry[fd].file_position ++;
 	return i;
 }
 

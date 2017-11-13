@@ -49,6 +49,9 @@ typedef struct process_control_block  {
 	uint32_t parent_esp;
 	uint32_t parent_ebp;
 	uint32_t return_value;
+	uint32_t return_instruction;
+	uint32_t kernel_stack;
+	uint32_t parent_esp0;
 } pcb_t;
 
 /* function to set memory address for the start of the filesystem */

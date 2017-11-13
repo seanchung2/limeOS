@@ -106,13 +106,6 @@ int32_t halt_256(uint32_t status){
 	pcb_t* pcb_halt = (pcb_t*)(KERNEL_BOT_ADDR - EIGHT_KB *(current_pid + 1));//current PCB, the one to be halted
 	pcb_t* pcb_parent = (pcb_t*)(KERNEL_BOT_ADDR - EIGHT_KB * (pcb_halt->parent_id + 1));//parent PCB
 	
-	//if we try to execute the last shell, we execute another shell
-	if(pcb_halt->process_id == pcb_halt->parent_id){
-		execute((uint8_t *)"shell");
-	}
-	
-	pcb_parent->return_value = status;
-
 	//close any relevant FDs
 	uint32_t i;
 	for(i = 0; i < 8; i++){
@@ -120,7 +113,9 @@ int32_t halt_256(uint32_t status){
 	}
 
 	pid_flags[current_pid] = 0;
-
+	if(current_pid == pcb_halt->parent_id)  {
+		execute((uint8_t*)"shell");
+	}
 	current_pid = pcb_halt->parent_id;
 	//restore parent paging
 	page_table_t* PDT = (page_table_t*)PDT_addr;
@@ -138,6 +133,7 @@ int32_t halt_256(uint32_t status){
 
 
 	tss.ss0 = KERNEL_DS;
+	tss.esp0 = pcb_halt->parent_esp0;
 
 	asm volatile (	"movl %0, %%esp;"
 					"movl %1, %%ebp;"
@@ -278,8 +274,10 @@ int32_t execute (const uint8_t* command){
 	new_process->parent_esp = reg_esp;
 	new_process->parent_ebp = reg_ebp;
 
+	new_process->parent_esp0 = tss.esp0;
 	tss.ss0 = KERNEL_DS;
 	tss.esp0 = (KERNEL_BOT_ADDR - ((new_pid) * EIGHT_KB)) - 4;
+	new_process->kernel_stack = (KERNEL_BOT_ADDR - ((new_pid) * EIGHT_KB)) - 4;
 
 
 	/* setup IRET context */
@@ -325,6 +323,10 @@ int32_t read (int32_t fd, void* buf, int32_t nbytes)
 	/* fd must be between 0-7 */
 	if(fd >= MAX_FD_NUM || fd < 0)
 		return -1;
+	
+	/* if the fd is not in used, then return -1 */
+	if (pcb->fd_entry[fd].flags == FREE)
+		return -1;
 
 	/* call the file's read function */
 	asm volatile("pushl	%4;"
@@ -361,7 +363,9 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 	/* fd must be between 0-7 */
 	if(fd >= MAX_FD_NUM || fd < 0)
 		return -1;
-	
+	/* if the fd is not in used, then return -1 */
+	if (pcb->fd_entry[fd].flags == FREE)
+		return -1;
 	/* call the file's read function */
 	asm volatile("pushl	%4;"
 				 "pushl	%3;"
