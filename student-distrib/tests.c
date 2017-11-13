@@ -766,8 +766,8 @@ int read_test()  {
 	TEST_HEADER;
 
 	uint8_t buf[10]="AAAAAAAAAA";
-	current_pid=2;
-	setup_PCB(2);
+	current_pid=0;
+	setup_PCB(0);
 
 	if(read(0,NULL,10) != -1)
 		return FAIL;
@@ -795,8 +795,8 @@ int write_test()  {
 	TEST_HEADER;
 
 	uint8_t buf[10];
-	current_pid=2;
-	setup_PCB(2);
+	current_pid=0;
+	setup_PCB(0);
 
 	if(write(1,NULL,10) != -1)
 		return FAIL;
@@ -823,8 +823,8 @@ int write_test()  {
 int open_test()  {
 	TEST_HEADER;
 
-	current_pid=2;
-	setup_PCB(2);
+	current_pid=0;
+	setup_PCB(0);
 
 	if(open(NULL) != -1)
 		return FAIL;
@@ -844,8 +844,8 @@ int open_test()  {
 int close_test()  {
 	TEST_HEADER;
 
-	current_pid=2;
-	setup_PCB(2);
+	current_pid=0;
+	setup_PCB(0);
 
 	if(close(0) != -1)
 		return FAIL;
@@ -907,5 +907,6 @@ void launch_tests(){
 	TEST_OUTPUT("write Test", write_test());
 	TEST_OUTPUT("open Test", open_test());
 	TEST_OUTPUT("close Test", close_test());
+	
 }
 
