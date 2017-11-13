@@ -17,7 +17,7 @@
 #define BUF_SIZE				4
 #define PROGRAM_PDT_INDEX		32
 #define PROGRAM_PROPERTIES		0x97
-#define MAX_PID					2
+#define MAX_PID					20
 #define VIRTUAL_BLOCK_BOTTOM	0x08400000
 
 

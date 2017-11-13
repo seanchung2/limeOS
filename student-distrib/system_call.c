@@ -274,6 +274,7 @@ int32_t execute (const uint8_t* command){
 
 	tss.ss0 = KERNEL_DS;
 	tss.esp0 = (KERNEL_BOT_ADDR - ((new_pid) * EIGHT_KB)) - 4;
+	new_process->kernel_stack = (KERNEL_BOT_ADDR - ((new_pid) * EIGHT_KB)) - 4;
 
 
 	/* setup IRET context */
