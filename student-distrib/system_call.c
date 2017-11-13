@@ -1,7 +1,7 @@
 #include "system_call.h"
 
 /* array of possible pid's */
-int32_t pid_flags[MAX_PID];
+int32_t pid_flags[MAX_PID] = {0, 0, 0, 0, 0, 0};
 
 /* Do nothing, return 0 */
 int32_t null_func()  {
@@ -68,6 +68,9 @@ pcb_t* setup_PCB (int32_t new_pid)
 	pcb->process_id = new_pid;
 	pcb->parent_id = current_pid;
 	pcb->child_id = -1;
+	pcb->parent_esp = 0;
+	pcb->parent_ebp = 0;
+	pcb->return_value = 0;
 
 	/* automatically setup stdin and stdout */
 	pcb->fd_entry[STDIN].operations_pointer = stdin_table;
@@ -100,11 +103,14 @@ int32_t halt (uint8_t status)
 */
 
 int32_t halt_256(uint32_t status){
-	pcb_t* pcb_halt = (pcb_t*)(KERNEL_BOT_ADDR - EIGHT_KB *(current_pid + 1));//current PCB
-	//May need to look into parent-child flag thing... kind of a parent-child relationship
-
-	//restore parent data
-	pcb_t* pcb_parent = (pcb_t*)(KERNEL_BOT_ADDR - EIGHT_KB * (pcb_halt->parent_id + 1));//parent PCB ????
+	pcb_t* pcb_halt = (pcb_t*)(KERNEL_BOT_ADDR - EIGHT_KB *(current_pid + 1));//current PCB, the one to be halted
+	pcb_t* pcb_parent = (pcb_t*)(KERNEL_BOT_ADDR - EIGHT_KB * (pcb_halt->parent_id + 1));//parent PCB
+	
+	//if we try to execute the last shell, we execute another shell
+	if(pcb_halt->process_id == pcb_halt->parent_id){
+		execute((uint8_t *)"shell");
+	}
+	
 	pcb_parent->return_value = status;
 
 	//close any relevant FDs
@@ -114,11 +120,11 @@ int32_t halt_256(uint32_t status){
 	}
 
 	pid_flags[current_pid] = 0;
-	current_pid = pcb_halt->parent_id;
 
+	current_pid = pcb_halt->parent_id;
 	//restore parent paging
 	page_table_t* PDT = (page_table_t*)PDT_addr;
-	PDT->entries[PROGRAM_PDT_INDEX] = (KERNEL_BOT_ADDR + (FOUR_MB*(pcb_halt->parent_id))) | PROGRAM_PROPERTIES;
+	PDT->entries[PROGRAM_PDT_INDEX] = (KERNEL_BOT_ADDR + (FOUR_MB*current_pid)) | PROGRAM_PROPERTIES;
 
 	/*flush TLBs */
 	asm volatile (	"movl %%CR3, %%eax;"	
