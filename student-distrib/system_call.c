@@ -1,7 +1,7 @@
 #include "system_call.h"
 
-/* array of possible pid's */
-int32_t pid_flags[MAX_PID] = {0, 0, 0, 0, 0, 0};
+/* Array of possible pid's */
+int32_t pid_flags[MAX_PID];
 
 /* Do nothing, return 0 */
 int32_t null_func()  {
@@ -43,13 +43,14 @@ int32_t directory_table[4] = { (uint32_t)(open_directory),
 								(uint32_t)(write_directory),
 								(uint32_t)(close_directory) };
 
-/*
-* setup_PCB ()
-* initialize a new PCB for a new process
-* input: none
-* output: none
-* side effect: as description
-*/
+/* setup_PCB
+ *
+ * Description: Setup the PCB
+ * Inputs: new_pid - New Process ID
+ * Outputs: None
+ * Return: Initialized PCB
+ * Side Effects: As description
+ */
 pcb_t* setup_PCB (int32_t new_pid)
 {
 	int i;
@@ -83,13 +84,16 @@ pcb_t* setup_PCB (int32_t new_pid)
 
 	return pcb;
 }
-/*
-* halt (uint8_t status)
-* hanlder for system call "halt"
-* input: none
-* output: none
-* side effect: as description
-*/
+
+/* halt
+ *
+ * Description: Handler for system call "halt"
+ *				'halt' system call, terminates a process, returning the specified value to its parent process.
+ * Inputs: status - 8 bit value
+ * Outputs: None
+ * Return: 0
+ * Side Effects: As description
+ */
 int32_t halt (uint8_t status)
 {
 	halt_256((uint32_t) status);
@@ -98,18 +102,19 @@ int32_t halt (uint8_t status)
 }
 
 /*
-* halt_256 (uint8_t status)
-* hanlder for system call "halt"
-* input: none
-* output: none
-* side effect: as description
+* halt_256
+*
+* Description: Helper function for the handler for system call "halt'
+* Input: status - 32 bit value of 'status', expanded value of 8 bit 'status'
+* Output: None
+* Return: 
+* Side effect: As description
 */
-
 int32_t halt_256(uint32_t status){
 	pcb_t* pcb_halt = (pcb_t*)(KERNEL_BOT_ADDR - EIGHT_KB *(current_pid + 1));//current PCB, the one to be halted
 	pcb_t* pcb_parent = (pcb_t*)(KERNEL_BOT_ADDR - EIGHT_KB * (pcb_halt->parent_id + 1));//parent PCB
 	
-	pcb_parent->return_value = status;
+	pcb_parent->return_value = status;//updating the return value (status) to parent
 
 	//close any relevant FDs
 	uint32_t i;
@@ -118,6 +123,7 @@ int32_t halt_256(uint32_t status){
 	}
 
 	pid_flags[current_pid] = 0;
+	//if the last shell, it will execute another shell
 	if(current_pid == pcb_halt->parent_id)  {
 		execute((uint8_t*)"shell");
 	}
@@ -126,7 +132,7 @@ int32_t halt_256(uint32_t status){
 	page_table_t* PDT = (page_table_t*)PDT_addr;
 	PDT->entries[PROGRAM_PDT_INDEX] = (KERNEL_BOT_ADDR + (FOUR_MB*current_pid)) | PROGRAM_PROPERTIES;
 
-	/*flush TLBs */
+	//flush TLBs
 	asm volatile (	"movl %%CR3, %%eax;"	
 					"andl $0xFFF, %%eax;"
 					"addl %0, %%eax;"
@@ -153,32 +159,36 @@ int32_t halt_256(uint32_t status){
 	return 0;
 
 }
+
 /*
-* execute (const uint8_t* command)
-* hanlder for system call "execute"
-* input: none
-* output: none
-* return:
+* execute
+* Description: Handler for system call "execute"
+*				'execute' system call attempts to load and execute a new program, handing off the processor to the new program until it terminates.
+* Input: command - A space separated sequence of words
+* Output: None
+* Return:
 *	-1: If command can not be executed
 *	256: If the program dies by an exception
-	0 to 255: If the program halts, as given by the halt()
-* side effect: as description
+*	0 to 255: If the program halts, as given by the halt()
+* Side Effect: As description
 */
 int32_t execute (const uint8_t* command){	
-	//null check of cmd
+	//Null check of cmd
 	if(command == NULL){
 		return -1;
 	}
+
 	//Variable Initialization
-	uint8_t file_name[MAX_NAME_LENGTH];
-	uint8_t local_arg[MAX_LENGTH_ARG];
-	uint8_t buffer[BUF_SIZE];
+	uint8_t file_name[MAX_NAME_LENGTH];//Stores the command before the first space is encountered
+	uint8_t local_arg[MAX_LENGTH_ARG];//Stores the command after the first space is encountered
+	uint8_t buffer[BUF_SIZE];//Buffer of size 4, to store 4 bytes
 
 	uint32_t file_length = 0;
 	uint32_t spaces = 0;
 	uint32_t i = 0;
 	uint32_t end_of_file_name = 0;
 	uint32_t local_arg_start_flag = 0;
+
 	//Parsing
 	while(command[i] != '\0'){
 		if(command[i] != ' ' && spaces == 0){
@@ -201,8 +211,8 @@ int32_t execute (const uint8_t* command){
 		}
 		i++;
 	}
-
 	local_arg[i - (file_length + spaces)] = '\0';
+	//If no space at all in the command
 	if(spaces == 0){
 		file_name[i] = '\0';
 	}
@@ -217,7 +227,7 @@ int32_t execute (const uint8_t* command){
 		return -1;
 	}
 
-	/*string comparison between buf and magic numbers to make sure that file is executable or not*/
+	//String comparison between buf and magic numbers to make sure that file is executable or not
 	if(strncmp((int8_t*)buffer, (int8_t*)magic_number, 4) != 0){
 		return -1;
 	}
@@ -225,12 +235,13 @@ int32_t execute (const uint8_t* command){
 	//Paging
 	page_table_t* PDT = (page_table_t*)PDT_addr;
 	int32_t new_pid;
+	//Searching for available pid
 	for(i = 0; i < MAX_PID; i++)  {
 		if(pid_flags[i] == 0)  {
 			break;
 		}
 	}
-
+	//If no pid available
 	if(i >= MAX_PID)  {
 		return -1;
 	}
@@ -240,7 +251,7 @@ int32_t execute (const uint8_t* command){
 
 	PDT->entries[PROGRAM_PDT_INDEX] = (KERNEL_BOT_ADDR + (FOUR_MB*i)) | PROGRAM_PROPERTIES;
 
-	/*flush TLBs */
+	//Flush TLBs
 	asm volatile (	"movl %%CR3, %%eax;"	
 					"andl $0xFFF, %%eax;"
 					"addl %0, %%eax;"
@@ -250,11 +261,11 @@ int32_t execute (const uint8_t* command){
 						: "eax", "cc"
 					);
 
-	/*Getting the entry point*/
-	uint8_t entry_point[BUF_SIZE];//first instruction’s address
+	//Getting the entry point
+	uint8_t entry_point[BUF_SIZE];//First instruction’s address
 	read_data(program.inode_number, 24, entry_point, 4);
 	
-	/*Copying the entire file into memory starting at virtual address LOAD_ADDR*/
+	//Copying the entire file into memory starting at virtual address LOAD_ADDR
 	uint32_t j;
 	uint32_t c;
 
@@ -310,14 +321,16 @@ int32_t execute (const uint8_t* command){
 }
 
 /*
-* read (int32_t fd, void* buf, int32_t nbytes)
-* hanlder for system call "read"
-* input: 
-*		fd: file descriptor
-*		buf: buffer which will be filled out in each read function
-*		nbyte: how many bytes we want
-* output: number of bytes copied or -1 for error happened
-* side effect: as description
+* read
+* Description: Hanlder for system call "read"
+*				'read' system call reads data from the keyboard,a file, device (RTC), or directory.
+* Input: 
+*		fd: File descriptor
+*		buf: Buffer which will be filled out in each read function
+*		nbyte: How many bytes we want
+* Output: None
+* Return: number of bytes copied or -1 for error happened
+* Side Effect: As description
 */
 int32_t read (int32_t fd, void* buf, int32_t nbytes)
 {
@@ -350,14 +363,16 @@ int32_t read (int32_t fd, void* buf, int32_t nbytes)
 }
 
 /*
-* write (int32_t fd, const void* buf, int32_t nbytes)
-* hanlder for system call "write"
-* input: 
-*		fd: file descriptor
-*		buf: buffer which will provide data each write function need
-*		nbyte: how many bytes we want
-* output: number of bytes written or -1 for error happened
-* side effect: as description
+* write 
+* Description: Hanlder for system call "write"
+*				'write' system call writes data to the terminal or to a device (RTC)
+* Input: 
+*		fd: File descriptor
+*		buf: Buffer which will provide data each write function need
+*		nbyte: How many bytes we want
+* Output: None
+* Return: Number of bytes written or -1 for error happened
+* Side Effect: As description
 */
 int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 {
