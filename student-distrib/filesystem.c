@@ -39,7 +39,7 @@ int32_t read_dentry_by_name(const uint8_t* fname, dentry_t* dentry)  {
 			}
 		}
 		if(match == 1 && j < MAX_NAME_LENGTH)  {
-			if(current->file_name[j+1] != '\0')  {
+			if(current->file_name[j] != '\0')  {
 				match = 0;
 			}
 		}

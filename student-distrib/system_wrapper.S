@@ -36,7 +36,7 @@ sys_handler:
 
 	cmpl 	$1 , %eax 		#check if eax < 1 
 	jl		error_eax
-	cmpl 	$10 , %eax 	#check if eax > 10
+	cmpl 	$6 , %eax 		#check if eax > 6
 	jg		error_eax
 
 	movl 	syscall_jumptable(,%eax,4) , %eax

@@ -327,6 +327,10 @@ int32_t read (int32_t fd, void* buf, int32_t nbytes)
 	/* fd must be between 0-7 */
 	if(fd >= MAX_FD_NUM || fd < 0)
 		return -1;
+	
+	/* if the fd is not in used, then return -1 */
+	if (pcb->fd_entry[fd].flags == FREE)
+		return -1;
 
 	/* call the file's read function */
 	asm volatile("pushl	%4;"
@@ -363,7 +367,9 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 	/* fd must be between 0-7 */
 	if(fd >= MAX_FD_NUM || fd < 0)
 		return -1;
-	
+	/* if the fd is not in used, then return -1 */
+	if (pcb->fd_entry[fd].flags == FREE)
+		return -1;
 	/* call the file's read function */
 	asm volatile("pushl	%4;"
 				 "pushl	%3;"
