@@ -19,6 +19,9 @@
 #define PROGRAM_PROPERTIES		0x97
 #define MAX_PID					20
 #define VIRTUAL_BLOCK_BOTTOM	0x08400000
+#define ENTRY_POINT_LOCATION	24
+#define STDIN_LEN				5
+#define STDOUT_LEN				6
 
 
 /* for pid status, PCB entries, and jumptable */
