@@ -1,7 +1,5 @@
 #include "keyboard.h"
-#include "lib.h"
-#include "i8259.h"
-#include "tests.h"
+
 
 /* store the status of shift/ctrl/capslock/enter/alt/terminal_read/add_to_buffer */
 uint8_t shift_flag = 0;
@@ -191,6 +189,15 @@ void defaultKeyPressed (uint8_t c)
 		buf_index = -1;
 		return;
 	}
+
+	/* if CTRL+C is pressed, halt the program that is currently running */
+	
+	/*if (ctrl_flag ==1 && (scancodeTable[index][c] == 'c' || scancodeTable[index][c] == 'C')){
+		sti();
+		halt_256(256);
+		buf_index = -1;
+		return;
+	}*/
 
 	if(scancodeTable[index][c] != '\0')
 	{

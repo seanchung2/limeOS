@@ -182,9 +182,12 @@ int32_t open_file(const uint8_t* filename)  {
  *					to the given buffer
  */
 int32_t read_file(int32_t fd, void* buf, int32_t nbytes)  {
+	int ret;
 	pcb_t* pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
 	uint32_t inode_index = pcb->fd_entry[fd].inode_index;
-	return read_data(inode_index, 0, (uint8_t*)buf, nbytes);
+	ret = read_data(inode_index, pcb->fd_entry[fd].file_position, (uint8_t*)buf, nbytes);
+	pcb->fd_entry[fd].file_position+= ret;
+	return ret;
 }
 
 /* write_file

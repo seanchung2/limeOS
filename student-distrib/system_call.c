@@ -18,12 +18,12 @@ const int8_t magic_number[4] = {0x7f, 0x45, 0x4c, 0x46};
  * write function
  * close function
  */
-int32_t stdin_table[4] = { (uint32_t)(null_func),
+int32_t stdin_table[4] = { 	(uint32_t)(null_func),
 							(uint32_t)(terminal_read),
 							(uint32_t)(null_func),
 							(uint32_t)(null_func) };
 
-int32_t stdout_table[4] = {(uint32_t)(null_func),
+int32_t stdout_table[4] = {	(uint32_t)(null_func),
 							(uint32_t)(null_func),
 							(uint32_t)(terminal_write),
 							(uint32_t)(null_func) };
@@ -38,18 +38,18 @@ int32_t file_table[4] = { 	(uint32_t)(open_file),
 							(uint32_t)(write_file),
 							(uint32_t)(close_file) };
 
-int32_t directory_table[4] = { (uint32_t)(open_directory),
+int32_t directory_table[4] = { 	(uint32_t)(open_directory),
 								(uint32_t)(read_directory),
 								(uint32_t)(write_directory),
 								(uint32_t)(close_directory) };
 
 /*
-* setup_PCB ()
-* initialize a new PCB for a new process
-* input: none
-* output: none
-* side effect: as description
-*/
+ * setup_PCB (int32_t new_pid)
+ * initialize a new PCB for a new process
+ * input: new_pid - the new process id
+ * output: return a new pcb block
+ * side effect: as description
+ */
 pcb_t* setup_PCB (int32_t new_pid)
 {
 	int i;
@@ -86,7 +86,7 @@ pcb_t* setup_PCB (int32_t new_pid)
 /*
 * halt (uint8_t status)
 * hanlder for system call "halt"
-* input: none
+* input: status - the value for return
 * output: none
 * side effect: as description
 */
@@ -100,14 +100,14 @@ int32_t halt (uint8_t status)
 /*
 * halt_256 (uint8_t status)
 * hanlder for system call "halt"
-* input: none
+* input: status - the value for return
 * output: none
 * side effect: as description
 */
 
 int32_t halt_256(uint32_t status){
-	pcb_t* pcb_halt = (pcb_t*)(KERNEL_BOT_ADDR - EIGHT_KB *(current_pid + 1));//current PCB, the one to be halted
-	pcb_t* pcb_parent = (pcb_t*)(KERNEL_BOT_ADDR - EIGHT_KB * (pcb_halt->parent_id + 1));//parent PCB
+	pcb_t* pcb_halt = (pcb_t*)(KERNEL_BOT_ADDR - EIGHT_KB *(current_pid + 1));				//current PCB, the one to be halted
+	pcb_t* pcb_parent = (pcb_t*)(KERNEL_BOT_ADDR - EIGHT_KB * (pcb_halt->parent_id + 1));	//parent PCB
 	
 	pcb_parent->return_value = status;
 
@@ -156,7 +156,7 @@ int32_t halt_256(uint32_t status){
 /*
 * execute (const uint8_t* command)
 * hanlder for system call "execute"
-* input: none
+* input: command - command to be executed
 * output: none
 * return:
 *	-1: If command can not be executed
@@ -170,8 +170,8 @@ int32_t execute (const uint8_t* command){
 		return -1;
 	}
 	//Variable Initialization
-	uint8_t file_name[MAX_NAME_LENGTH];
 	uint8_t local_arg[MAX_LENGTH_ARG];
+	uint8_t file_name[MAX_NAME_LENGTH];
 	uint8_t buffer[BUF_SIZE];
 
 	uint32_t file_length = 0;
@@ -203,6 +203,7 @@ int32_t execute (const uint8_t* command){
 	}
 
 	local_arg[i - (file_length + spaces)] = '\0';
+
 	if(spaces == 0){
 		file_name[i] = '\0';
 	}
@@ -284,6 +285,9 @@ int32_t execute (const uint8_t* command){
 	tss.esp0 = (KERNEL_BOT_ADDR - ((new_pid) * EIGHT_KB)) - 4;
 	new_process->kernel_stack = (KERNEL_BOT_ADDR - ((new_pid) * EIGHT_KB)) - 4;
 
+	/* copy args to pcb */
+	if(local_arg_start_flag)
+		strcpy((int8_t*)new_process->args,(int8_t*)local_arg);
 
 	/* setup IRET context */
 	uint32_t target_instruction = *((uint32_t*)entry_point);
@@ -306,6 +310,7 @@ int32_t execute (const uint8_t* command){
 				);
 	pcb_t* PCB = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
 	int32_t return_val = PCB->return_value;	
+
 	return return_val;
 }
 
@@ -521,4 +526,58 @@ int32_t close (int32_t fd)
 	pcb->fd_entry[fd].flags = FREE;
 
 	return 0;
+}
+
+/*
+ * getargs (uint8_t * buf , int32_t nbytes)
+ * handle system call "getargs"
+ * input: none
+ * output: 
+ * side effect: as description
+ */
+int32_t getargs (uint8_t * buf , int32_t nbytes)
+{
+	pcb_t * pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
+
+	if (buf==NULL)
+		return -1;
+	if (strlen((int8_t*)pcb->args)==0)
+		return -1;
+
+	strncpy((int8_t*)buf, (int8_t*)pcb->args, (uint32_t)nbytes);
+	return 0;
+}
+
+/*
+ * vidmap (uint8_t** screen_start)
+ * handle system call "vidmap"
+ * input: none
+ * output: 
+ * side effect: as description
+ */
+int32_t vidmap (uint8_t** screen_start)
+{
+	return 0;
+}
+
+/*
+ * set_handler (int32_t signum, void* handler_address)
+ * handle system call "set_handler"
+ * input: none
+ * output: return -1 for not supporting set_handler
+ * side effect: as description
+ */
+int32_t set_handler (int32_t signum, void* handler_address){
+	return -1;
+}
+
+/*
+ * sigreturn (void)
+ * handle system call "sigreturn"
+ * input: none
+ * output: return -1 for not supporting set_handler
+ * side effect: as description
+ */
+int32_t sigreturn (void){
+	return -1;
 }

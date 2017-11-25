@@ -13,6 +13,10 @@ syscall_jumptable:
 	.long write
 	.long open
 	.long close
+	.long getargs
+	.long vidmap
+	.long set_handler
+	.long sigreturn
 
 #
 # sys_handler()
@@ -36,7 +40,7 @@ sys_handler:
 
 	cmpl 	$1 , %eax 		#check if eax < 1 
 	jl		error_eax
-	cmpl 	$6 , %eax 		#check if eax > 6
+	cmpl 	$10 , %eax 		#check if eax > 10
 	jg		error_eax
 
 	movl 	syscall_jumptable(,%eax,4) , %eax

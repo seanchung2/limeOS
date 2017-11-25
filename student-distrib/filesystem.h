@@ -15,6 +15,7 @@
 #define INODE_OFFSET 		40
 #define KERNEL_BOT_ADDR		0x800000
 #define EIGHT_KB			0x2000
+#define MAX_LENGTH_ARG 			128
 
 extern int32_t current_pid;
 
@@ -52,6 +53,7 @@ typedef struct process_control_block  {
 	uint32_t return_instruction;
 	uint32_t kernel_stack;
 	uint32_t parent_esp0;
+	uint8_t args[MAX_LENGTH_ARG]; 
 } pcb_t;
 
 /* function to set memory address for the start of the filesystem */

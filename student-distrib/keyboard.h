@@ -1,5 +1,8 @@
 #include "lib.h"
 #include "terminal.h"
+#include "i8259.h"
+#include "tests.h"
+#include "system_call.h"
 
 #ifndef _KEYBOARD_H
 #define _KEYBOARD_H

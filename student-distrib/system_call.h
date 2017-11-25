@@ -55,4 +55,16 @@ int32_t open (const uint8_t* filename);
 /* handle system call "close" */
 int32_t close (int32_t fd);
 
+/* handle system call "getargs" */
+int32_t getargs (uint8_t * buf , int32_t nbytes);
+
+/* handle system call "vidmap" */
+int32_t vidmap (uint8_t** screen_start);
+
+/* handle system call "set_handler" */
+int32_t set_handler (int32_t signum, void* handler_address);
+
+/* handle system call "sigreturn" */
+int32_t sigreturn (void);
+
 #endif /* _SYSTEM_CALL_H */

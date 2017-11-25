@@ -901,12 +901,14 @@ void launch_tests(){
 
 
 	/* Checkpoint 3 */
-	TEST_OUTPUT("setup PCB Test", setup_PCB_test());
-	TEST_OUTPUT("execute Test", execute_test());
-	TEST_OUTPUT("read Test", read_test());
-	TEST_OUTPUT("write Test", write_test());
-	TEST_OUTPUT("open Test", open_test());
-	TEST_OUTPUT("close Test", close_test());
+	//TEST_OUTPUT("setup PCB Test", setup_PCB_test());
+	//TEST_OUTPUT("execute Test", execute_test());
+	//TEST_OUTPUT("read Test", read_test());
+	//TEST_OUTPUT("write Test", write_test());
+	//TEST_OUTPUT("open Test", open_test());
+	//TEST_OUTPUT("close Test", close_test());
+
+	/* Checkpoint 4 */
 	
 }
 
