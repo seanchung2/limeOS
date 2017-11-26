@@ -29,6 +29,7 @@ void init_paging()  {
 	for(i = 0; i < PAGE_SIZE; i++)  {
 		PDT.entries[i] = 0;
 		PT0.entries[i] = 0;
+		PT1.entries[i] = 0;
 	}
 
 	// Initialize the kernal entry
