@@ -546,6 +546,7 @@ int32_t getargs (uint8_t *buf, int32_t nbytes)
 		return -1;
 
 	strncpy((int8_t*)buf, (int8_t*)pcb->args, (uint32_t)nbytes);
+	(pcb->args)[0] = '\0';
 	return 0;
 }
 
