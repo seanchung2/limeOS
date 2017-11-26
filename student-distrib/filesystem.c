@@ -131,9 +131,6 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
 			break;
 		}
 	}
-
-	/* add a null character to the end of the string and return the number of copied characters */
-	buf[copied_count] = '\0';
 	return copied_count;
 }
 

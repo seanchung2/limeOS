@@ -271,6 +271,9 @@ void RTC_test(){
 int read_data_test()  {
 	TEST_HEADER;
 
+	current_pid=0;
+	setup_PCB(0);
+
 	int i;
 	uint8_t test[186];
 	dentry_t test_dentry;
@@ -552,18 +555,22 @@ int terminal_close_Test()
 void read_file_test()  {
 	TEST_HEADER;
 
+	current_pid=0;
+	setup_PCB(0);
+
 	int32_t test_fd;
-	uint8_t test_buf[51];
-	uint8_t test_name[34] = "frame0.txt";
+	uint8_t test_buf[1024];
+	uint8_t test_name[34] = "cat";
 
-	test_fd = open_file(test_name);
-	read_file(test_fd, test_buf, 50);
-
-	terminal_write(0, (int8_t*)test_buf, 50);
+	test_fd = open(test_name);
+	
+	while(0 != read_file(test_fd, test_buf, 1024))  {
+		terminal_write(0, (int8_t*)test_buf, 1024);
+	}
 
 	putc('\n');
 
-	close_file(0);
+	close_file(test_fd);
 }
 
 /* write_file_test
@@ -890,7 +897,7 @@ void launch_tests(){
 	//read_data_test();
 
 	//TEST_OUTPUT("Open File Test", open_file_test());
-	//read_file_test();
+	read_file_test();
 	//TEST_OUTPUT("Write File Test", write_file_test());
 	//TEST_OUTPUT("Close File Test", close_file_test());
 
