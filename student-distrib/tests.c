@@ -867,6 +867,56 @@ int close_test()  {
 }
 
 /* Checkpoint 4 tests */
+/* getargs_test
+ * 
+ * Test the getargs function
+ * Inputs: None
+ * Side Effects: None
+ * Coverage: system_call.c
+ */
+int getargs_test() {
+	TEST_HEADER;
+
+	int8_t *buf = NULL, buf2[10];
+	pcb_t *pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
+
+	current_pid=0;
+	setup_PCB(0);
+
+	if(getargs((uint8_t *)buf, 0) != -1)
+		return FAIL;
+	if(getargs((uint8_t *)buf2, 10) != -1)
+		return FAIL;
+
+	strcpy((int8_t*)pcb->args, (int8_t*)"abcedf");
+	if(getargs((uint8_t *)buf2, 10) != 0)
+		return FAIL;
+	
+	if(strncmp(buf2, (int8_t*)"abcedf", 6) !=0)
+		return FAIL;
+
+	return PASS;
+}
+
+/* vidmap_test
+ * 
+ * Test the vidmap function
+ * Inputs: None
+ * Side Effects: None
+ * Coverage: system_call.c
+ */
+int vidmap_test() {
+	TEST_HEADER;
+
+	uint8_t** screen_start = NULL;
+
+	if(vidmap(screen_start) != -1)
+		return FAIL;
+
+	printf("%d\n",screen_start);
+
+	return PASS;
+}
 /* Checkpoint 5 tests */
 
 
@@ -916,6 +966,7 @@ void launch_tests(){
 	//TEST_OUTPUT("close Test", close_test());
 
 	/* Checkpoint 4 */
-	
+	TEST_OUTPUT("getargs Test", getargs_test());
+	TEST_OUTPUT("vidmap Test", vidmap_test());
 }
 
