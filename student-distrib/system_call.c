@@ -538,10 +538,11 @@ int32_t getargs (uint8_t *buf, int32_t nbytes)
 {
 	pcb_t *pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
 
-	//Checking validity and error handling
-	if (buf == NULL)
+	/* if user buf is null, return -1 */
+	if (buf==NULL)
 		return -1;
-	if (strlen((int8_t*)pcb->args) == 0)
+	/* if input arguements length is 0, return -1 */
+	if (strlen((int8_t*)pcb->args)==0)
 		return -1;
 
 	strncpy((int8_t*)buf, (int8_t*)pcb->args, (uint32_t)nbytes);

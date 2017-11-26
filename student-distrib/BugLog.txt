@@ -4,18 +4,57 @@
 CHECKPOINT 1:
 *************
 
-BUG 1:
+BUG 1:			"Macro in idt.h"
 Description:	We attempted to use a macro to declare the basic exception handlers
 				we are using.
 Fix:			Instead of using a macro, we wrote all of the fuctions by hand in 
 				the header file.
 
-BUG 2:
+BUG 2:			"RTC & keyboard"
 Description:	The RTC was not intializing while the keyboard was initialized.
 				Both of them would work individually, but attempting to intialize
 				both of them at the same time would result in the RTC producing
 				no interupts
-Fix:			We put a while loop at the end of both interupt handlers as a
-				replacment for an assembly wrapper. In the future we will write
-				a wrapper to properly handle this problem, but for now this allows
-				us to run the code and test other aspects of our OS.
+Fix:			We write a wrapper with iret to properly handle this problem.
+
+CHECKPOINT 2:
+*************
+
+BUG 1:
+Description:	We mistake the meaning of termial read and terminal write, we thought
+				read is to read keyboard buffer(which had alreadly in our code) into 
+				termial buffer, so we create another terminal buffer and let write to 
+				use the static buffer to get what user had input.
+Fix:			After checkpoint 2 demo, we immediately fixed the problem with add a while
+				loop inside terminal read, add a flag to detect for enter press, delete 
+				terminal buffer, and let terminal write use the input buffer from arguements.
+
+CHECKPOINT 3:
+*************
+
+BUG 1:			"keyboard input"
+Description:	We found out the keyboard will put charater incorrectly, leave the keyboard button 
+				will also trigger interrupt, but it will print the press botton's charater.
+				That is, the screen will have double charaters if we press a single button once.
+Fix:			We remove the do-while loop in our keyboard handler, and that fixed the problem.
+
+BUG 2:			"system call on shell"
+Description:	The shell works great, but when running other system call twice, 
+				after finished the system call work, it shows Page fault or General Protection fault.
+Fix:			Thomas found out that we should also store tss to let program halt correctly.
+
+CHECKPOINT 4:
+*************
+
+BUG 1:			"cat with readable file"
+Description:	When we input "cat frame0.txt", the fish image shows again and again, like a infinite loop.
+Fix:			We found out that our read_file function didn't change file position after reading data,
+				so we modified the code in filesystem.c and fixed the problem.
+
+BUG 2:			"cat with executable file"
+Description:	When we do cat with executable arguements, the program will act abnormally.
+Fix:			We add '\0' at the end of buffer sent to file_read function, after we delete it,
+				we can do the cat with executable arguements.
+
+CHECKPOINT 5:
+*************
