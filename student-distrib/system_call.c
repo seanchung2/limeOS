@@ -19,30 +19,33 @@ const int8_t magic_number[4] = {0x7f, 0x45, 0x4c, 0x46};
  * write function
  * close function
  */
-int32_t stdin_table[4] = { 	(uint32_t)(null_func),
-							(uint32_t)(terminal_read),
-							(uint32_t)(null_func),
-							(uint32_t)(null_func) };
+int32_t (*stdin_table[4])() = {	null_func,
+							terminal_read,
+							null_func,
+							null_func
+						};
 
-int32_t stdout_table[4] = {	(uint32_t)(null_func),
-							(uint32_t)(null_func),
-							(uint32_t)(terminal_write),
-							(uint32_t)(null_func) };
+int32_t (*stdout_table[4])() = {	null_func,
+							null_func,
+							terminal_write,
+							null_func
+						};
 
-int32_t rtc_table[4] = { 	(uint32_t)(open_RTC),
-							(uint32_t)(read_RTC),
-							(uint32_t)(write_RTC),
-							(uint32_t)(close_RTC) };
+int32_t (*rtc_table[4])() = { 	open_RTC,
+							read_RTC,
+							write_RTC,
+							close_RTC
+						};
 
-int32_t file_table[4] = { 	(uint32_t)(open_file),
-							(uint32_t)(read_file),
-							(uint32_t)(write_file),
-							(uint32_t)(close_file) };
+int32_t (*file_table[4])() = { 	open_file,
+							read_file,
+							write_file,
+							close_file };
 
-int32_t directory_table[4] = { 	(uint32_t)(open_directory),
-								(uint32_t)(read_directory),
-								(uint32_t)(write_directory),
-								(uint32_t)(close_directory) };
+int32_t (*directory_table[4])() = { 	open_directory,
+								read_directory,
+								write_directory,
+								close_directory };
 
 
 /* setup_PCB (int32_t new_pid)
@@ -55,7 +58,7 @@ int32_t directory_table[4] = { 	(uint32_t)(open_directory),
  */
 pcb_t* setup_PCB (int32_t new_pid)
 {
-	int i;
+	int i,j;
 	/* fetch the pcb in current process */
 	if(new_pid <0 || new_pid > MAX_PID)
 		return (pcb_t*)-1;
@@ -65,7 +68,9 @@ pcb_t* setup_PCB (int32_t new_pid)
 	/* initialize the fd_entry */
 	for(i=0; i<MAX_FD_NUM; i++)
 	{
-		pcb->fd_entry[i].operations_pointer = NULL;
+		/* free the current PCB block */
+		for(j=0;j<4;j++)
+			pcb->fd_entry[i].operations_pointer[j] = NULL;
 		pcb->fd_entry[i].inode_index = -1;
 		pcb->fd_entry[i].file_position = -1;
 		pcb->fd_entry[i].flags = FREE;
@@ -79,9 +84,11 @@ pcb_t* setup_PCB (int32_t new_pid)
 	pcb->return_value = 0;
 
 	/* automatically setup stdin and stdout */
-	pcb->fd_entry[STDIN].operations_pointer = stdin_table;
+	for(i=0; i<4; i++)
+		pcb->fd_entry[STDIN].operations_pointer[i] = stdin_table[i];
 	pcb->fd_entry[STDIN].flags = IN_USE;
-	pcb->fd_entry[STDOUT].operations_pointer = stdout_table;
+	for(i=0; i<4; i++)
+		pcb->fd_entry[STDOUT].operations_pointer[i] = stdout_table[i];
 	pcb->fd_entry[STDOUT].flags = IN_USE;
 
 	return pcb;
@@ -354,18 +361,7 @@ int32_t read (int32_t fd, void* buf, int32_t nbytes)
 		return -1;
 
 	/* call the file's read function */
-	asm volatile("pushl	%4;"
-				 "pushl	%3;"
-				 "pushl	%2;"
-				 "call  *%1;"
-		 		 "movl 	%%eax,%0;"
-		 		 "addl	$12,%%esp;"
-		 		 : "=r"(ret)
-		 		 : "g" (pcb->fd_entry[fd].operations_pointer[READ]),
-		 		   "g" (fd),
-		 		   "g" (buf),
-		 		   "g" (nbytes)
-		 		 : "eax", "cc");
+	ret = (*pcb->fd_entry[fd].operations_pointer[READ])(fd,buf,nbytes);
 	return ret;
 }
 
@@ -398,18 +394,7 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 		return -1;
 
 	/* call the file's read function */
-	asm volatile("pushl	%4;"
-				 "pushl	%3;"
-				 "pushl	%2;"
-				 "call  *%1;"
-		 		 "movl 	%%eax, %0;"
-		 		 "addl	$12, %%esp;"
-		 		 : "=r"(ret)
-		 		 : "g" (pcb->fd_entry[fd].operations_pointer[WRITE]),
-		 		   "g" (fd),
-		 		   "g" (buf),
-		 		   "g" (nbytes)
-		 		 : "eax", "cc");
+	ret = (*pcb->fd_entry[fd].operations_pointer[WRITE])(fd,buf,nbytes);
 	return ret;
 }
 
@@ -427,7 +412,7 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 int32_t open (const uint8_t* filename)
 {
 	dentry_t dentry;
-	int i;
+	int i,j;
 	int ret;
 	/* fetch the pcb in current process */
 	pcb_t * pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
@@ -438,7 +423,8 @@ int32_t open (const uint8_t* filename)
 	/* if filename is "stdin" */
 	if( strncmp((int8_t*)filename, (int8_t*)"stdin", STDIN_LEN) == 0)
 	{
-		pcb->fd_entry[STDIN].operations_pointer = stdin_table;
+		for(i=0; i<4; i++)
+			pcb->fd_entry[STDIN].operations_pointer[i] = stdin_table[i];
 		pcb->fd_entry[STDIN].flags = IN_USE;
 		return STDIN;
 	}
@@ -446,7 +432,8 @@ int32_t open (const uint8_t* filename)
 	/* if filename is "stdout" */
 	if( strncmp((int8_t*)filename, (int8_t*)"stdout", STDOUT_LEN) == 0)
 	{
-		pcb->fd_entry[STDOUT].operations_pointer = stdout_table;
+		for(i=0; i<4; i++)
+			pcb->fd_entry[STDOUT].operations_pointer[i] = stdout_table[i];
 		pcb->fd_entry[STDOUT].flags = IN_USE;
 		return STDOUT;
 	}
@@ -465,13 +452,16 @@ int32_t open (const uint8_t* filename)
 				then initializing the operation ptr */
 			switch(dentry.file_type){
 				case FILE_TYPE_RTC:
-					pcb->fd_entry[i].operations_pointer = rtc_table;
+					for(j=0; j<4; j++)
+						pcb->fd_entry[i].operations_pointer[j] = rtc_table[j];
 					break;
 				case FILE_TYPE_DIR:
-					pcb->fd_entry[i].operations_pointer = directory_table;
+					for(j=0; j<4; j++)
+						pcb->fd_entry[i].operations_pointer[j] = directory_table[j];
 					break;
 				case FILE_TYPE_FILE:
-					pcb->fd_entry[i].operations_pointer = file_table;
+					for(j=0; j<4; j++)
+						pcb->fd_entry[i].operations_pointer[j] = file_table[j];
 					break;
 
 				/* if the file type is unknown, return -1 */	
@@ -485,14 +475,7 @@ int32_t open (const uint8_t* filename)
 			pcb->fd_entry[i].flags = IN_USE;
 
 			/* call the file's open function */
-			asm volatile("pushl	%2;"
-						 "call  *%1;"
-				 		 "movl 	%%eax,%0;"
-				 		 "addl	$4,%%esp;"
-				 		 : "=r"(ret)
-				 		 : "g" (pcb->fd_entry[i].operations_pointer[OPEN]),
-				 		   "g" (filename)
-				 		 : "eax", "cc");
+			ret = (*pcb->fd_entry[i].operations_pointer[OPEN])(filename);
 			if (ret < 0)
 				return -1;
 
@@ -517,7 +500,7 @@ int32_t open (const uint8_t* filename)
  */
 int32_t close (int32_t fd)
 {
-	int ret;
+	int ret,i;
 	/* fetch the pcb in current process */
 	pcb_t * pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
 
@@ -530,19 +513,13 @@ int32_t close (int32_t fd)
 		return -1;
 
 	/* call the file's close function */
-	asm volatile("pushl	%2;"
-				 "call  *%1;"
-		 		 "movl 	%%eax,%0;"
-		 		 "addl	$4,%%esp;"
-		 		 : "=r"(ret)
-		 		 : "g" (pcb->fd_entry[fd].operations_pointer[CLOSE]),
-		 		   "g" (fd)
-		 		 : "eax");
+	ret = (*(pcb->fd_entry[fd].operations_pointer)[CLOSE])(fd);
 	if (ret < 0)
 		return -1;
 
 	/* free the current PCB block */
-	pcb->fd_entry[fd].operations_pointer = NULL;
+	for(i=0;i<4;i++)
+		pcb->fd_entry[fd].operations_pointer[i] = NULL;
 	pcb->fd_entry[fd].inode_index = -1;
 	pcb->fd_entry[fd].file_position = -1;
 	pcb->fd_entry[fd].flags = FREE;

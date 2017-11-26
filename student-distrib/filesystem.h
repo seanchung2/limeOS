@@ -35,7 +35,7 @@ typedef struct inode  {
 
 /* entry in file array of PCB */
 typedef struct fd_entry  {
-	int32_t* operations_pointer;
+	int32_t (*operations_pointer[4])();
 	int32_t inode_index;
 	int32_t file_position;
 	int32_t flags;

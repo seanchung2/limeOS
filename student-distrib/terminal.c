@@ -24,7 +24,7 @@ void set_t_enter_flag()
  * output: the number had copied
  * side effect: as description
  */
-int terminal_read(int32_t fd, void* buf, int32_t nbytes)
+int32_t terminal_read(int32_t fd, void* buf, int32_t nbytes)
 {
 	if(buf == NULL)
 		return -1;
@@ -57,7 +57,7 @@ int terminal_read(int32_t fd, void* buf, int32_t nbytes)
  *		   fail	   -> return -1
  * side effect: as description
  */
-int terminal_write(int32_t fd, const int8_t* buf, int32_t nbytes)
+int32_t terminal_write(int32_t fd, const int8_t* buf, int32_t nbytes)
 {
 	int i;
 
@@ -86,7 +86,7 @@ int terminal_write(int32_t fd, const int8_t* buf, int32_t nbytes)
  * input: filename - name to be open
  * output: none
  */
-int terminal_open(const uint8_t* filename)
+int32_t terminal_open(const uint8_t* filename)
 {
 	return 0;
 }
@@ -97,7 +97,7 @@ int terminal_open(const uint8_t* filename)
  * input: fd - index to be closed
  * output: none
  */
-int terminal_close(int32_t fd)
+int32_t terminal_close(int32_t fd)
 {
 	return 0;
 }
