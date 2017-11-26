@@ -1,5 +1,6 @@
 #include "system_call.h"
 
+
 /* Array of possible pid's */
 int32_t pid_flags[MAX_PID];
 
@@ -578,6 +579,18 @@ int32_t getargs (uint8_t * buf , int32_t nbytes)
  */
 int32_t vidmap (uint8_t** screen_start)
 {
+	//Checking validity and error handling
+	if((uint32_t) screen_start < VIRTUAL_BLOCK_TOP || (uint32_t) screen_start > VIRTUAL_BLOCK_BOTTOM){
+		return -1;
+	}
+
+	//PCB extraction
+	//pcb_t * pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
+
+	uint8_t * destination_mem = USER_VID_MEM_ADD;//Pre setting virtual address
+	//memcpy((uint32_t *)destination_mem, (uint32_t *)VID, FOUR_KB);
+	*screen_start = destination_mem;
+
 	return 0;
 }
 

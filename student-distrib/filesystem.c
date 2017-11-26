@@ -102,7 +102,7 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
 	uint8_t* data_block_address;
 
 	/* check if offset is too large for file */
-	if(offset > inode_ptr->length)  {
+	if(offset >= inode_ptr->length)  {
 		return 0;
 	}
 

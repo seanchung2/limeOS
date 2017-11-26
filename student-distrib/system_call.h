@@ -11,6 +11,9 @@
 #define KERNEL_BOT_ADDR			0x800000
 #define FOUR_MB					0x400000
 #define LOAD_ADDR				0x08048000
+#define USER_VID_MEM_ADD		0x06400000
+#define VID 					0xB8000
+//#define FOUR_KB				0x1000
 #define EIGHT_KB				0x2000
 #define MAX_FD_NUM				8
 #define MAX_LENGTH_ARG 			128
@@ -18,6 +21,7 @@
 #define PROGRAM_PDT_INDEX		32
 #define PROGRAM_PROPERTIES		0x97
 #define MAX_PID					20
+#define VIRTUAL_BLOCK_TOP		0x08000000
 #define VIRTUAL_BLOCK_BOTTOM	0x08400000
 #define ENTRY_POINT_LOCATION	24
 #define STDIN_LEN				5
