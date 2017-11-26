@@ -557,9 +557,9 @@ int32_t close (int32_t fd)
  * output: 
  * side effect: as description
  */
-int32_t getargs (uint8_t * buf , int32_t nbytes)
+int32_t getargs (uint8_t *buf, int32_t nbytes)
 {
-	pcb_t * pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
+	pcb_t *pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
 
 	/* if user buf is null, return -1 */
 	if (buf==NULL)
@@ -576,7 +576,7 @@ int32_t getargs (uint8_t * buf , int32_t nbytes)
  * vidmap (uint8_t** screen_start)
  * handle system call "vidmap"
  * input: none
- * output: 
+ * output: 0 success; -1 failure
  * side effect: as description
  */
 int32_t vidmap (uint8_t** screen_start)
@@ -586,11 +586,7 @@ int32_t vidmap (uint8_t** screen_start)
 		return -1;
 	}
 
-	//PCB extraction
-	//pcb_t * pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
-
 	uint8_t * destination_mem = (uint8_t*)USER_VID_MEM_ADD;//Pre setting virtual address
-	//memcpy((uint32_t *)destination_mem, (uint32_t *)VID, FOUR_KB);
 	*screen_start = destination_mem;
 
 	return 0;

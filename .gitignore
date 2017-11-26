@@ -115,5 +115,8 @@ source/
 # limeOS
 *.dep
 bootimg
-cifsa92f
-cifsf221
+*.img
+*.sh
+mp3.img
+debug.sh
+student-distrib/debug.sh
