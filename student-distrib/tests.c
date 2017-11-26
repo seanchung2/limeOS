@@ -913,10 +913,42 @@ int vidmap_test() {
 	if(vidmap(screen_start) != -1)
 		return FAIL;
 
-	printf("%d\n",screen_start);
+	return PASS;
+}
+/* set_handler_test
+ * 
+ * Test the set_handler function
+ * Inputs: None
+ * Side Effects: None
+ * Coverage: system_call.c
+ */
+int set_handler_test() {
+	TEST_HEADER;
+
+	int32_t signum;
+	uint8_t* ptr;
+
+	if(set_handler(signum, ptr) != -1)
+		return FAIL;
 
 	return PASS;
 }
+/* sigreturn_test
+ * 
+ * Test the sigreturn function
+ * Inputs: None
+ * Side Effects: None
+ * Coverage: system_call.c
+ */
+int sigreturn_test() {
+	TEST_HEADER;
+
+	if(sigreturn() != -1)
+		return FAIL;
+
+	return PASS;
+}
+
 /* Checkpoint 5 tests */
 
 
@@ -968,5 +1000,7 @@ void launch_tests(){
 	/* Checkpoint 4 */
 	TEST_OUTPUT("getargs Test", getargs_test());
 	TEST_OUTPUT("vidmap Test", vidmap_test());
+	TEST_OUTPUT("set_handler Test", set_handler_test());
+	TEST_OUTPUT("sigreturn Test", sigreturn_test());
 }
 
