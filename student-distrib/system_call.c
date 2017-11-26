@@ -587,7 +587,7 @@ int32_t vidmap (uint8_t** screen_start)
 	//PCB extraction
 	//pcb_t * pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
 
-	uint8_t * destination_mem = USER_VID_MEM_ADD;//Pre setting virtual address
+	uint8_t * destination_mem = (uint8_t*)USER_VID_MEM_ADD;//Pre setting virtual address
 	//memcpy((uint32_t *)destination_mem, (uint32_t *)VID, FOUR_KB);
 	*screen_start = destination_mem;
 
