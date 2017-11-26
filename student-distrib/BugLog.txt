@@ -38,10 +38,12 @@ Description:	We found out the keyboard will put charater incorrectly, leave the 
 				That is, the screen will have double charaters if we press a single button once.
 Fix:			We remove the do-while loop in our keyboard handler, and that fixed the problem.
 
-BUG 2:			"system call on shell"
-Description:	The shell works great, but when running other system call twice, 
-				after finished the system call work, it shows Page fault or General Protection fault.
-Fix:			Thomas found out that we should also store tss to let program halt correctly.
+BUG 2:			"running two programs back to back"
+Description:	Running a single program works fine, but when we attempt to run a second program
+				right after running the first, it causes the OS to break.
+Fix:			We were not restoring the tss when we halted, and this caused us to attempt to return
+				the wrong place in our halt fucntion, causing a large amount of problems. By restorimg
+				the tss in our halt function, we fixed this bug.
 
 CHECKPOINT 4:
 *************
@@ -53,8 +55,15 @@ Fix:			We found out that our read_file function didn't change file position afte
 
 BUG 2:			"cat with executable file"
 Description:	When we do cat with executable arguements, the program will act abnormally.
-Fix:			We add '\0' at the end of buffer sent to file_read function, after we delete it,
-				we can do the cat with executable arguements.
+Fix:			In our file read function, we add a trailing '\0' character at the end of the returned string.
+				When we attempt to read the same number of bytes as the buffer size, this causes us to overflow the
+				buffer and cause problems. To fix this, we removed the trailing '\0'.
+
+BUG 3:			"cat using old arguments"
+Description:	When we call cat with an argument, then call it again without an argument, it will use
+				the argument from the first call for the second call.
+Fix:			We clear the buffer where we store the argument in the PCB after we copy it into the
+				buffer sent as an argument for getargs.
 
 CHECKPOINT 5:
 *************
