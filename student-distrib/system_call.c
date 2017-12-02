@@ -78,10 +78,10 @@ pcb_t* setup_PCB (int32_t new_pid)
 	/* initial the rest fields in PCB */
 	pcb->process_id = new_pid;
 	pcb->parent_id = current_pid;
-	pcb->child_id = -1;
 	pcb->parent_esp = 0;
 	pcb->parent_ebp = 0;
 	pcb->return_value = 0;
+	pcb->tty = terminal_num;
 
 	/* automatically setup stdin and stdout */
 	for(i=0; i<4; i++)

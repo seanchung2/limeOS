@@ -11,10 +11,9 @@ uint8_t alt_flag = 0;
 uint8_t terminal_read_flag = 0;
 uint8_t isAdd = 0; 
 /* store the input characters */
-volatile int buf_index = -1;
+volatile int buf_index[3] = {-1,-1,-1};
 uint8_t char_buf[CHARACTER_BUFFER_SIZE];
 
-int count[2] = {0,0};
 /* 
  * initialize_keyboard()
  * Description: Initializes the Keyboard
@@ -55,18 +54,15 @@ void keyboard_handler ()
     /* call terminal write to write buffer to screen */
     if (isAdd == 1)
     {
-    	terminal_write(0,(int8_t*)(char_buf+buf_index) , 1);
+    	terminal_write(0,(int8_t*)(char_buf+buf_index[terminal_num]) , 1);
     	isAdd = 0;
-    	/*test*/ count[0]++;
     }
-    /*test*/else count[1]++;
     if (enter_flag == 1)
     {	
-    	buf_index=-1;
+    	buf_index[terminal_num]=-1;
     	enter_flag = 0;
     }
 
-	///*test*/printf(" ------> press:%d  release:%d", count[0], count[1]); putc('\n');
 
     /* Send end-of-interrupt signal for the specified IRQ */
     send_eoi(KEYBOARD_IRQ);
@@ -89,15 +85,15 @@ void keyboard_output_dealer (uint8_t c)
 	/* if the scancode is "enter" */
 		case PRESS_ENTER:
 			enter_flag = 1; 
-			char_buf[++buf_index] = '\n';
+			char_buf[++buf_index[terminal_num]] = '\n';
 
-			if(command_buf[0] =='\0')
+			if(command_buf[terminal_num][0] =='\0')
 				for(i=0;i<CHARACTER_BUFFER_SIZE;i++)
 				{
-					command_buf[i] = char_buf[i]; 
+					command_buf[terminal_num][i] = char_buf[i]; 
 					if(char_buf[i] == '\n')
 					{
-						set_t_enter_flag();
+						set_t_enter_flag(terminal_num);
 						break;
 					}
 				}
@@ -140,9 +136,9 @@ void keyboard_output_dealer (uint8_t c)
 	/* if the scancode is "backspace" */
 		case PRESS_BACKSPACE:
 			 /* check if the buffer is empty */
-			 if(buf_index > -1)
+			 if(buf_index[terminal_num] > -1)
 			 {
-		 		buf_index--;
+		 		buf_index[terminal_num]--;
 				backspace_pressed();
 			 }
 			 break;
@@ -186,7 +182,7 @@ void defaultKeyPressed (uint8_t c)
 	if (ctrl_flag ==1 && (scancodeTable[index][c] == 'l' || scancodeTable[index][c] == 'L')){
 		clear();
 		reset_screen();
-		buf_index = -1;
+		buf_index[terminal_num] = -1;
 		return;
 	}
 
@@ -195,16 +191,16 @@ void defaultKeyPressed (uint8_t c)
 	/*if (ctrl_flag ==1 && (scancodeTable[index][c] == 'c' || scancodeTable[index][c] == 'C')){
 		sti();
 		halt_256(256);
-		buf_index = -1;
+		buf_index[terminal_num] = -1;
 		return;
 	}*/
 
 	if(scancodeTable[index][c] != '\0')
 	{
-		if(buf_index < CHARACTER_BUFFER_SIZE-2)
+		if(buf_index[terminal_num] < CHARACTER_BUFFER_SIZE-2)
 		{	
 			isAdd = 1;
-			char_buf[++buf_index] = scancodeTable[index][c];
+			char_buf[++buf_index[terminal_num]] = scancodeTable[index][c];
 		}
 	}
 	else

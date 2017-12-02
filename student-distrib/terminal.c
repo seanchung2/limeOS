@@ -3,8 +3,8 @@
 #define NUM_COLS        80
 #define NUM_ROWS        25
 
-volatile uint8_t t_enter_flag;
-
+volatile uint8_t t_enter_flag[3];
+int terminal_num = 0;
 /*
  * void set_t_enter_flag()
  * set t_enter_flag to 1
@@ -14,7 +14,7 @@ volatile uint8_t t_enter_flag;
  */
 void set_t_enter_flag()
 {
-	t_enter_flag = 1;
+	t_enter_flag[get_tty()] = 1;
 }
 /*
  * int terminal_read(int32_t fd, void* buf, int32_t nbytes)
@@ -30,16 +30,17 @@ int32_t terminal_read(int32_t fd, void* buf, int32_t nbytes)
 		return -1;
 
 	int i = 0;
-	t_enter_flag = 0;
-	((int8_t*)command_buf)[0] = '\0';
+	int local_t_num = get_tty();
+	t_enter_flag[local_t_num] = 0;
+	(command_buf)[local_t_num][0] = '\0';
 
-	while(!t_enter_flag);
+	while(!t_enter_flag[local_t_num]);
 
 	while(1)
 	{
-		((int8_t*)buf)[i] = ((int8_t*)command_buf)[i];
+		((int8_t*)buf)[i] = (command_buf)[local_t_num][i];
 		
-		if(((int8_t*)command_buf)[i] == '\n')
+		if((command_buf)[local_t_num][i] == '\n')
 			break;
 		i++;
 	}
@@ -100,4 +101,15 @@ int32_t terminal_open(const uint8_t* filename)
 int32_t terminal_close(int32_t fd)
 {
 	return 0;
+}
+
+/*
+ * void set_terminal_num(int i)
+ * change the terminal number
+ * input: i - terminal number
+ * output: none
+ */
+void set_terminal_num(int i)
+{
+	terminal_num = i;
 }

@@ -7,6 +7,7 @@
 
 #include "types.h"
 #include "i8259.h"
+#include "filesystem.h"
 
 /* self-defined variables */
 extern int RTC_STATUS;              // for test
@@ -38,6 +39,7 @@ void backspace_pressed(void);
 void update_cursor(int x, int y);
 int check_out_of_bound();
 void scroll_screen();
+uint8_t get_tty();
 
 /* Userspace address-check functions */
 int32_t bad_userspace_addr(const void* addr, int32_t len);

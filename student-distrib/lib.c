@@ -620,3 +620,15 @@ void scroll_screen()
     }
     screen_y--;
 }
+
+/* uint8_t get_tty()
+ * return current terminal number
+ * Inputs: none
+ * Return Value: tty
+ * Side effect: None
+ */
+uint8_t get_tty()
+{
+    pcb_t *pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
+    return pcb->tty;
+}

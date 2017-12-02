@@ -46,7 +46,6 @@ typedef struct process_control_block  {
 	fd_entry_t fd_entry[8];
 	uint32_t process_id;
 	uint32_t parent_id;
-	uint32_t child_id;
 	uint32_t parent_esp;
 	uint32_t parent_ebp;
 	uint32_t return_value;
@@ -54,6 +53,7 @@ typedef struct process_control_block  {
 	uint32_t kernel_stack;
 	uint32_t parent_esp0;
 	uint8_t args[MAX_LENGTH_ARG]; 
+	uint8_t tty;
 } pcb_t;
 
 /* function to set memory address for the start of the filesystem */
