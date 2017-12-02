@@ -34,6 +34,11 @@
 #define PRESS_ALT 					0x38
 #define RELEASE_ALT					0xB8
 
+#define KEY_F1						0x3B
+#define KEY_F3						0x3D
+
+const static uint8_t functionKeyTable[3] = {0x3B,0x3C,0x3D};
+
 const static uint8_t scancodeTable[4][TABLE_SIZE+1] = {
 	{'\0', '\0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\0', '\0',
 	 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\0', '\0', 'a', 's',
