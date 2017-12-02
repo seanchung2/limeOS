@@ -1,13 +1,16 @@
-#include "lib.h"
 
 #ifndef _TERMINAL_H
 #define _TERMINAL_H
 
+#include "lib.h"
+#include "paging.h"
+
+
 #define CHARACTER_BUFFER_SIZE 		128
+#define VIDEO_MEMORY				0xB8000
 uint8_t command_buf[3][CHARACTER_BUFFER_SIZE];
 
-/* current terminal number */
-extern int terminal_num;
+const int backup_mem_addr[3] = {0xB9000, 0xBA000, 0xBB000};  
 
 /* set the t_enter_flag to 1 */
 extern void set_t_enter_flag();
@@ -26,5 +29,7 @@ extern int32_t terminal_close(int32_t fd);
 
 /* set the terminal number */
 extern void set_terminal_num(int i);
+
+extern void terminal_switch(int new_tty);
 
 #endif /* _TERMINAL_H */

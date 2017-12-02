@@ -139,7 +139,7 @@ void keyboard_output_dealer (uint8_t c)
 			 if(buf_index[terminal_num] > -1)
 			 {
 		 		buf_index[terminal_num]--;
-				backspace_pressed();
+				backspace_pressed(get_tty());
 			 }
 			 break;
 
@@ -180,7 +180,7 @@ void defaultKeyPressed (uint8_t c)
 
 	/* if CTRL+L is pressed, clean the screen and reset the cursor position */
 	if (ctrl_flag ==1 && (scancodeTable[index][c] == 'l' || scancodeTable[index][c] == 'L')){
-		clear();
+		clear(get_tty());
 		reset_screen();
 		buf_index[terminal_num] = -1;
 		return;

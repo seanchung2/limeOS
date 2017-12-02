@@ -14,6 +14,8 @@ extern int RTC_STATUS;              // for test
 #define COLOR_SCREEN 7              // for text color when rtc disabled
 #define SCROLL_ENTER_PRESSED    1   // for shifting the screen
 #define SCROLL_LAST_LETTER      2   // for shifting the screen
+/* current terminal number */
+extern int terminal_num;
 
 int32_t printf(int8_t *format, ...);
 void putc(uint8_t c);
@@ -21,7 +23,7 @@ int32_t puts(int8_t *s);
 int8_t *itoa(uint32_t value, int8_t* buf, int32_t radix);
 int8_t *strrev(int8_t* s);
 uint32_t strlen(const int8_t* s);
-void clear(void);
+void clear();
 
 void* memset(void* s, int32_t c, uint32_t n);
 void* memset_word(void* s, int32_t c, uint32_t n);
@@ -35,7 +37,7 @@ int8_t* strncpy(int8_t* dest, const int8_t*src, uint32_t n);
 /* added by limeOS */
 void test_interrupts(void);
 void reset_screen();
-void backspace_pressed(void);
+void backspace_pressed();
 void update_cursor(int x, int y);
 int check_out_of_bound();
 void scroll_screen();

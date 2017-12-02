@@ -44,7 +44,13 @@ void init_paging()  {
 	// Initialize Video Memory's entry in PT0
 	PT0.entries[VID_MEM_INDEX] = VID_MEM_ENTRY;
 
+	// 3 pages for t1 t2 t3 at 100MB 100MB+4KB 100MB+8KB (virtual memory)
+	PT0.entries[VID_MEM_INDEX+1] = KERNEL_VID_MEM_BACKUP_1;
+	PT0.entries[VID_MEM_INDEX+2] = KERNEL_VID_MEM_BACKUP_2;
+	PT0.entries[VID_MEM_INDEX+3] = KERNEL_VID_MEM_BACKUP_3;
 	PT1.entries[0] = USER_VID_MEM_ENTRY;
+	PT1.entries[1] = VID_MEM_BACKUP_2;
+	PT1.entries[2] = VID_MEM_BACKUP_3;
 
 	// Set top bits of CR3 to address of Page Descriptor Table
 	asm volatile (	"movl %%CR3, %%eax;"	
