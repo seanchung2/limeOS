@@ -174,6 +174,13 @@ void defaultKeyPressed (uint8_t c)
 {
 	int index = 2*capslock_flag + 1*shift_flag;
 
+	/* if alt+F1/F2/F3 is pressed, change to each terminal */
+	if(alt_flag ==1 && c >= KEY_F1 && c <= KEY_F3)
+	{
+		printf("F%c pressed!\n",(c-0xA));
+		return;
+	}
+
 	/* if the scancode is nothing to do with normal characters, do nothing */
 	if(c>TABLE_SIZE)
 		return;
