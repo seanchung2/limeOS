@@ -37,7 +37,7 @@ void entry(unsigned long magic, unsigned long addr) {
     multiboot_info_t *mbi;
 
     /* Clear the screen. */
-    clear();
+    clear(0);
 
     /* Am I booted by a Multiboot-compliant boot loader? */
     if (magic != MULTIBOOT_BOOTLOADER_MAGIC) {
@@ -152,7 +152,7 @@ void entry(unsigned long magic, unsigned long addr) {
     }
 
     /* clear the screen and move the screen pointer back to the 0,0 */
-    clear();
+    clear(0);
     reset_screen();
 
     /* Init the PIC */

@@ -2,31 +2,29 @@
  * vim:ts=4 noexpandtab */
 #include "rtc.h"
 #include "lib.h"
-#define VIDEO           0xB8000
-#define NUM_COLS        80
-#define NUM_ROWS        25
-#define ATTRIB          0x7
-#define CUR_LPORT       0xF
-#define CUR_HPORT       0xE
-#define VGA_INDEX_REG   0x3D4
-#define VGA_DATA_REG    0x3D5
 
-static int screen_x;
-static int screen_y;
-static char* video_mem = (char *)VIDEO;
+
+static int screen_x[3];
+static int screen_y[3];
+
+char* video_mem[3] = {(char *)VIDEO, (char *)VID_BACKUP_2, (char *)VID_BACKUP_3};
 
 /* self-defined variables */
 int RTC_STATUS=0;       /* for test use */
+int terminal_num = 0;
+
+/* initial current pid */
+int32_t current_pid = 0;
 
 /* void clear(void);
  * Inputs: void
  * Return Value: none
  * Function: Clears video memory */
-void clear(void) {
+void clear() {
     int32_t i;
     for (i = 0; i < NUM_ROWS * NUM_COLS; i++) {
-        *(uint8_t *)(video_mem + (i << 1)) = ' ';
-        *(uint8_t *)(video_mem + (i << 1) + 1) = ATTRIB;
+        *(uint8_t *)(video_mem[terminal_num] + (i << 1)) = ' ';
+        *(uint8_t *)(video_mem[terminal_num] + (i << 1) + 1) = ATTRIB;
     }
 }
 
@@ -58,7 +56,7 @@ int32_t printf(int8_t *format, ...) {
 
     /*test*/
     if(check_out_of_bound())
-        scroll_screen();
+        scroll_screen(get_tty());
 
     while (*buf != '\0') {
         switch (*buf) {
@@ -179,19 +177,19 @@ int32_t puts(int8_t* s) {
  *  Function: Output a character to the console */
 void putc(uint8_t c) {
     if(c == '\n' || c == '\r') {
-        screen_y++;
-        screen_x = 0;
+        screen_y[terminal_num]++;
+        screen_x[terminal_num] = 0;
     } else {
-        *(uint8_t *)(video_mem + ((NUM_COLS * screen_y + screen_x) << 1)) = c;
-        *(uint8_t *)(video_mem + ((NUM_COLS * screen_y + screen_x) << 1) + 1) = ATTRIB;
-        screen_x++;
+        *(uint8_t *)(video_mem[terminal_num] + ((NUM_COLS * screen_y[terminal_num] + screen_x[terminal_num]) << 1)) = c;
+        *(uint8_t *)(video_mem[terminal_num] + ((NUM_COLS * screen_y[terminal_num] + screen_x[terminal_num]) << 1) + 1) = ATTRIB;
+        screen_x[terminal_num]++;
 
-        screen_y = (screen_y + (screen_x / NUM_COLS)) % NUM_ROWS;
-        screen_x %= NUM_COLS;
+        screen_y[terminal_num] = (screen_y[terminal_num] + (screen_x[terminal_num] / NUM_COLS)) % NUM_ROWS;
+        screen_x[terminal_num] %= NUM_COLS;
     }
 
     /*test*/
-    update_cursor(screen_x, screen_y);
+    update_cursor(screen_x[terminal_num], screen_y[terminal_num]);
 }
 
 /* int8_t* itoa(uint32_t value, int8_t* buf, int32_t radix);
@@ -491,10 +489,10 @@ void test_interrupts(void) {
 
     for (i = 0; i < NUM_ROWS * NUM_COLS; i++) {
         if(RTC_STATUS == 1) {
-            video_mem[(i << 1) + 1]++;
+            video_mem[terminal_num][(i << 1) + 1]++;
         }
         else {
-            video_mem[(i << 1) + 1] = COLOR_SCREEN;
+            video_mem[terminal_num][(i << 1) + 1] = COLOR_SCREEN;
         }
     }
     outb(0x0C, 0x70);
@@ -518,11 +516,11 @@ void test_interrupts(void) {
  * Function: as description
  */
 void reset_screen(void)  {
-    screen_x = 0;
-    screen_y = 0;
+    screen_x[terminal_num] = 0;
+    screen_y[terminal_num] = 0;
 
     /*test*/
-    update_cursor(screen_x, screen_y);
+    update_cursor(screen_x[terminal_num], screen_y[terminal_num]);
 }
 
 /* void backspace_pressed(void)
@@ -531,24 +529,24 @@ void reset_screen(void)  {
  * Return Value: void
  * Function: as description
  */
-void backspace_pressed(void){
+void backspace_pressed(){
     
-    screen_x--;
-    if((screen_x < 0) && (screen_y == 0))
+    screen_x[terminal_num]--;
+    if((screen_x[terminal_num] < 0) && (screen_y[terminal_num] == 0))
     {
-        screen_x++;
+        screen_x[terminal_num]++;
     }
-    else if ((screen_x < 0) && (screen_y > 0))
+    else if ((screen_x[terminal_num] < 0) && (screen_y[terminal_num] > 0))
     {
-        screen_x += NUM_COLS; 
-        screen_y--;
+        screen_x[terminal_num] += NUM_COLS; 
+        screen_y[terminal_num]--;
     }
-    *(uint8_t *)(video_mem + ((NUM_COLS * screen_y + screen_x) << 1)) = ' ';
-    *(uint8_t *)(video_mem + ((NUM_COLS * screen_y + screen_x) << 1) + 1) = ATTRIB;
+    *(uint8_t *)(video_mem[terminal_num] + ((NUM_COLS * screen_y[terminal_num] + screen_x[terminal_num]) << 1)) = ' ';
+    *(uint8_t *)(video_mem[terminal_num] + ((NUM_COLS * screen_y[terminal_num] + screen_x[terminal_num]) << 1) + 1) = ATTRIB;
 
 
     /*TEST*/
-    update_cursor(screen_x, screen_y);
+    update_cursor(screen_x[terminal_num], screen_y[terminal_num]);
 }
 
 
@@ -585,10 +583,10 @@ void update_cursor(int x, int y)
 int check_out_of_bound()
 {
     int status = 0;
-    if(screen_y == (NUM_ROWS-1))
+    if(screen_y[terminal_num] == (NUM_ROWS-1))
     {
         status = SCROLL_ENTER_PRESSED;
-        if(screen_x == (NUM_COLS-1))
+        if(screen_x[terminal_num] == (NUM_COLS-1))
         {
             status = SCROLL_LAST_LETTER;
         }
@@ -613,12 +611,12 @@ void scroll_screen()
     {
         for (x = 0; x<NUM_COLS; x++)
         {
-            *(uint8_t *)(video_mem + ((NUM_COLS * (y-1) + x) << 1)) = *(uint8_t *)(video_mem + ((NUM_COLS * y + x) << 1));
+            *(uint8_t *)(video_mem[terminal_num] + ((NUM_COLS * (y-1) + x) << 1)) = *(uint8_t *)(video_mem[terminal_num] + ((NUM_COLS * y + x) << 1));
             if(y == (NUM_ROWS-1))
-                *(uint8_t *)(video_mem + ((NUM_COLS * y + x) << 1)) = ' ';
+                *(uint8_t *)(video_mem[terminal_num] + ((NUM_COLS * y + x) << 1)) = ' ';
         }
     }
-    screen_y--;
+    screen_y[terminal_num]--;
 }
 
 /* uint8_t get_tty()

@@ -15,8 +15,17 @@
 #define UVM_MASK			0x7
 #define USER_VID_MEM_ENTRY 	0xB8007
 
+// for backup video memory, store in 185*4k, 186*4k, 187*4k
+#define KERNEL_VID_MEM_BACKUP_1 	0xB9003
+#define KERNEL_VID_MEM_BACKUP_2 	0xBA003
+#define KERNEL_VID_MEM_BACKUP_3 	0xBB003
+#define VID_MEM_BACKUP_1 	0xB9007
+#define VID_MEM_BACKUP_2 	0xBA007
+#define VID_MEM_BACKUP_3 	0xBB007
+extern int VID_MEM_BACKUP[3];
 extern int PDT_addr;
 extern int PT0_addr;
+extern int PT1_addr;
 
 // struct for creating page tables
 typedef struct page_table_t  {

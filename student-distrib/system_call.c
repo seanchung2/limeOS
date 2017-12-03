@@ -1,5 +1,6 @@
 #include "system_call.h"
 
+int user_vid_mem_addr[3] = {0x06400000, 0x06400000+0x1000, 0x06400000+2*0x1000};
 
 /* Array of possible pid's */
 int32_t pid_flags[MAX_PID];
@@ -128,7 +129,7 @@ int32_t halt_256(uint32_t status){
 	//close any relevant FDs
 	uint32_t i;
 	for(i = 0; i < MAX_FD_NUM; i++){
-		pcb_halt->fd_entry[i].flags = 0;
+		close(i);
 	}
 
 	pid_flags[current_pid] = 0;

@@ -7,13 +7,32 @@
 
 #include "types.h"
 #include "i8259.h"
-#include "filesystem.h"
+
 
 /* self-defined variables */
 extern int RTC_STATUS;              // for test
 #define COLOR_SCREEN 7              // for text color when rtc disabled
 #define SCROLL_ENTER_PRESSED    1   // for shifting the screen
 #define SCROLL_LAST_LETTER      2   // for shifting the screen
+#define VIDEO           0xB8000
+#define VID_BACKUP_1    0xB9000
+#define VID_BACKUP_2    0xBA000
+#define VID_BACKUP_3    0xBB000
+#define NUM_COLS        80
+#define NUM_ROWS        25
+#define ATTRIB          0x7
+#define CUR_LPORT       0xF
+#define CUR_HPORT       0xE
+#define VGA_INDEX_REG   0x3D4
+#define VGA_DATA_REG    0x3D5
+#define KERNEL_BOT_ADDR     0x800000
+#define MAX_LENGTH_ARG          128
+#define EIGHT_KB            0x2000
+
+/* current terminal number */
+extern int terminal_num;
+extern int32_t current_pid;
+extern char* video_mem[3];
 
 int32_t printf(int8_t *format, ...);
 void putc(uint8_t c);
@@ -21,7 +40,7 @@ int32_t puts(int8_t *s);
 int8_t *itoa(uint32_t value, int8_t* buf, int32_t radix);
 int8_t *strrev(int8_t* s);
 uint32_t strlen(const int8_t* s);
-void clear(void);
+void clear();
 
 void* memset(void* s, int32_t c, uint32_t n);
 void* memset_word(void* s, int32_t c, uint32_t n);
@@ -35,7 +54,7 @@ int8_t* strncpy(int8_t* dest, const int8_t*src, uint32_t n);
 /* added by limeOS */
 void test_interrupts(void);
 void reset_screen();
-void backspace_pressed(void);
+void backspace_pressed();
 void update_cursor(int x, int y);
 int check_out_of_bound();
 void scroll_screen();
@@ -44,6 +63,29 @@ uint8_t get_tty();
 /* Userspace address-check functions */
 int32_t bad_userspace_addr(const void* addr, int32_t len);
 int32_t safe_strncpy(int8_t* dest, const int8_t* src, int32_t n);
+
+/* entry in file array of PCB */
+typedef struct fd_entry  {
+    int32_t (*operations_pointer[4])();
+    int32_t inode_index;
+    int32_t file_position;
+    int32_t flags;
+} fd_entry_t;
+
+/* structure for PCB */
+typedef struct process_control_block  {
+    fd_entry_t fd_entry[8];
+    uint32_t process_id;
+    uint32_t parent_id;
+    uint32_t parent_esp;
+    uint32_t parent_ebp;
+    uint32_t return_value;
+    uint32_t return_instruction;
+    uint32_t kernel_stack;
+    uint32_t parent_esp0;
+    uint8_t args[MAX_LENGTH_ARG]; 
+    uint8_t tty;
+} pcb_t;
 
 /* Port read functions */
 /* Inb reads a byte and returns its value as a zero-extended 32-bit

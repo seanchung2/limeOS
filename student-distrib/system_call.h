@@ -27,7 +27,7 @@
 #define STDIN_LEN				5
 #define STDOUT_LEN				6
 
-
+extern int user_vid_mem_addr[3];
 /* for pid status, PCB entries, and jumptable */
 enum pidStatus{FREE = 0, IN_USE};
 enum jumpTable{OPEN = 0, READ, WRITE, CLOSE};

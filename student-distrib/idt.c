@@ -1,5 +1,4 @@
 #include "idt.h"
-#include "rtc.h"
 /* init_idt
  *
  * Set the gates and load IDT with correct vectors

@@ -3,9 +3,6 @@
 /* holds the adress for the start of the filesystem */
 static uint32_t fs_start;
 
-/* initial current pid */
-int32_t current_pid = 0;
-
 /* temporary dentry table */
 static int dentry_table_flags[FILE_TABLE_SIZE];
 

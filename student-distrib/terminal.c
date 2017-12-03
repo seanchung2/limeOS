@@ -4,7 +4,8 @@
 #define NUM_ROWS        25
 
 volatile uint8_t t_enter_flag[3];
-int terminal_num = 0;
+int backup_mem_addr[3] = {0xB9000, 0xBA000, 0xBB000};
+
 /*
  * void set_t_enter_flag()
  * set t_enter_flag to 1
@@ -112,4 +113,24 @@ int32_t terminal_close(int32_t fd)
 void set_terminal_num(int i)
 {
 	terminal_num = i;
+}
+
+/*
+*/
+void terminal_switch(int new_tty)
+{
+	page_table_t* PT1 = (page_table_t*)PT1_addr;
+
+	/* copy video memory to backup */
+	memcpy((void*)backup_mem_addr[terminal_num], (void *)VIDEO_MEMORY, FOUR_KB);
+	/* copy backup to video memory */
+	memcpy((void*)VIDEO_MEMORY, (void *)backup_mem_addr[new_tty], FOUR_KB);
+
+	video_mem[terminal_num] = (char*)backup_mem_addr[terminal_num];
+	video_mem[new_tty] = (char*)VIDEO_MEMORY;
+
+	PT1->entries[terminal_num] = VID_MEM_BACKUP[terminal_num];
+	PT1->entries[new_tty] = USER_VID_MEM_ENTRY;
+
+	terminal_num = new_tty;
 }
