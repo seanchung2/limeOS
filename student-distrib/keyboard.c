@@ -139,7 +139,7 @@ void keyboard_output_dealer (uint8_t c)
 			 if(buf_index[terminal_num] > -1)
 			 {
 		 		buf_index[terminal_num]--;
-				backspace_pressed(get_tty());
+				backspace_pressed();
 			 }
 			 break;
 
@@ -177,7 +177,7 @@ void defaultKeyPressed (uint8_t c)
 	/* if alt+F1/F2/F3 is pressed, change to each terminal */
 	if(alt_flag ==1 && c >= KEY_F1 && c <= KEY_F3)
 	{
-		printf("F%c pressed!\n",(c-0xA));
+		terminal_switch((c-KEY_F1));
 		return;
 	}
 
