@@ -1,5 +1,6 @@
 #include "lib.h"
 #include "i8259.h"
+#include "scheduling.h"
 
 /*
 Programmable Interval Timer: A system clock is used to accurately schedule a new process
@@ -31,3 +32,12 @@ and allow the current task to wait for a certain period of time.
  * Side Effects: As description
  */
 void intitalize_PIT();
+
+/* PIT_handler
+ *
+ * Description: 
+ * Inputs: None
+ * Outputs: None
+ * Side Effects: As description
+ */
+void PIT_handler();
