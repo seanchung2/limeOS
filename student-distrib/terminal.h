@@ -10,7 +10,7 @@
 #define VIDEO_MEMORY				0xB8000
 uint8_t command_buf[3][CHARACTER_BUFFER_SIZE];
 
-const int backup_mem_addr[3] = {0xB9000, 0xBA000, 0xBB000};  
+extern int backup_mem_addr[3];  
 
 /* set the t_enter_flag to 1 */
 extern void set_t_enter_flag();

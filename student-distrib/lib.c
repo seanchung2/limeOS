@@ -2,26 +2,19 @@
  * vim:ts=4 noexpandtab */
 #include "rtc.h"
 #include "lib.h"
-#define VIDEO           0xB8000
-#define VID_BACKUP_1    0xB9000
-#define VID_BACKUP_2    0xBA000
-#define VID_BACKUP_3    0xBB000
-#define NUM_COLS        80
-#define NUM_ROWS        25
-#define ATTRIB          0x7
-#define CUR_LPORT       0xF
-#define CUR_HPORT       0xE
-#define VGA_INDEX_REG   0x3D4
-#define VGA_DATA_REG    0x3D5
+
 
 static int screen_x[3];
 static int screen_y[3];
 
-static char* video_mem[3] = {(char *)VIDEO, (char *)VID_BACKUP_2, (char *)VID_BACKUP_3};
+char* video_mem[3] = {(char *)VIDEO, (char *)VID_BACKUP_2, (char *)VID_BACKUP_3};
 
 /* self-defined variables */
 int RTC_STATUS=0;       /* for test use */
 int terminal_num = 0;
+
+/* initial current pid */
+int32_t current_pid = 0;
 
 /* void clear(void);
  * Inputs: void

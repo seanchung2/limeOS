@@ -13,11 +13,6 @@
 #define ONE_KB 				1024
 #define FILE_TABLE_SIZE 	8
 #define INODE_OFFSET 		40
-#define KERNEL_BOT_ADDR		0x800000
-#define EIGHT_KB			0x2000
-#define MAX_LENGTH_ARG 			128
-
-extern int32_t current_pid;
 
 /* directory entry structure */
 typedef struct dentry  {
@@ -32,29 +27,6 @@ typedef struct inode  {
 	int32_t length;
 	int32_t data_block_numbers[DATA_BLOCK_COUNT];
 } inode_t;
-
-/* entry in file array of PCB */
-typedef struct fd_entry  {
-	int32_t (*operations_pointer[4])();
-	int32_t inode_index;
-	int32_t file_position;
-	int32_t flags;
-} fd_entry_t;
-
-/* structure for PCB */
-typedef struct process_control_block  {
-	fd_entry_t fd_entry[8];
-	uint32_t process_id;
-	uint32_t parent_id;
-	uint32_t parent_esp;
-	uint32_t parent_ebp;
-	uint32_t return_value;
-	uint32_t return_instruction;
-	uint32_t kernel_stack;
-	uint32_t parent_esp0;
-	uint8_t args[MAX_LENGTH_ARG]; 
-	uint8_t tty;
-} pcb_t;
 
 /* function to set memory address for the start of the filesystem */
 void set_fs_start(module_t* mod);

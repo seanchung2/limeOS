@@ -4,9 +4,9 @@
 #include "x86_desc.h"
 #include "lib.h"
 #include "i8259.h"
-#include "idt.h"
 #include "system_wrapper.h"
 #include "keyboard.h"
+#include "rtc.h"
 
 /* Define variables */
 #define SYSTEM_CALL_VEC_NUM 0x80

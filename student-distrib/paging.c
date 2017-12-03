@@ -1,5 +1,7 @@
 #include "paging.h"
 
+int VID_MEM_BACKUP[3] = {0xB9007, 0xBA007, 0xBB007};
+
 // Page Descriptor Table struct
 static page_table_t PDT __attribute__( (aligned(FOUR_KB)) );
 

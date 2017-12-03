@@ -22,7 +22,7 @@
 #define VID_MEM_BACKUP_1 	0xB9007
 #define VID_MEM_BACKUP_2 	0xBA007
 #define VID_MEM_BACKUP_3 	0xBB007
-const int VID_MEM_BACKUP[3] = {VID_MEM_BACKUP_1, VID_MEM_BACKUP_2, VID_MEM_BACKUP_3};
+extern int VID_MEM_BACKUP[3];
 extern int PDT_addr;
 extern int PT0_addr;
 extern int PT1_addr;
