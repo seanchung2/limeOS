@@ -187,7 +187,7 @@ void defaultKeyPressed (uint8_t c)
 
 	/* if CTRL+L is pressed, clean the screen and reset the cursor position */
 	if (ctrl_flag ==1 && (scancodeTable[index][c] == 'l' || scancodeTable[index][c] == 'L')){
-		clear(get_tty());
+		clear(terminal_num);
 		reset_screen();
 		buf_index[terminal_num] = -1;
 		return;

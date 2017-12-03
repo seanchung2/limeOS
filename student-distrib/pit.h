@@ -11,7 +11,7 @@ and allow the current task to wait for a certain period of time.
 #define CHANNNEL_2 			0x42
 #define COMMAND_REGISTER	0x43
 #define SET_LOW				0xFF
-#define PIT_IRQ				1
+#define PIT_IRQ				0
 #define HIGH_BYTE_SET		8
 
 #define DEFAULT_FREQ		1193180

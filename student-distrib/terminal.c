@@ -15,7 +15,7 @@ int backup_mem_addr[3] = {0xB9000, 0xBA000, 0xBB000};
  */
 void set_t_enter_flag()
 {
-	t_enter_flag[get_tty()] = 1;
+	t_enter_flag[terminal_num] = 1;
 }
 /*
  * int terminal_read(int32_t fd, void* buf, int32_t nbytes)
@@ -31,17 +31,16 @@ int32_t terminal_read(int32_t fd, void* buf, int32_t nbytes)
 		return -1;
 
 	int i = 0;
-	int local_t_num = get_tty();
-	t_enter_flag[local_t_num] = 0;
-	(command_buf)[local_t_num][0] = '\0';
+	t_enter_flag[terminal_num] = 0;
+	(command_buf)[terminal_num][0] = '\0';
 
-	while(!t_enter_flag[local_t_num]);
+	while(!t_enter_flag[terminal_num]);
 
 	while(1)
 	{
-		((int8_t*)buf)[i] = (command_buf)[local_t_num][i];
+		((int8_t*)buf)[i] = (command_buf)[terminal_num][i];
 		
-		if((command_buf)[local_t_num][i] == '\n')
+		if((command_buf)[terminal_num][i] == '\n')
 			break;
 		i++;
 	}
@@ -133,4 +132,15 @@ void terminal_switch(int new_tty)
 	PT1->entries[new_tty] = USER_VID_MEM_ENTRY;
 
 	terminal_num = new_tty;
+
+	asm volatile (	"movl %%CR3, %%eax;"	
+					"andl $0xFFF, %%eax;"
+					"addl %0, %%eax;"
+					"movl %%eax, %%CR3;"
+						:
+						: "r" (PDT_addr)
+						: "eax", "cc"
+						);
+
+	update_cursor(screen_x[terminal_num], screen_y[terminal_num]);
 }

@@ -12,7 +12,7 @@ and allow the current task to wait for a certain period of time.
  * Outputs: None
  * Side Effects: As description
  */
-void intitialize_PIT(){
+void intitalize_PIT(){
 	int16_t div = DEFAULT_FREQ/DIVIDER;  
 
 	outb(RESULTANT_BYTE, COMMAND_REGISTER);

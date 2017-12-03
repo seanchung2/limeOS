@@ -13,7 +13,6 @@
 #define LOAD_ADDR				0x08048000
 #define USER_VID_MEM_ADD		0x06400000
 #define VID 					0xB8000
-//#define FOUR_KB				0x1000
 #define EIGHT_KB				0x2000
 #define MAX_FD_NUM				8
 #define MAX_LENGTH_ARG 			128
@@ -27,6 +26,7 @@
 #define STDIN_LEN				5
 #define STDOUT_LEN				6
 
+extern int32_t pid_flags[MAX_PID];
 extern int user_vid_mem_addr[3];
 /* for pid status, PCB entries, and jumptable */
 enum pidStatus{FREE = 0, IN_USE};

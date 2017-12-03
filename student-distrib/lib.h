@@ -33,6 +33,8 @@ extern int RTC_STATUS;              // for test
 extern int terminal_num;
 extern int32_t current_pid;
 extern char* video_mem[3];
+extern int screen_x[3];
+extern int screen_y[3];
 
 int32_t printf(int8_t *format, ...);
 void putc(uint8_t c);

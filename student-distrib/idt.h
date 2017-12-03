@@ -177,9 +177,10 @@ void XF()  {
 void k_handler();
 /* a wrapper to map idt table to RTC_handler */
 void R_handler();
+/* a wrapper to map idt table to PIT_handler */
+void P_handler();
 
 /* initialize the IDT */
 extern void init_idt();
-void P_handler();
 
 #endif

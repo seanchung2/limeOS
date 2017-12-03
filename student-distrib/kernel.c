@@ -13,6 +13,7 @@
 #include "filesystem.h"
 #include "rtc.h"
 #include "system_call.h"
+#include "pit.h"
 
 #define RUN_TESTS
 
@@ -164,6 +165,7 @@ void entry(unsigned long magic, unsigned long addr) {
     set_fs_start((module_t*)(mbi->mods_addr));
     initialize_keyboard();
     initialize_RTC();
+    intitalize_PIT();
     init_paging();
 
     /* Enable interrupts */

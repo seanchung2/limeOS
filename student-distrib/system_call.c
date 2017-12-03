@@ -1,8 +1,6 @@
 #include "system_call.h"
 
 int user_vid_mem_addr[3] = {0x06400000, 0x06400000+0x1000, 0x06400000+2*0x1000};
-
-/* Array of possible pid's */
 int32_t pid_flags[MAX_PID];
 
 /* Do nothing, return 0 */
@@ -381,6 +379,8 @@ int32_t read (int32_t fd, void* buf, int32_t nbytes)
 int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 {
 	int ret;
+	int tty_save;
+
 	/* fetch the pcb in current process */
 	pcb_t * pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
 
@@ -394,8 +394,14 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 	if (pcb->fd_entry[fd].flags == FREE)
 		return -1;
 
-	/* call the file's read function */
+	tty_save = terminal_num;
+	terminal_num = get_tty();
+
+	/* call the file's write function */
 	ret = (*pcb->fd_entry[fd].operations_pointer[WRITE])(fd,buf,nbytes);
+
+	terminal_num = tty_save;
+
 	return ret;
 }
 
@@ -565,7 +571,7 @@ int32_t vidmap (uint8_t** screen_start)
 		return -1;
 	}
 
-	uint8_t * destination_mem = (uint8_t*)USER_VID_MEM_ADD;//Pre setting virtual address
+	uint8_t * destination_mem = (uint8_t*)user_vid_mem_addr[terminal_num];//Pre setting virtual address
 	*screen_start = destination_mem;
 
 	return 0;

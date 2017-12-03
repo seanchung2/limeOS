@@ -4,8 +4,8 @@
 #include "lib.h"
 
 
-static int screen_x[3];
-static int screen_y[3];
+int screen_x[3];
+int screen_y[3];
 
 char* video_mem[3] = {(char *)VIDEO, (char *)VID_BACKUP_2, (char *)VID_BACKUP_3};
 
@@ -56,7 +56,7 @@ int32_t printf(int8_t *format, ...) {
 
     /*test*/
     if(check_out_of_bound())
-        scroll_screen(get_tty());
+        scroll_screen(terminal_num);
 
     while (*buf != '\0') {
         switch (*buf) {
