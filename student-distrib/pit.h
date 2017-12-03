@@ -1,6 +1,5 @@
 #include "lib.h"
 #include "i8259.h"
-#include "scheduling.h"
 
 /*
 Programmable Interval Timer: A system clock is used to accurately schedule a new process

@@ -22,7 +22,7 @@ CHECKPOINT 2:
 
 BUG 1:
 Description:	We mistake the meaning of termial read and terminal write, we thought
-				read is to read keyboard buffer(which had alreadly in our code) into 
+				read is to read keyboard buffer(which we had alreadly in our code) into 
 				termial buffer, so we create another terminal buffer and let write to 
 				use the static buffer to get what user had input.
 Fix:			After checkpoint 2 demo, we immediately fixed the problem with add a while

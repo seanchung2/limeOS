@@ -7,6 +7,7 @@
 #include "system_wrapper.h"
 #include "keyboard.h"
 #include "rtc.h"
+#include "pit.h"
 
 /* Define variables */
 #define SYSTEM_CALL_VEC_NUM 		0x80
@@ -179,5 +180,6 @@ void R_handler();
 
 /* initialize the IDT */
 extern void init_idt();
+void P_handler();
 
 #endif
