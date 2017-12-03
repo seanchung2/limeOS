@@ -9,10 +9,11 @@
 #include "keyboard.h"
 
 /* Define variables */
-#define SYSTEM_CALL_VEC_NUM 0x80
-#define EXCEPTION_DEFINED_BY_INTEL 0x20 
-#define KEYBOARD_VEC_NUM 0x21
-#define RTC_VEC_NUM 0x28
+#define SYSTEM_CALL_VEC_NUM 		0x80
+#define EXCEPTION_DEFINED_BY_INTEL 	0x20
+#define PIT_VEC_NUM 				0x20 //IRQ0 
+#define KEYBOARD_VEC_NUM 			0x21 //IRQ1
+#define RTC_VEC_NUM 				0x28 //IRQ8
 
 /* Define the handler for undefined interrupt
  * Inputs: none

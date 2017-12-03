@@ -74,6 +74,9 @@ void init_idt()
 
 	/* set rtc handler to the entry */
 	SET_IDT_ENTRY(idt[RTC_VEC_NUM], R_handler);
+
+	/* set pit handler to the entry */
+	SET_IDT_ENTRY(idt[PIT_VEC_NUM], P_handler);
 	
 }
 
@@ -139,4 +142,32 @@ void R_handler()
 void rtc_linker()  {
 	RTC_handler();
 	return;
+}
+
+/* 
+ * P_handler
+ * a wrapper to map idt table to PIT_handler
+ * Inputs: none
+ * Outputs: none
+ */
+void P_handler()
+{
+	asm volatile (	"pushl	%ebp;"
+					"movl	%ebp,%esp;"
+					"pushl	%ebx;"	
+					"pushl	%esi;"
+					"pushl	%edi;"
+						"pushl	%eax;"
+						"pushl	%ecx;"
+						"pushl	%edx;"
+							"call 	PIT_handler;"
+						"popl	%edx;"
+						"popl	%ecx;"
+						"popl	%eax;"
+					"popl	%edi;"
+					"popl	%esi;"
+					"popl	%ebx;"
+					"leave;"
+					"iret;"
+									);
 }
