@@ -1,5 +1,9 @@
+#ifndef PIT_H
+#define PIT_H
+
 #include "lib.h"
 #include "i8259.h"
+#include "sched.h"
 
 /*
 Programmable Interval Timer: A system clock is used to accurately schedule a new process
@@ -40,3 +44,5 @@ void intitalize_PIT();
  * Side Effects: As description
  */
 void PIT_handler();
+
+#endif

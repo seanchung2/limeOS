@@ -33,5 +33,6 @@ void intitalize_PIT(){
 void PIT_handler(){
     send_eoi(PIT_IRQ);
     //IF ANY OF THE TWO OUT OF THREE TERMINALS RUNNING WE NEED TO DO SWITCH(in scheduling)
+    task_switch();
     return;
 }

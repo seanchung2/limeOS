@@ -348,6 +348,8 @@ int32_t execute (const uint8_t* command){
 int32_t read (int32_t fd, void* buf, int32_t nbytes)
 {
 	int ret;
+	//int tty_save;
+
 	/* fetch the pcb in current process */
 	pcb_t * pcb = (pcb_t *)(KERNEL_BOT_ADDR - (current_pid+1) * EIGHT_KB);
 
@@ -359,8 +361,14 @@ int32_t read (int32_t fd, void* buf, int32_t nbytes)
 	if (pcb->fd_entry[fd].flags == FREE)
 		return -1;
 
+	//tty_save = terminal_num;
+	//terminal_num = get_tty();
+
 	/* call the file's read function */
 	ret = (*pcb->fd_entry[fd].operations_pointer[READ])(fd,buf,nbytes);
+
+	//terminal_num = tty_save;
+
 	return ret;
 }
 
@@ -394,6 +402,7 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 	if (pcb->fd_entry[fd].flags == FREE)
 		return -1;
 
+	cli();
 	tty_save = terminal_num;
 	terminal_num = get_tty();
 
@@ -401,6 +410,7 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 	ret = (*pcb->fd_entry[fd].operations_pointer[WRITE])(fd,buf,nbytes);
 
 	terminal_num = tty_save;
+	sti();
 
 	return ret;
 }

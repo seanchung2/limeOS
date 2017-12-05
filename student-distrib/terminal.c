@@ -31,16 +31,16 @@ int32_t terminal_read(int32_t fd, void* buf, int32_t nbytes)
 		return -1;
 
 	int i = 0;
-	t_enter_flag[terminal_num] = 0;
-	(command_buf)[terminal_num][0] = '\0';
+	t_enter_flag[get_tty()] = 0;
+	(command_buf)[get_tty()][0] = '\0';
 
-	while(!t_enter_flag[terminal_num]);
+	while(!t_enter_flag[get_tty()]);
 
 	while(1)
 	{
-		((int8_t*)buf)[i] = (command_buf)[terminal_num][i];
+		((int8_t*)buf)[i] = (command_buf)[get_tty()][i];
 		
-		if((command_buf)[terminal_num][i] == '\n')
+		if((command_buf)[get_tty()][i] == '\n')
 			break;
 		i++;
 	}
