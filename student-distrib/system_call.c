@@ -136,6 +136,9 @@ int32_t halt_256(uint32_t status){
 		execute((uint8_t*)"shell");
 	}
 	current_pid = pcb_halt->parent_id;
+
+	execute_pid[get_tty()] = current_pid;
+
 	//restore parent paging
 	page_table_t* PDT = (page_table_t*)PDT_addr;
 	PDT->entries[PROGRAM_PDT_INDEX] = (KERNEL_BOT_ADDR + (FOUR_MB*current_pid)) | PROGRAM_PROPERTIES;
@@ -288,6 +291,8 @@ int32_t execute (const uint8_t* command){
 
 	pcb_t *new_process = setup_PCB(new_pid);
 	current_pid = new_pid;
+
+	execute_pid[terminal_num] = current_pid;
 
 	uint32_t reg_esp;//Kernel stack pointer stored
 	uint32_t reg_ebp; 

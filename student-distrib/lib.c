@@ -6,6 +6,7 @@
 
 int screen_x[3];
 int screen_y[3];
+int execute_pid[3] = {-1,-1,-1};
 
 char* video_mem[3] = {(char *)VIDEO, (char *)VID_BACKUP_2, (char *)VID_BACKUP_3};
 

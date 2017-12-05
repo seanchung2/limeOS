@@ -1,9 +1,9 @@
 #include "sched.h"
 
 static int terminals_initialized = 0;
+int pit_terminal_num = 0;
 
 void task_switch()  {
-	int i;
 	uint32_t reg_esp;
 	uint32_t reg_ebp;
 
@@ -49,38 +49,36 @@ void task_switch()  {
 		terminal_num = 0;
 		terminals_initialized = 0;
 	}
+	pit_terminal_num = (pit_terminal_num+1)%3;
 
-	for(i = 1; i <= MAX_PID; i++)  {
-		if(pid_flags[(i+current_pid) % MAX_PID] == IN_USE)  {
-			current_pid = (current_pid + i) % MAX_PID;
-			pcb_t* pcb_next = (pcb_t*)(KERNEL_BOT_ADDR - EIGHT_KB * (current_pid + 1));
+	current_pid = execute_pid[pit_terminal_num];
+	pcb_t* pcb_next = (pcb_t*)(KERNEL_BOT_ADDR - EIGHT_KB * (current_pid + 1));
 
-			page_table_t* PDT = (page_table_t*)PDT_addr;
-			PDT->entries[PROGRAM_PDT_INDEX] = (KERNEL_BOT_ADDR + (FOUR_MB*current_pid)) | PROGRAM_PROPERTIES;
+	page_table_t* PDT = (page_table_t*)PDT_addr;
+	PDT->entries[PROGRAM_PDT_INDEX] = (KERNEL_BOT_ADDR + (FOUR_MB*current_pid)) | PROGRAM_PROPERTIES;
 
-			asm volatile (	"movl %%CR3, %%eax;"	
-							"andl $0xFFF, %%eax;"
-							"addl %0, %%eax;"
-							"movl %%eax, %%CR3;"
-								:
-								: "r" (PDT_addr)
-								: "eax", "cc"
-							);
+	asm volatile (	"movl %%CR3, %%eax;"	
+					"andl $0xFFF, %%eax;"
+					"addl %0, %%eax;"
+					"movl %%eax, %%CR3;"
+						:
+						: "r" (PDT_addr)
+						: "eax", "cc"
+					);
 
-			tss.ss0 = KERNEL_DS;
-			tss.esp0 = pcb_next->sched_esp0;
+	tss.ss0 = KERNEL_DS;
+	tss.esp0 = pcb_next->sched_esp0;
 
-			reg_ebp = pcb_next->sched_ebp;
-			reg_esp = pcb_next->sched_esp;
-			asm volatile (	"movl %0, %%esp;"
-							"movl %1, %%ebp;"
-								:
-								: "g" (reg_esp),
-								  "g" (reg_ebp)
-							);
+	reg_ebp = pcb_next->sched_ebp;
+	reg_esp = pcb_next->sched_esp;
+	asm volatile (	"movl %0, %%esp;"
+					"movl %1, %%ebp;"
+						:
+						: "g" (reg_esp),
+						  "g" (reg_ebp)
+					);
 
-			sti();
-			return;
-		}
-	}
+	sti();
+	return;
 }
+
