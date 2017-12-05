@@ -185,7 +185,9 @@ int32_t halt_256(uint32_t status){
 */
 int32_t execute (const uint8_t* command){	
 	//Null check of cmd
+	cli();
 	if(command == NULL){
+		sti();
 		return -1;
 	}
 
@@ -232,15 +234,18 @@ int32_t execute (const uint8_t* command){
 	//Executable check
 	dentry_t program;
 	if(read_dentry_by_name((uint8_t*) file_name, &program) == -1){
+		sti();
 		return -1;
 	}
 
 	if(read_data(program.inode_number, 0, buffer, BUF_SIZE) == -1){
+		sti();
 		return -1;
 	}
 
 	//String comparison between buf and magic numbers to make sure that file is executable or not
 	if(strncmp((int8_t*)buffer, (int8_t*)magic_number, BUF_SIZE) != 0){
+		sti();
 		return -1;
 	}
 
@@ -255,6 +260,7 @@ int32_t execute (const uint8_t* command){
 	}
 	//If no pid available
 	if(i >= MAX_PID)  {
+		sti();
 		return -1;
 	}
 	pid_flags[i] = 1;
@@ -292,8 +298,6 @@ int32_t execute (const uint8_t* command){
 	pcb_t *new_process = setup_PCB(new_pid);
 	current_pid = new_pid;
 
-	execute_pid[terminal_num] = current_pid;
-
 	uint32_t reg_esp;//Kernel stack pointer stored
 	uint32_t reg_ebp; 
 	asm volatile (	"movl %%esp, %0;"
@@ -319,6 +323,8 @@ int32_t execute (const uint8_t* command){
 	uint32_t stack_pointer = VIRTUAL_BLOCK_BOTTOM - 1;
 	uint32_t stack_segment = USER_DS;
 
+	execute_pid[terminal_num] = current_pid;
+	sti();
 	asm volatile (	"pushl %3;"
 					"pushl %2;"
 					"pushfl;"

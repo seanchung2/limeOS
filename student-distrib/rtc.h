@@ -6,6 +6,7 @@
 #define _RTC_H
 
 #include "types.h"
+#include "lib.h"
 
 /*Definitions for RTC*/
 #define RTC_REG_A			0x8A

@@ -6,7 +6,7 @@
 #include "rtc.h"
 #include "lib.h"
 
-volatile int rtc_interrupt_occured = 1;
+volatile int rtc_interrupt_occured[3] = {1,1,1};
 
 /* initialize_RTC
  *
@@ -85,8 +85,8 @@ int32_t open_RTC(const uint8_t* filename){
  * Side Effects: As description
  */
 int32_t read_RTC(int32_t fd, void* buf, int32_t nbytes){
-	rtc_interrupt_occured = 1; //set it to 1, active low methodology followed everywhere
-	while (rtc_interrupt_occured == 1){//like a spin lock
+	rtc_interrupt_occured[get_tty()]= 1; //set it to 1, active low methodology followed everywhere
+	while (rtc_interrupt_occured[get_tty()] == 1){//like a spin lock
 	}
 	return 0;
 }
@@ -131,7 +131,9 @@ int32_t close_RTC(int32_t fd){
  */
 void RTC_handler(){
 	int8_t garbage;
-	rtc_interrupt_occured = 0;
+	rtc_interrupt_occured[0] = 0;
+	rtc_interrupt_occured[1] = 0;
+	rtc_interrupt_occured[2] = 0;
 	outb(RTC_REG_C, RTC_PORT);
     garbage = inb(COMS_PORT);
     send_eoi(RTC_EOI);

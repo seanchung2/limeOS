@@ -18,7 +18,6 @@ void task_switch()  {
 	pcb_current->sched_esp0 = tss.esp0;
 
 	if(pid_flags[0] == FREE)  {
-		printf("starting terminal 0\n");
 		current_pid = 0;
 		terminal_num = 0;
 		send_eoi(0);
@@ -27,7 +26,6 @@ void task_switch()  {
 	}
 
 	if(pid_flags[1] == FREE)  {
-		printf("starting terminal 1\n");
 		current_pid = 1;
 		terminal_num = 1;
 		send_eoi(0);
@@ -36,7 +34,6 @@ void task_switch()  {
 	}
 
 	if(pid_flags[2] == FREE)  {
-		printf("starting terminal 2\n");
 		current_pid = 2;
 		terminal_num = 2;
 		send_eoi(0);
@@ -77,7 +74,7 @@ void task_switch()  {
 						: "g" (reg_esp),
 						  "g" (reg_ebp)
 					);
-
+	update_cursor(screen_x[terminal_num], screen_y[terminal_num]);
 	sti();
 	return;
 }
