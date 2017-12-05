@@ -179,9 +179,7 @@ void entry(unsigned long magic, unsigned long addr) {
     /* Run tests */
     //launch_tests();
 #endif
-    sti();
     /* Execute the first program ("shell") ... */
-    execute((uint8_t*)"shell");
 
     //hello
     /* Spin (nicely, so we don't chew up cycles) */

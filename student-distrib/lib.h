@@ -85,7 +85,10 @@ typedef struct process_control_block  {
     uint32_t return_instruction;
     uint32_t kernel_stack;
     uint32_t parent_esp0;
-    uint8_t args[MAX_LENGTH_ARG]; 
+    uint8_t args[MAX_LENGTH_ARG];
+    uint32_t sched_ebp;
+    uint32_t sched_esp;
+    uint32_t sched_esp0;
     uint8_t tty;
 } pcb_t;
 
