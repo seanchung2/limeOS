@@ -55,18 +55,6 @@ void task_switch()  {
 			current_pid = (current_pid + i) % MAX_PID;
 			pcb_t* pcb_next = (pcb_t*)(KERNEL_BOT_ADDR - EIGHT_KB * (current_pid + 1));
 
-			reg_ebp = pcb_next->sched_ebp;
-			reg_esp = pcb_next->sched_esp;
-			asm volatile (	"movl %0, %%esp;"
-							"movl %1, %%ebp;"
-								:
-								: "g" (reg_esp),
-								  "g" (reg_ebp)
-							);
-
-			tss.ss0 = KERNEL_DS;
-			tss.esp0 = pcb_next->sched_esp0;
-
 			page_table_t* PDT = (page_table_t*)PDT_addr;
 			PDT->entries[PROGRAM_PDT_INDEX] = (KERNEL_BOT_ADDR + (FOUR_MB*current_pid)) | PROGRAM_PROPERTIES;
 
@@ -77,6 +65,18 @@ void task_switch()  {
 								:
 								: "r" (PDT_addr)
 								: "eax", "cc"
+							);
+
+			tss.ss0 = KERNEL_DS;
+			tss.esp0 = pcb_next->sched_esp0;
+
+			reg_ebp = pcb_next->sched_ebp;
+			reg_esp = pcb_next->sched_esp;
+			asm volatile (	"movl %0, %%esp;"
+							"movl %1, %%ebp;"
+								:
+								: "g" (reg_esp),
+								  "g" (reg_ebp)
 							);
 
 			sti();
