@@ -135,13 +135,6 @@ void R_handler()
 					"iret;"
 									);
 }
-//test_interrupts
-//RTC_handler
-
-void rtc_linker()  {
-	RTC_handler();
-	return;
-}
 
 /* 
  * P_handler

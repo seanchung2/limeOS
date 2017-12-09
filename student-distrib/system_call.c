@@ -372,9 +372,6 @@ int32_t read (int32_t fd, void* buf, int32_t nbytes)
 	if (pcb->fd_entry[fd].flags == FREE)
 		return -1;
 
-	//tty_save = terminal_num;
-	//terminal_num = get_tty();
-
 	/* call the file's read function */
 	ret = (*pcb->fd_entry[fd].operations_pointer[READ])(fd,buf,nbytes);
 

@@ -189,7 +189,7 @@ void putc(uint8_t c) {
         screen_x[terminal_num] %= NUM_COLS;
     }
 
-    /*test*/
+    /* update cursor */
     update_cursor(screen_x[terminal_num], screen_y[terminal_num]);
 }
 
@@ -504,12 +504,6 @@ void test_interrupts(void) {
     RTC_handler();
 }
 
-
-//write new RTC handler
-
-
-
-
 /* void reset_screen(void)
  * move the screen pointer back to 0,0
  * Inputs: void
@@ -520,7 +514,7 @@ void reset_screen(void)  {
     screen_x[terminal_num] = 0;
     screen_y[terminal_num] = 0;
 
-    /*test*/
+    /* update cursor */
     update_cursor(screen_x[terminal_num], screen_y[terminal_num]);
 }
 
@@ -546,7 +540,7 @@ void backspace_pressed(){
     *(uint8_t *)(video_mem[terminal_num] + ((NUM_COLS * screen_y[terminal_num] + screen_x[terminal_num]) << 1) + 1) = ATTRIB;
 
 
-    /*TEST*/
+    /* updat the cursor */
     update_cursor(screen_x[terminal_num], screen_y[terminal_num]);
 }
 

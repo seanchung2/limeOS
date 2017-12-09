@@ -193,15 +193,7 @@ void defaultKeyPressed (uint8_t c)
 		return;
 	}
 
-	/* if CTRL+C is pressed, halt the program that is currently running */
-	
-	/*if (ctrl_flag ==1 && (scancodeTable[index][c] == 'c' || scancodeTable[index][c] == 'C')){
-		sti();
-		halt_256(256);
-		buf_index[terminal_num] = -1;
-		return;
-	}*/
-
+	/* find the character for this scancode */
 	if(scancodeTable[index][c] != '\0')
 	{
 		if(buf_index[terminal_num] < CHARACTER_BUFFER_SIZE-2)

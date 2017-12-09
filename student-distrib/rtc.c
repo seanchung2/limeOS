@@ -16,7 +16,6 @@ volatile int rtc_interrupt_occured[3] = {1,1,1};
  * Side Effects: As description
  */
 void initialize_RTC(){
-	//cli();
 
 	uint8_t regB = 0x00;//Register B of RTC
 	outb(RTC_REG_B, RTC_PORT);
@@ -24,7 +23,6 @@ void initialize_RTC(){
 	regB = regB | 0x40;//This turns on bit 6
 	outb(RTC_REG_B, RTC_PORT);
 	outb(regB, COMS_PORT);
-	//sti();
 
 	enable_irq(2);
 	enable_irq(8);
@@ -118,7 +116,6 @@ int32_t write_RTC(int32_t fd, const void* buf, int32_t nbytes){
  * Side Effects: As description
  */
 int32_t close_RTC(int32_t fd){
-	//changeFreq_RTC(RTC_DEFAULT_FREQ);	//as RTC interrupts should remain open all the times, therefore we set the rate back to 2.
 	return 0;//success
 }
 
