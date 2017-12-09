@@ -11,7 +11,6 @@
 
 /* self-defined variables */
 extern int RTC_STATUS;              // for test
-#define COLOR_SCREEN 7              // for text color when rtc disabled
 #define SCROLL_ENTER_PRESSED    1   // for shifting the screen
 #define SCROLL_LAST_LETTER      2   // for shifting the screen
 #define VIDEO           0xB8000
@@ -78,19 +77,17 @@ typedef struct fd_entry  {
 /* structure for PCB */
 typedef struct process_control_block  {
     fd_entry_t fd_entry[8];
-    uint32_t process_id;
-    uint32_t parent_id;
-    uint32_t parent_esp;
-    uint32_t parent_ebp;
-    uint32_t return_value;
-    uint32_t return_instruction;
-    uint32_t kernel_stack;
-    uint32_t parent_esp0;
-    uint8_t args[MAX_LENGTH_ARG];
-    uint32_t sched_ebp;
-    uint32_t sched_esp;
-    uint32_t sched_esp0;
-    uint8_t tty;
+    uint32_t process_id;                // pid of this pcb
+    uint32_t parent_id;                 // pid of the parent process of this pcb 
+    uint32_t parent_esp;                // parent's esp (used to restore esp when halt this process)
+    uint32_t parent_ebp;                // parent's ebp (used to restore esp when halt this process)
+    uint32_t return_value;              // used to store the return value
+    uint32_t parent_esp0;               // parent's esp0 (used to restore esp when halt this process)
+    uint8_t args[MAX_LENGTH_ARG];       // store the arguments from the terminal input
+    uint32_t sched_ebp;                 // used to store/restore ebp using in task switching 
+    uint32_t sched_esp;                 // used to store/restore esp using in task switching
+    uint32_t sched_esp0;                // used to store/restore esp0 using in task switching
+    uint8_t tty;                        // the terminal number currently on the screen
 } pcb_t;
 
 /* Port read functions */

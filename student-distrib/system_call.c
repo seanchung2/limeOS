@@ -311,7 +311,6 @@ int32_t execute (const uint8_t* command){
 	new_process->parent_esp0 = tss.esp0;
 	tss.ss0 = KERNEL_DS;
 	tss.esp0 = (KERNEL_BOT_ADDR - ((new_pid) * EIGHT_KB)) - 1;
-	new_process->kernel_stack = (KERNEL_BOT_ADDR - ((new_pid) * EIGHT_KB)) - 1;
 
 	/* copy args to pcb */
 	if(local_arg_start_flag)
@@ -371,9 +370,6 @@ int32_t read (int32_t fd, void* buf, int32_t nbytes)
 	/* if the fd is not in used, then return -1 */
 	if (pcb->fd_entry[fd].flags == FREE)
 		return -1;
-
-	//tty_save = terminal_num;
-	//terminal_num = get_tty();
 
 	/* call the file's read function */
 	ret = (*pcb->fd_entry[fd].operations_pointer[READ])(fd,buf,nbytes);

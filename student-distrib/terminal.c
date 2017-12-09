@@ -104,18 +104,11 @@ int32_t terminal_close(int32_t fd)
 }
 
 /*
- * void set_terminal_num(int i)
- * change the terminal number
- * input: i - terminal number
+ * void terminal_switch(int new_tty)
+ * switch the current terminal on screen to the new (based on new_tty) one
+ * input: new_tty - new terminal number
  * output: none
  */
-void set_terminal_num(int i)
-{
-	terminal_num = i;
-}
-
-/*
-*/
 void terminal_switch(int new_tty)
 {
 	page_table_t* PT1 = (page_table_t*)PT1_addr;
@@ -125,14 +118,17 @@ void terminal_switch(int new_tty)
 	/* copy backup to video memory */
 	memcpy((void*)VIDEO_MEMORY, (void *)backup_mem_addr[new_tty], FOUR_KB);
 
+	/* change the video memory to the new terminal on screen */
 	video_mem[terminal_num] = (char*)backup_mem_addr[terminal_num];
 	video_mem[new_tty] = (char*)VIDEO_MEMORY;
 
+	/* change the page table for the new terminal */
 	PT1->entries[terminal_num] = VID_MEM_BACKUP[terminal_num];
 	PT1->entries[new_tty] = USER_VID_MEM_ENTRY;
 
 	terminal_num = new_tty;
 
+	/* flush TLB*/
 	asm volatile (	"movl %%CR3, %%eax;"	
 					"andl $0xFFF, %%eax;"
 					"addl %0, %%eax;"

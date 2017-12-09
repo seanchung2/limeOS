@@ -1,6 +1,8 @@
 #include "paging.h"
 
+// for backup video memory, store in 185*4k, 186*4k, 187*4k
 int VID_MEM_BACKUP[3] = {0xB9007, 0xBA007, 0xBB007};
+const int KERNEL_VID_MEM_BACKUP[3] = {0xB9003, 0xBA003, 0xBB003};
 
 // Page Descriptor Table struct
 static page_table_t PDT __attribute__( (aligned(FOUR_KB)) );
@@ -47,13 +49,15 @@ void init_paging()  {
 	PT0.entries[VID_MEM_INDEX] = VID_MEM_ENTRY;
 
 	// 3 pages for t1 t2 t3 at 100MB 100MB+4KB 100MB+8KB (virtual memory)
-	PT0.entries[VID_MEM_INDEX+1] = KERNEL_VID_MEM_BACKUP_1;
-	PT0.entries[VID_MEM_INDEX+2] = KERNEL_VID_MEM_BACKUP_2;
-	PT0.entries[VID_MEM_INDEX+3] = KERNEL_VID_MEM_BACKUP_3;
-	PT1.entries[0] = USER_VID_MEM_ENTRY;
-	PT1.entries[1] = VID_MEM_BACKUP_2;
-	PT1.entries[2] = VID_MEM_BACKUP_3;
-
+	for(i=1; i<=3; i++)
+	{
+		PT0.entries[VID_MEM_INDEX+i] = KERNEL_VID_MEM_BACKUP[i-1];
+		if(i == 1)
+			PT1.entries[i-1] = USER_VID_MEM_ENTRY;
+		else
+			PT1.entries[i-1] = VID_MEM_BACKUP[i-1];
+	}
+	
 	// Set top bits of CR3 to address of Page Descriptor Table
 	asm volatile (	"movl %%CR3, %%eax;"	
 					"andl $0xFFF, %%eax;"

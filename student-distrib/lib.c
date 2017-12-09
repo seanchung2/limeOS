@@ -7,6 +7,7 @@
 int screen_x[3];
 int screen_y[3];
 int execute_pid[3] = {-1,-1,-1};
+const int SCREEN_COLOR[3] = {0x9,0xA,0xC};
 
 char* video_mem[3] = {(char *)VIDEO, (char *)VID_BACKUP_2, (char *)VID_BACKUP_3};
 
@@ -189,7 +190,7 @@ void putc(uint8_t c) {
         screen_x[terminal_num] %= NUM_COLS;
     }
 
-    /*test*/
+    /* update cursor */
     update_cursor(screen_x[terminal_num], screen_y[terminal_num]);
 }
 
@@ -493,7 +494,7 @@ void test_interrupts(void) {
             video_mem[terminal_num][(i << 1) + 1]++;
         }
         else {
-            video_mem[terminal_num][(i << 1) + 1] = COLOR_SCREEN;
+            video_mem[terminal_num][(i << 1) + 1] = SCREEN_COLOR[terminal_num];
         }
     }
     outb(0x0C, 0x70);
@@ -503,12 +504,6 @@ void test_interrupts(void) {
 
     RTC_handler();
 }
-
-
-//write new RTC handler
-
-
-
 
 /* void reset_screen(void)
  * move the screen pointer back to 0,0
@@ -520,7 +515,7 @@ void reset_screen(void)  {
     screen_x[terminal_num] = 0;
     screen_y[terminal_num] = 0;
 
-    /*test*/
+    /* update cursor */
     update_cursor(screen_x[terminal_num], screen_y[terminal_num]);
 }
 
@@ -546,7 +541,7 @@ void backspace_pressed(){
     *(uint8_t *)(video_mem[terminal_num] + ((NUM_COLS * screen_y[terminal_num] + screen_x[terminal_num]) << 1) + 1) = ATTRIB;
 
 
-    /*TEST*/
+    /* updat the cursor */
     update_cursor(screen_x[terminal_num], screen_y[terminal_num]);
 }
 
@@ -561,6 +556,14 @@ void update_cursor(int x, int y)
 {
     uint16_t pos = y * NUM_COLS + x;
  
+    /*test*/
+    int i;
+    for (i = 0; i < NUM_ROWS * NUM_COLS; i++) {
+        video_mem[terminal_num][(i << 1) + 1] = SCREEN_COLOR[terminal_num];
+    }
+    outb(0x0C, 0x70);
+    inb(0x71);
+
     /* cursor low port to VGA index register */
     outb(CUR_LPORT, VGA_INDEX_REG);
     /* cursor low position to VGA data register */

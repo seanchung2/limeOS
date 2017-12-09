@@ -27,9 +27,6 @@ extern int32_t terminal_open(const uint8_t* filename);
 /* do nothing for now */
 extern int32_t terminal_close(int32_t fd);
 
-/* set the terminal number */
-extern void set_terminal_num(int i);
-
 extern void terminal_switch(int new_tty);
 
 #endif /* _TERMINAL_H */

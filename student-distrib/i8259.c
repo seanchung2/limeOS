@@ -38,10 +38,6 @@ void i8259_init(void) {
 	//setting the protocols and EOI signal
 	outb(ICW4, MASTER_8259_PORT + 1);
 	outb(ICW4, SLAVE_8259_PORT + 1);
-
-	//SAVING THE MASKS
-	//master_mask = inb(MASTER_8259_PORT + 1);
-	//slave_mask = inb(SLAVE_8259_PORT + 1);
 }
 
 /* enable_irq
