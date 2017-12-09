@@ -50,13 +50,15 @@ void task_switch()  {
 	/* increment the "pit_terminal_num" by one to know which terminal should switch to */
 	pit_terminal_num = (pit_terminal_num+1)%3;
 
-	/**/
+	/* find out the next pid number to be executed in the array "execute_pid" */
 	current_pid = execute_pid[pit_terminal_num];
 	pcb_t* pcb_next = (pcb_t*)(KERNEL_BOT_ADDR - EIGHT_KB * (current_pid + 1));
 
+	/* change the page table to fit the next task */
 	page_table_t* PDT = (page_table_t*)PDT_addr;
 	PDT->entries[PROGRAM_PDT_INDEX] = (KERNEL_BOT_ADDR + (FOUR_MB*current_pid)) | PROGRAM_PROPERTIES;
 
+	/* flush TLB*/
 	asm volatile (	"movl %%CR3, %%eax;"	
 					"andl $0xFFF, %%eax;"
 					"addl %0, %%eax;"
@@ -66,9 +68,11 @@ void task_switch()  {
 						: "eax", "cc"
 					);
 
+	/* set the next task's esp0 in tss */
 	tss.ss0 = KERNEL_DS;
 	tss.esp0 = pcb_next->sched_esp0;
 
+	/* restore esp and ebp for the next task*/
 	reg_ebp = pcb_next->sched_ebp;
 	reg_esp = pcb_next->sched_esp;
 	asm volatile (	"movl %0, %%esp;"
@@ -77,7 +81,10 @@ void task_switch()  {
 						: "g" (reg_esp),
 						  "g" (reg_ebp)
 					);
+
+	/* update the cursor */
 	update_cursor(screen_x[terminal_num], screen_y[terminal_num]);
+
 	sti();
 	return;
 }
