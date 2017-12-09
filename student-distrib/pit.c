@@ -7,7 +7,7 @@ and allow the current task to wait for a certain period of time.
 
 /* initialize_PIT
  *
- * Description: Initialize the PIT
+ * Description: Initializes the PIT
  * Inputs: None
  * Outputs: None
  * Side Effects: As description
@@ -25,7 +25,7 @@ void intitalize_PIT(){
 
 /* PIT_handler
  *
- * Description: 
+ * Description: PIT handler; task_switch() called here
  * Inputs: None
  * Outputs: None
  * Side Effects: As description

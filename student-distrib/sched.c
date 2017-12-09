@@ -5,7 +5,7 @@ int pit_terminal_num = 0;
 
 /* task_switch
  *
- * Description: do the task switch
+ * Description: Do the task switching
  * Inputs: None
  * Outputs: None
  * Side Effects: Page table changed
@@ -28,14 +28,14 @@ void task_switch()  {
 	pcb_current->sched_esp0 = tss.esp0;
 
 	/* if there is no process in the first terminal, start a shell */
-	for(i=0; i<3; i++)
+	for(i = 0; i < TERMINAL_COUNT; i++)
 		if(pid_flags[i] == FREE)  {
 			current_pid = i;
 			terminal_num = i;
-			send_eoi(0);
+			send_eoi(PIT_IRQ);
 			sti();
 
-			if(i == 2) //last terminal to start
+			if(i == TERMINAL_COUNT - 1) //last terminal to start
 				terminals_initialized = 1;
 
 			execute((uint8_t*)"shell");
@@ -48,7 +48,7 @@ void task_switch()  {
 	}
 
 	/* increment the "pit_terminal_num" by one to know which terminal should switch to */
-	pit_terminal_num = (pit_terminal_num+1)%3;
+	pit_terminal_num = (pit_terminal_num+1)%TERMINAL_COUNT;
 
 	/**/
 	current_pid = execute_pid[pit_terminal_num];
