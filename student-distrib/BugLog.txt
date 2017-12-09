@@ -67,3 +67,13 @@ Fix:			We clear the buffer where we store the argument in the PCB after we copy 
 
 CHECKPOINT 5:
 *************
+
+BUG 1:			"scheduling with page faults occur"
+Description:	When we start the scheduler, page fault will happen immediately.
+Fix:			We found out that we retrieved and stored the data in some local variables from PCB
+				before the context switching, then used those variables to restore ebp and esp. Local variables may be messed up when doing context switch so we changed the order and this bug resolved.
+
+BUG 2:			"Pingpong/fish lagging"
+Description:	Pingpong/fish starts to be lagging when another fish/pingpong starts running.
+Fix:			Instead of sharing one flage, we added another two flags in rtc.c
+				in order to distinguish different processes; that is, process in first terminal will and can only detect the first flag, and the bug fixed as a result.
