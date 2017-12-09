@@ -59,7 +59,7 @@ pcb_t* setup_PCB (int32_t new_pid)
 {
 	int i,j;
 	/* fetch the pcb in current process */
-	if(new_pid <0 || new_pid > MAX_PID)
+	if(new_pid < 0 || new_pid > MAX_PID)
 		return (pcb_t*)-1;
 
 	pcb_t * pcb = (pcb_t *)(KERNEL_BOT_ADDR - (new_pid+1) * EIGHT_KB);
@@ -548,19 +548,21 @@ int32_t close (int32_t fd)
 	/* free the current PCB block */
 	for(i=0;i<4;i++)
 		pcb->fd_entry[fd].operations_pointer[i] = NULL;
+
 	pcb->fd_entry[fd].inode_index = -1;
 	pcb->fd_entry[fd].file_position = -1;
 	pcb->fd_entry[fd].flags = FREE;
 
 	return 0;
 }
-
-/*
- * getargs (uint8_t * buf , int32_t nbytes)
- * handle system call "getargs"
- * input: none
- * output: 
- * side effect: as description
+/* getargs
+ * 
+ * DESCRIPTION:	Handle system call "getargs"
+ * INPUT: 	buf - Buffer which will provide arg 
+ *			nbytes - Number of bytes we want
+ * OUTPUT: 	 0 - Success
+ *			-1 - Error
+ * SIDE EFFECT:	As Description
  */
 int32_t getargs (uint8_t *buf, int32_t nbytes)
 {
@@ -577,13 +579,13 @@ int32_t getargs (uint8_t *buf, int32_t nbytes)
 	(pcb->args)[0] = '\0';
 	return 0;
 }
-
-/*
- * vidmap (uint8_t** screen_start)
- * handle system call "vidmap"
- * input: none
- * output: 0 success; -1 failure
- * side effect: as description
+/* vidmap
+ * 
+ * DESCRIPTION:	Handle system call "vidmap"
+ * INPUT: 	screen_start
+ * OUTPUT: 	 0 - Success
+ *			-1 - Error (If out of bounds)
+ * SIDE EFFECT:	As Description
  */
 int32_t vidmap (uint8_t** screen_start)
 {
@@ -598,23 +600,24 @@ int32_t vidmap (uint8_t** screen_start)
 	return 0;
 }
 
-/*
- * set_handler (int32_t signum, void* handler_address)
- * handle system call "set_handler"
- * input: none
- * output: return -1 for not supporting set_handler
- * side effect: as description
+/* set_handler
+ * 
+ * DESCRIPTION:	Handle system call "set_handler"
+ * INPUT: 	signum
+ 			handler_address
+ * OUTPUT: 	Return -1 for not supporting set_handler
+ * SIDE EFFECT:	As Description
  */
 int32_t set_handler (int32_t signum, void* handler_address){
 	return -1;
 }
 
-/*
- * sigreturn (void)
- * handle system call "sigreturn"
- * input: none
- * output: return -1 for not supporting set_handler
- * side effect: as description
+/* sigreturn
+ * 
+ * DESCRIPTION:	Handle system call "sigreturn"
+ * INPUT: 	None
+ * OUTPUT: 	Return -1 for not supporting sigreturn
+ * SIDE EFFECT:	As Description
  */
 int32_t sigreturn (void){
 	return -1;
