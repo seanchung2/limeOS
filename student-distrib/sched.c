@@ -3,11 +3,21 @@
 static int terminals_initialized = 0;
 int pit_terminal_num = 0;
 
+/* task_switch
+ *
+ * Description: do the task switch
+ * Inputs: None
+ * Outputs: None
+ * Side Effects: Page table changed
+ */
 void task_switch()  {
+	int i;
 	uint32_t reg_esp;
 	uint32_t reg_ebp;
 
 	pcb_t* pcb_current = (pcb_t*)(KERNEL_BOT_ADDR - EIGHT_KB *(current_pid + 1));
+
+	/* store the esp and ebp first */
 	asm volatile (	"movl %%esp, %0;"
 					"movl %%ebp, %1;"
 						: "=g" (reg_esp),
@@ -17,37 +27,30 @@ void task_switch()  {
 	pcb_current->sched_esp = reg_esp;
 	pcb_current->sched_esp0 = tss.esp0;
 
-	if(pid_flags[0] == FREE)  {
-		current_pid = 0;
-		terminal_num = 0;
-		send_eoi(0);
-		sti();
-		execute((uint8_t*)"shell");
-	}
+	/* if there is no process in the first terminal, start a shell */
+	for(i=0; i<3; i++)
+		if(pid_flags[i] == FREE)  {
+			current_pid = i;
+			terminal_num = i;
+			send_eoi(0);
+			sti();
 
-	if(pid_flags[1] == FREE)  {
-		current_pid = 1;
-		terminal_num = 1;
-		send_eoi(0);
-		sti();
-		execute((uint8_t*)"shell");
-	}
+			if(i == 2) //last terminal to start
+				terminals_initialized = 1;
 
-	if(pid_flags[2] == FREE)  {
-		current_pid = 2;
-		terminal_num = 2;
-		send_eoi(0);
-		sti();
-		terminals_initialized = 1;
-		execute((uint8_t*)"shell");
-	}
+			execute((uint8_t*)"shell");
+		}
 
+	/* if three shells in each terminal has started, change the current terminal to default (first) one */
 	if(terminals_initialized)  {
 		terminal_num = 0;
 		terminals_initialized = 0;
 	}
+
+	/* increment the "pit_terminal_num" by one to know which terminal should switch to */
 	pit_terminal_num = (pit_terminal_num+1)%3;
 
+	/**/
 	current_pid = execute_pid[pit_terminal_num];
 	pcb_t* pcb_next = (pcb_t*)(KERNEL_BOT_ADDR - EIGHT_KB * (current_pid + 1));
 
