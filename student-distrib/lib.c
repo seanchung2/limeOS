@@ -7,6 +7,7 @@
 int screen_x[3];
 int screen_y[3];
 int execute_pid[3] = {-1,-1,-1};
+const int SCREEN_COLOR[3] = {0x9,0xA,0xC};
 
 char* video_mem[3] = {(char *)VIDEO, (char *)VID_BACKUP_2, (char *)VID_BACKUP_3};
 
@@ -493,7 +494,7 @@ void test_interrupts(void) {
             video_mem[terminal_num][(i << 1) + 1]++;
         }
         else {
-            video_mem[terminal_num][(i << 1) + 1] = COLOR_SCREEN;
+            video_mem[terminal_num][(i << 1) + 1] = SCREEN_COLOR[terminal_num];
         }
     }
     outb(0x0C, 0x70);
@@ -555,6 +556,14 @@ void update_cursor(int x, int y)
 {
     uint16_t pos = y * NUM_COLS + x;
  
+    /*test*/
+    int i;
+    for (i = 0; i < NUM_ROWS * NUM_COLS; i++) {
+        video_mem[terminal_num][(i << 1) + 1] = SCREEN_COLOR[terminal_num];
+    }
+    outb(0x0C, 0x70);
+    inb(0x71);
+
     /* cursor low port to VGA index register */
     outb(CUR_LPORT, VGA_INDEX_REG);
     /* cursor low position to VGA data register */

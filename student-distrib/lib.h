@@ -11,7 +11,6 @@
 
 /* self-defined variables */
 extern int RTC_STATUS;              // for test
-#define COLOR_SCREEN 7              // for text color when rtc disabled
 #define SCROLL_ENTER_PRESSED    1   // for shifting the screen
 #define SCROLL_LAST_LETTER      2   // for shifting the screen
 #define VIDEO           0xB8000
