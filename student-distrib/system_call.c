@@ -262,7 +262,7 @@ int32_t execute (const uint8_t* command){
 	if(i >= MAX_PID)  {
 		printf("Maximum number of processes reached. Please exit shell. \n");
 		sti();
-		return -1;
+		return  0;
 	}
 	pid_flags[i] = 1;
 	new_pid = i;
