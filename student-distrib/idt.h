@@ -36,6 +36,7 @@ void undefined_interrupt()  {
 // 0 Division Error Handler
 void DE()  {
 	printf(" Divide Error!!!\n");
+	sti();
 	halt_256(256);
 	while(1)  {}
 }
@@ -43,6 +44,7 @@ void DE()  {
 // 1 Reserved Exception Handler
 void DB()  {
 	printf("RESERVED!!!\n");
+	sti();
 	halt_256(256);
 	while(1)  {}
 }
@@ -50,6 +52,7 @@ void DB()  {
 // 2 Non Maskable Interupt Handler
 void NMI()  {
 	printf("Nonmaskable Interrupt Exception!!!\n");
+	sti();
 	halt_256(256);
 	while(1)  {}
 }
@@ -57,6 +60,7 @@ void NMI()  {
 // 3 Breakpoint Exception Handler
 void BP()  {
 	printf("Breakpoint Exception!!!\n");
+	sti();
 	halt_256(256);
 	while(1)  {}
 }
@@ -64,6 +68,7 @@ void BP()  {
 // 4 Overflow Exception Handler
 void OF()  {
 	printf("Overflow Exception!!!\n");
+	sti();
 	halt_256(256);
 	while(1)  {}
 }
@@ -71,6 +76,7 @@ void OF()  {
 // 5 Bound Range Exceeded Exception Handler
 void BR()  {
 	printf("BOUND Range Exceeded Exception!!!\n");
+	sti();
 	halt_256(256);
 	while(1)  {}
 }
@@ -78,6 +84,7 @@ void BR()  {
 // 6 Invalid Opcode Exception Handler
 void UD()  {
 	printf("Invalid Opcode Exception!!!\n");
+	sti();
 	halt_256(256);
 	while(1)  {}
 }
@@ -85,6 +92,7 @@ void UD()  {
 // 7 Device Not Available Exception Handler
 void NM()  {
 	printf("Device Not Available Exception!!!\n");
+	sti();
 	halt_256(256);
 	while(1)  {}
 }
@@ -92,6 +100,7 @@ void NM()  {
 // 8 Double Faut Exception Handler
 void DF()  {
 	printf("Double Fault Exception!!!\n");
+	sti();
 	halt_256(256);
 	while(1)  {}
 }
@@ -99,6 +108,7 @@ void DF()  {
 // 9 Coprocessor Segment Overrun Exception Handler
 void CSO()  {
 	printf("Coprocessor Segment Overrun Exception!!!\n");
+	sti();
 	halt_256(256);
 	while(1)  {}
 }
@@ -106,6 +116,7 @@ void CSO()  {
 // 10 Invalid TSS Exception Handler
 void TS()  {
 	printf("Invalid TSS Exception!!!\n");
+	sti();
 	halt_256(256);
 	while(1)  {}
 }
@@ -113,6 +124,7 @@ void TS()  {
 // 11 Segment Not Preset Exception Handler
 void NP()  {
 	printf("Segment Not Present!!!\n");
+	sti();
 	halt_256(256);
 	while(1)  {}
 }
@@ -120,6 +132,7 @@ void NP()  {
 // 12 Stack-Segment Fault Exception Handler
 void SS()  {
 	printf("Stack-Segment Fault Exception!!!\n");
+	sti();
 	halt_256(256);
 	while(1)  {}
 }
@@ -127,6 +140,7 @@ void SS()  {
 // 13 General Protetion Exception Handler
 void GP()  {
 	printf("General Protection Exception!!!\n");
+	sti();
 	halt_256(256);
 	while(1)  {}
 }
@@ -134,6 +148,7 @@ void GP()  {
 // 14 Page Fault Exception Handler
 void PF()  {
 	printf("Page Fault Exception!!!\n");
+	sti();
 	halt_256(256);
 	while(1)  {}
 }
@@ -141,6 +156,7 @@ void PF()  {
 // 15 Reserved
 void Resr()  {
 	printf("Reserved!!!\n");
+	sti();
 	halt_256(256);
 	while(1)  {}
 }
@@ -148,6 +164,7 @@ void Resr()  {
 // 16 Floating Point Error Exception Handler
 void MF()  {
 	printf("Floating Point Error Exception!!!\n");
+	sti();
 	halt_256(256);
 	while(1)  {}
 }
@@ -155,6 +172,7 @@ void MF()  {
 // 17 Alignment Check Exception Handler
 void AC()  {
 	printf("Alignment Check Exception!!!\n");
+	sti();
 	halt_256(256);
 	while(1)  {}
 }
@@ -162,6 +180,7 @@ void AC()  {
 // 18 Machine Check Exception handler
 void MC()  {
 	printf("Machine Check Exception!!!\n");
+	sti();
 	halt_256(256);
 	while(1)  {}
 }
@@ -169,6 +188,7 @@ void MC()  {
 // 19 SIMD Floatin-Point Exception Handler
 void XF()  {
 	printf("SIMD Floating Point Exception!!!\n");
+	sti();
 	halt_256(256);
 	while(1)  {}
 }

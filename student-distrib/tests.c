@@ -964,7 +964,7 @@ void launch_tests(){
 	//TEST_OUTPUT("Paging Test (KERNEL)", paging_test_kernel());
 	//TEST_OUTPUT("Pagint Test (VIDMEM)", paging_test_vidmem());
 	//TEST_OUTPUT("Paging Value Test", paging_value_test());
-
+	//divide_zero_test();
 
 	/* Checkpoint 2 */
 	//RTC_test();
@@ -979,7 +979,7 @@ void launch_tests(){
 	//read_data_test();
 
 	//TEST_OUTPUT("Open File Test", open_file_test());
-	read_file_test();
+	//read_file_test();
 	//TEST_OUTPUT("Write File Test", write_file_test());
 	//TEST_OUTPUT("Close File Test", close_file_test());
 
@@ -998,9 +998,9 @@ void launch_tests(){
 	//TEST_OUTPUT("close Test", close_test());
 
 	/* Checkpoint 4 */
-	TEST_OUTPUT("getargs Test", getargs_test());
-	TEST_OUTPUT("vidmap Test", vidmap_test());
-	TEST_OUTPUT("set_handler Test", set_handler_test());
-	TEST_OUTPUT("sigreturn Test", sigreturn_test());
+	//TEST_OUTPUT("getargs Test", getargs_test());
+	//TEST_OUTPUT("vidmap Test", vidmap_test());
+	//TEST_OUTPUT("set_handler Test", set_handler_test());
+	//TEST_OUTPUT("sigreturn Test", sigreturn_test());
 }
 

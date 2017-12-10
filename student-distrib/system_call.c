@@ -418,6 +418,8 @@ int32_t write (int32_t fd, const void* buf, int32_t nbytes)
 	ret = (*pcb->fd_entry[fd].operations_pointer[WRITE])(fd,buf,nbytes);
 
 	terminal_num = tty_save;
+	/* update the cursor */
+	update_cursor(screen_x[terminal_num], screen_y[terminal_num]);
 	sti();
 
 	return ret;

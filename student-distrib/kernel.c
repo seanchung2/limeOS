@@ -36,7 +36,7 @@
 void entry(unsigned long magic, unsigned long addr) {
 
     multiboot_info_t *mbi;
-
+    int i;
     /* Clear the screen. */
     clear(0);
 
@@ -173,13 +173,17 @@ void entry(unsigned long magic, unsigned long addr) {
      * IDT correctly otherwise QEMU will triple fault and simple close
      * without showing you any output */
     printf("Enabling Interrupts\n");
-    sti();
+    
+    for (i = 0; i < NUM_ROWS * NUM_COLS; i++) {
+        video_mem[0][(i << 1) + 1] = SCREEN_COLOR[0];
+    }
 
-#ifdef RUN_TESTS
+    #ifdef RUN_TESTS
     /* Run tests */
-    //launch_tests();
-#endif
-    /* Execute the first program ("shell") ... */
+    launch_tests();
+    #endif
+
+    sti();
 
     //hello
     /* Spin (nicely, so we don't chew up cycles) */

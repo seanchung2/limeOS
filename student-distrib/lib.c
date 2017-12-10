@@ -7,8 +7,7 @@
 int screen_x[3];
 int screen_y[3];
 int execute_pid[3] = {-1,-1,-1};
-const int SCREEN_COLOR[3] = {0x9,0xA,0xC};
-
+int SCREEN_COLOR[3] = {0x9,0xA,0xC};
 char* video_mem[3] = {(char *)VIDEO, (char *)VID_BACKUP_2, (char *)VID_BACKUP_3};
 
 /* self-defined variables */
@@ -26,7 +25,7 @@ void clear() {
     int32_t i;
     for (i = 0; i < NUM_ROWS * NUM_COLS; i++) {
         *(uint8_t *)(video_mem[terminal_num] + (i << 1)) = ' ';
-        *(uint8_t *)(video_mem[terminal_num] + (i << 1) + 1) = ATTRIB;
+        *(uint8_t *)(video_mem[terminal_num] + (i << 1) + 1) = SCREEN_COLOR[terminal_num];
     }
 }
 
@@ -183,7 +182,8 @@ void putc(uint8_t c) {
         screen_x[terminal_num] = 0;
     } else {
         *(uint8_t *)(video_mem[terminal_num] + ((NUM_COLS * screen_y[terminal_num] + screen_x[terminal_num]) << 1)) = c;
-        *(uint8_t *)(video_mem[terminal_num] + ((NUM_COLS * screen_y[terminal_num] + screen_x[terminal_num]) << 1) + 1) = ATTRIB;
+        *(uint8_t *)(video_mem[terminal_num] + ((NUM_COLS * screen_y[terminal_num] + screen_x[terminal_num]) << 1) + 1) = SCREEN_COLOR[terminal_num];
+        *(uint8_t *)(video_mem[terminal_num] + (((NUM_COLS * screen_y[terminal_num] + screen_x[terminal_num])+1) << 1) + 1) = SCREEN_COLOR[terminal_num];
         screen_x[terminal_num]++;
 
         screen_y[terminal_num] = (screen_y[terminal_num] + (screen_x[terminal_num] / NUM_COLS)) % NUM_ROWS;
@@ -191,7 +191,7 @@ void putc(uint8_t c) {
     }
 
     /* update cursor */
-    update_cursor(screen_x[terminal_num], screen_y[terminal_num]);
+    //update_cursor(screen_x[terminal_num], screen_y[terminal_num]);
 }
 
 /* int8_t* itoa(uint32_t value, int8_t* buf, int32_t radix);
@@ -555,15 +555,9 @@ void backspace_pressed(){
 void update_cursor(int x, int y)
 {
     uint16_t pos = y * NUM_COLS + x;
- 
-    /*test*/
-    int i;
-    for (i = 0; i < NUM_ROWS * NUM_COLS; i++) {
-        video_mem[terminal_num][(i << 1) + 1] = SCREEN_COLOR[terminal_num];
-    }
-    outb(0x0C, 0x70);
-    inb(0x71);
-
+    
+    if (terminal_num != get_tty())
+        return;
     /* cursor low port to VGA index register */
     outb(CUR_LPORT, VGA_INDEX_REG);
     /* cursor low position to VGA data register */

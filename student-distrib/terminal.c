@@ -139,4 +139,10 @@ void terminal_switch(int new_tty)
 						);
 
 	update_cursor(screen_x[terminal_num], screen_y[terminal_num]);
+	/* change each terminal color */
+    int i;
+    
+    for (i = 0; i < NUM_ROWS * NUM_COLS; i++) {
+        video_mem[terminal_num][(i << 1) + 1] = SCREEN_COLOR[terminal_num];
+    }
 }

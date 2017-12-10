@@ -35,6 +35,7 @@ extern char* video_mem[3];
 extern int screen_x[3];
 extern int screen_y[3];
 extern int execute_pid[3];
+extern int SCREEN_COLOR[3];
 
 int32_t printf(int8_t *format, ...);
 void putc(uint8_t c);
